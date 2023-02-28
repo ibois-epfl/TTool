@@ -4,6 +4,18 @@ project(TTool VERSION "0.1.0" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(BUILD_TSEGMENT_AS_API ON CACHE BOOL "Do not build tsegment exe")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
+
+add_executable(ttool src/main.cc)
+
+
+target_include_directories(ttool PUBLIC deps/TSegment)
+
+
+find_package(OpenCV 4.5.5 REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+target_link_libraries(ttool ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
 # file(GLOB ttool_src
 #     "src/*.cc"

@@ -8,8 +8,15 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
   "../CMakeLists.txt"
+  "CMakeFiles/3.22.1/CMakeCCompiler.cmake"
   "CMakeFiles/3.22.1/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.22.1/CMakeSystem.cmake"
+  "../deps/TSegment/CMakeLists.txt"
+  "/usr/local/lib/cmake/opencv4/OpenCVConfig-version.cmake"
+  "/usr/local/lib/cmake/opencv4/OpenCVConfig.cmake"
+  "/usr/local/lib/cmake/opencv4/OpenCVModules-release.cmake"
+  "/usr/local/lib/cmake/opencv4/OpenCVModules.cmake"
+  "/usr/share/cmake-3.22/Modules/CMakeCInformation.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeCXXInformation.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeGenericSystem.cmake"
@@ -17,16 +24,26 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake"
+  "/usr/share/cmake-3.22/Modules/CPack.cmake"
+  "/usr/share/cmake-3.22/Modules/CPackComponent.cmake"
+  "/usr/share/cmake-3.22/Modules/CheckCSourceCompiles.cmake"
+  "/usr/share/cmake-3.22/Modules/CheckIncludeFile.cmake"
+  "/usr/share/cmake-3.22/Modules/CheckLibraryExists.cmake"
   "/usr/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
+  "/usr/share/cmake-3.22/Modules/Compiler/GNU-C.cmake"
   "/usr/share/cmake-3.22/Modules/Compiler/GNU-CXX.cmake"
   "/usr/share/cmake-3.22/Modules/Compiler/GNU.cmake"
   "/usr/share/cmake-3.22/Modules/FindGit.cmake"
   "/usr/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake"
   "/usr/share/cmake-3.22/Modules/FindPackageMessage.cmake"
+  "/usr/share/cmake-3.22/Modules/FindThreads.cmake"
+  "/usr/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake"
+  "/usr/share/cmake-3.22/Modules/Platform/Linux-GNU-C.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/Linux-GNU-CXX.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/Linux-GNU.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/Linux.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/UnixPaths.cmake"
+  "/usr/share/cmake-3.22/Templates/CPackConfig.cmake.in"
   )
 
 # The corresponding makefile is:
@@ -38,8 +55,12 @@ set(CMAKE_MAKEFILE_OUTPUTS
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "CPackConfig.cmake"
+  "CPackSourceConfig.cmake"
+  "deps/TSegment/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/ttool.dir/DependInfo.cmake"
   )

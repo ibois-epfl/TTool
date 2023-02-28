@@ -68,7 +68,7 @@ CMAKE_BINARY_DIR = /home/as/TTool/build
 # Special rule for the target package
 package: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool..."
-	/usr/bin/cpack --config ./CPackConfig.cmake
+	cd /home/as/TTool/build && /usr/bin/cpack --config ./CPackConfig.cmake
 .PHONY : package
 
 # Special rule for the target package
@@ -78,7 +78,7 @@ package/fast: package
 # Special rule for the target package_source
 package_source:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
-	/usr/bin/cpack --config ./CPackSourceConfig.cmake /home/as/TTool/build/CPackSourceConfig.cmake
+	cd /home/as/TTool/build && /usr/bin/cpack --config ./CPackSourceConfig.cmake /home/as/TTool/build/CPackSourceConfig.cmake
 .PHONY : package_source
 
 # Special rule for the target package_source
@@ -107,14 +107,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/as/TTool/build/CMakeFiles /home/as/TTool/build//CMakeFiles/progress.marks
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
+	cd /home/as/TTool/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/as/TTool/build/CMakeFiles /home/as/TTool/build/deps/TSegment//CMakeFiles/progress.marks
+	cd /home/as/TTool/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 deps/TSegment/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/as/TTool/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean
+	cd /home/as/TTool/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 deps/TSegment/clean
 .PHONY : clean
 
 # The main clean target
@@ -123,55 +123,18 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 preinstall
+	cd /home/as/TTool/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 deps/TSegment/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 preinstall
+	cd /home/as/TTool/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 deps/TSegment/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/as/TTool/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
-
-#=============================================================================
-# Target rules for targets named ttool
-
-# Build rule for target.
-ttool: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ttool
-.PHONY : ttool
-
-# fast build rule for target.
-ttool/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ttool.dir/build.make CMakeFiles/ttool.dir/build
-.PHONY : ttool/fast
-
-src/main.o: src/main.cc.o
-.PHONY : src/main.o
-
-# target to build an object file
-src/main.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ttool.dir/build.make CMakeFiles/ttool.dir/src/main.cc.o
-.PHONY : src/main.cc.o
-
-src/main.i: src/main.cc.i
-.PHONY : src/main.i
-
-# target to preprocess a source file
-src/main.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ttool.dir/build.make CMakeFiles/ttool.dir/src/main.cc.i
-.PHONY : src/main.cc.i
-
-src/main.s: src/main.cc.s
-.PHONY : src/main.s
-
-# target to generate assembly for a file
-src/main.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ttool.dir/build.make CMakeFiles/ttool.dir/src/main.cc.s
-.PHONY : src/main.cc.s
 
 # Help Target
 help:
@@ -183,10 +146,6 @@ help:
 	@echo "... package"
 	@echo "... package_source"
 	@echo "... rebuild_cache"
-	@echo "... ttool"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
 .PHONY : help
 
 
@@ -198,6 +157,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/as/TTool/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
