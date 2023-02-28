@@ -3,6 +3,7 @@
 /home/as/TTool/build/CMakeFiles/package_source.dir
 /home/as/TTool/build/CMakeFiles/edit_cache.dir
 /home/as/TTool/build/CMakeFiles/rebuild_cache.dir
+/home/as/TTool/build/deps/TSegment/CMakeFiles/tsegment_lib.dir
 /home/as/TTool/build/deps/TSegment/CMakeFiles/package.dir
 /home/as/TTool/build/deps/TSegment/CMakeFiles/package_source.dir
 /home/as/TTool/build/deps/TSegment/CMakeFiles/edit_cache.dir

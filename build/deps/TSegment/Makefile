@@ -136,6 +136,20 @@ depend:
 	cd /home/as/TTool/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
+# Convenience name for target.
+deps/TSegment/CMakeFiles/tsegment_lib.dir/rule:
+	cd /home/as/TTool/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 deps/TSegment/CMakeFiles/tsegment_lib.dir/rule
+.PHONY : deps/TSegment/CMakeFiles/tsegment_lib.dir/rule
+
+# Convenience name for target.
+tsegment_lib: deps/TSegment/CMakeFiles/tsegment_lib.dir/rule
+.PHONY : tsegment_lib
+
+# fast build rule for target.
+tsegment_lib/fast:
+	cd /home/as/TTool/build && $(MAKE) $(MAKESILENT) -f deps/TSegment/CMakeFiles/tsegment_lib.dir/build.make deps/TSegment/CMakeFiles/tsegment_lib.dir/build
+.PHONY : tsegment_lib/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -146,6 +160,7 @@ help:
 	@echo "... package"
 	@echo "... package_source"
 	@echo "... rebuild_cache"
+	@echo "... tsegment_lib"
 .PHONY : help
 
 

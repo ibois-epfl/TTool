@@ -10,12 +10,17 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
 add_executable(ttool src/main.cc)
 
 
+# target_include_directories(ttool PUBLIC deps/TSegment)
+
+# find_package(OpenCV 4.5.5 REQUIRED)
+# include_directories(${OpenCV_INCLUDE_DIRS})
+# target_link_libraries(ttool ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+
+
 target_include_directories(ttool PUBLIC deps/TSegment)
+target_link_libraries(ttool ${tsegment_lib})
 
 
-find_package(OpenCV 4.5.5 REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-target_link_libraries(ttool ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
 # file(GLOB ttool_src
 #     "src/*.cc"
