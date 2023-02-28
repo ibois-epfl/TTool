@@ -1,0 +1,2 @@
+/home/as/TTool/build/CMakeFiles/edit_cache.dir
+/home/as/TTool/build/CMakeFiles/rebuild_cache.dir
