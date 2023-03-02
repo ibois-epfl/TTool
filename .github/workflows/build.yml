@@ -36,15 +36,21 @@ jobs:
         version: 4.5.5
 
 
-
-
-    # download submodules
-    - name: Checkout repository
+    - name: clone submodule
       uses: actions/checkout@v2
-    - name: Checkout submodules
-      uses: textbook/git-checkout-submodule-action@master
       with:
-        remote: true
+        repository: <org name>/<repo name>
+        path: path
+        ssh-key: ${{ secrets.SSH_KEY }}
+        persist-credentials: true
+
+    - name: checkout submodule
+      run: |
+        git submodule init
+        git submodule update
+
+
+
 
     - name: Configure CMake
       run: ./configure.sh
