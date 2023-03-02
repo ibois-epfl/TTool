@@ -28,13 +28,8 @@ jobs:
         version: 4.5.5
 
 
-    - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          token: ${{ secrets.ACCESS_TOKEN }}
-
     with:
-        repository: {owner}/repo
+        repository: ibois-epfl/TTool
         token: ${{ secrets.ACCESS_TOKEN }}
         submodules: recursive
 
