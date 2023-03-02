@@ -24,10 +24,10 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake"
-  "/usr/share/cmake-3.22/Modules/CPack.cmake"
-  "/usr/share/cmake-3.22/Modules/CPackComponent.cmake"
   "/usr/share/cmake-3.22/Modules/CheckCSourceCompiles.cmake"
+  "/usr/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake"
   "/usr/share/cmake-3.22/Modules/CheckIncludeFile.cmake"
+  "/usr/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake"
   "/usr/share/cmake-3.22/Modules/CheckLibraryExists.cmake"
   "/usr/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
   "/usr/share/cmake-3.22/Modules/Compiler/GNU-C.cmake"
@@ -43,7 +43,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.22/Modules/Platform/Linux-GNU.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/Linux.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/UnixPaths.cmake"
-  "/usr/share/cmake-3.22/Templates/CPackConfig.cmake.in"
   )
 
 # The corresponding makefile is:
@@ -55,13 +54,10 @@ set(CMAKE_MAKEFILE_OUTPUTS
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
-  "CPackConfig.cmake"
-  "CPackSourceConfig.cmake"
   "deps/TSegment/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/ttool.dir/DependInfo.cmake"
-  "deps/TSegment/CMakeFiles/tsegment_lib.dir/DependInfo.cmake"
   )

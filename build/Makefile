@@ -149,19 +149,6 @@ ttool/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ttool.dir/build.make CMakeFiles/ttool.dir/build
 .PHONY : ttool/fast
 
-#=============================================================================
-# Target rules for targets named tsegment_lib
-
-# Build rule for target.
-tsegment_lib: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tsegment_lib
-.PHONY : tsegment_lib
-
-# fast build rule for target.
-tsegment_lib/fast:
-	$(MAKE) $(MAKESILENT) -f deps/TSegment/CMakeFiles/tsegment_lib.dir/build.make deps/TSegment/CMakeFiles/tsegment_lib.dir/build
-.PHONY : tsegment_lib/fast
-
 src/main.o: src/main.cc.o
 .PHONY : src/main.o
 
@@ -196,7 +183,6 @@ help:
 	@echo "... package"
 	@echo "... package_source"
 	@echo "... rebuild_cache"
-	@echo "... tsegment_lib"
 	@echo "... ttool"
 	@echo "... src/main.o"
 	@echo "... src/main.i"

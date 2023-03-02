@@ -11,33 +11,20 @@ add_executable(ttool src/main.cc)
 
 
 # target_include_directories(ttool PUBLIC deps/TSegment)
+find_package(OpenCV 4.5.5 REQUIRED)
+if(NOT OpenCV_FOUND)
+    message(FATAL_ERROR "OpenCV 4.5.5 not found")
+endif()
 
-# find_package(OpenCV 4.5.5 REQUIRED)
-# include_directories(${OpenCV_INCLUDE_DIRS})
-# target_link_libraries(ttool ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+find_package(Threads REQUIRED)
+if(NOT Threads_FOUND)
+    message(FATAL_ERROR "Threads not found")
+endif()
 
-
-target_include_directories(ttool PUBLIC deps/TSegment)
-target_link_libraries(ttool ${tsegment_lib})
-
-
-
-# file(GLOB ttool_src
-#     "src/*.cc"
-#     "src/*.hh"
-#     )
-
-# add_executable(ttool ${ttool_src})
-
-# target_include_directories(ttool PUBLIC
-#     ${CMAKE_CURRENT_SOURCE_DIR}/src
-#     )
-
-# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
-# target_include_directories(ttool PUBLIC
-#     ${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment/src
-#     )
-
+target_include_directories(ttool PRIVATE 
+                           ${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment
+                           ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(ttool ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
 # #------------------------------------------------------------------------------------------------------------
 # # Check and update git submodules
