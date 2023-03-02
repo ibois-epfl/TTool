@@ -20,15 +20,15 @@ jobs:
     steps:
     
 
-    - name: Update apt-get
-      run: sudo apt-get update
+    # - name: Update apt-get
+    #   run: sudo apt-get update
 
     # - uses: actions/checkout@v2
     # - uses: Dovyski/setup-opencv-action@v1.1
     #   with:
     #     opencv-version: '4.5.5'
 
-    # - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
     #----------------------------------------------------------------------------
     # deps
@@ -43,7 +43,7 @@ jobs:
 
     - name: Configure CMake
       # configure the project and create a build script
-      run: cmake -B ${{env.BUILD_TYPE}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: ./configure.sh
 
     - name: Build
       run: ./build.sh
