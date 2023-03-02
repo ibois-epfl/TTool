@@ -21,17 +21,16 @@ jobs:
 
 
     - uses: actions/checkout@v3
+      with:
+          repository: ibois-epfl/TTool
+          token: ${{ secrets.ACCESS_TOKEN }}
+          submodules: recursive
 
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
         packages: libopencv-dev
         version: 4.5.5
 
-
-    with:
-        repository: ibois-epfl/TTool
-        token: ${{ secrets.ACCESS_TOKEN }}
-        submodules: recursive
 
     - name: submodules recursively
       run: git submodule update --init --recursive
