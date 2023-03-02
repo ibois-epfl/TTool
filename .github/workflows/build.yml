@@ -42,7 +42,8 @@ jobs:
         # execute_install_scripts: true  # if the pkg cannot be cached
 
     - name: Configure CMake
-      run: ./configure.sh
+      # configure the project and create a build script
+      run: cmake -B ${{env.BUILD_TYPE}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
       run: ./build.sh
