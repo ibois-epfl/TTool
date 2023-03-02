@@ -34,10 +34,10 @@ jobs:
         version: 4.5.5
 
 
-    # - uses: actions/checkout@v2
-    #     with:
-    #       submodules: recursive
-    #       token: ${{ secrets.ACCESS_TOKEN }}
+    - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
 
 
 
