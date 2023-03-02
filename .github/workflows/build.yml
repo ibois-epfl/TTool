@@ -36,18 +36,10 @@ jobs:
         version: 4.5.5
 
 
-    - name: clone submodule
-      uses: actions/checkout@v2
-      with:
-        repository: ibois-epfl/TSegment
-        path: deps/TSegment
-        ssh-key: ${{ secrets.SSH_KEY }}
-        persist-credentials: true
-
-    - name: checkout submodule
-      run: |
-        git submodule init
-        git submodule update
+    - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
 
 
 
