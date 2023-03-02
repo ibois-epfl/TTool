@@ -19,13 +19,7 @@ jobs:
 
     steps:
 
-    # download submodules
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    - name: Checkout submodules
-      uses: textbook/git-checkout-submodule-action@master
-      with:
-        remote: true
+    
 
 
     # - uses: actions/checkout@v1
@@ -40,6 +34,17 @@ jobs:
       with:
         packages: libopencv-dev
         version: 4.5.5
+
+
+
+
+    # download submodules
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Checkout submodules
+      uses: textbook/git-checkout-submodule-action@master
+      with:
+        remote: true
 
     - name: Configure CMake
       run: ./configure.sh
