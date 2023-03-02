@@ -1,9 +1,0 @@
-/home/as/TTool/build/CMakeFiles/ttool.dir
-/home/as/TTool/build/CMakeFiles/package.dir
-/home/as/TTool/build/CMakeFiles/package_source.dir
-/home/as/TTool/build/CMakeFiles/edit_cache.dir
-/home/as/TTool/build/CMakeFiles/rebuild_cache.dir
-/home/as/TTool/build/deps/TSegment/CMakeFiles/package.dir
-/home/as/TTool/build/deps/TSegment/CMakeFiles/package_source.dir
-/home/as/TTool/build/deps/TSegment/CMakeFiles/edit_cache.dir
-/home/as/TTool/build/deps/TSegment/CMakeFiles/rebuild_cache.dir
