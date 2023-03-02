@@ -32,8 +32,8 @@ jobs:
         version: 4.5.5
 
 
-    # - name: submodules recursively
-    #   run: git submodule update --init --recursive
+    - name: submodules recursively
+      run: git submodule update --init --recursive
 
 
     - name: Configure CMake
