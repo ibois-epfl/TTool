@@ -11,7 +11,7 @@ add_executable(ttool src/main.cc)
 
 
 # target_include_directories(ttool PUBLIC deps/TSegment)
-find_package(OpenCV 4.5.5 REQUIRED)
+find_package(OpenCV 4.5.4 REQUIRED)
 if(NOT OpenCV_FOUND)
     message(FATAL_ERROR "OpenCV 4.5.5 not found")
 endif()
