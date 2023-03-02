@@ -39,8 +39,8 @@ jobs:
     - name: clone submodule
       uses: actions/checkout@v2
       with:
-        repository: <org name>/<repo name>
-        path: path
+        repository: ibois-epfl/TSegment
+        path: deps/TSegment
         ssh-key: ${{ secrets.SSH_KEY }}
         persist-credentials: true
 
