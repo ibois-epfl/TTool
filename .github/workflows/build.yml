@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: Dovyski/setup-opencv-action@v1.1
+    - uses: actions/checkout@v2
+    - uses: 9and3/setup-opencv-action@v1.1
       with:
         opencv-version: '4.5.5'
 
