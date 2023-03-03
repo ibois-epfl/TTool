@@ -31,12 +31,13 @@ jobs:
 
     - uses: actions/checkout@v3
       with:
-          repository: ibois-epfl/TTool
+          # repository: ibois-epfl/TTool
           token: ${{ secrets.ACCESS_TOKEN }}
 
-    # - name: test
-    #   run: "POOOOOP" ${{ secrets.ACCESS_TOKEN }}
-          # submodules: recursive
+    - name: Step 1 - Echo out a GitHub Actions Secret to the logs
+        run: |
+          echo "The GitHub Action Secret will be masked:  "
+          echo ${{ secrets.ACCESS_TOKEN }}
 
 
     - name: Configure CMake
