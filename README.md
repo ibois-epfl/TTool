@@ -6,7 +6,7 @@
 
 This is the repository hosting the API for TTool. It is a program able to detect the 6dof of a fix toolhead from the feed of a fix camera view.
 
-This is the structure of the API. Each sub-API is imported as a git submodule and integrate it from the main CMakeList.txt` file
+This is the structure of the API. Each sub-API is imported as a git submodule and integrate it from the main `CMakeList.txt` file
 
 ```mermaid
 flowchart TB
