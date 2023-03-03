@@ -1,6 +1,4 @@
-
 #!/bin/bash
-
 
 # Check if build/ dir is present
 if [ -d build ]; then
