@@ -1,12 +1,18 @@
 
 #!/bin/bash
 
+
+# Check if build/ dir is present
 if [ -d build ]; then
     echo "[INFO] build/ dir already present."
 else
     mkdir build
 fi
 
+# update the submodules
+git submodule update --init --recursive
+
+# execute cmake config
 while getopts ":c" opt; do
     case $opt in
         c)  # purge build/ dir

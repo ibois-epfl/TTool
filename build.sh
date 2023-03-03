@@ -18,12 +18,7 @@ done
 if $is_max_processor_build ; then
     echo "[INFO] Building with make nbr max processors"
     if [ -d build ]; then
-        # if nproc smaller than 4
-        if [ $(nproc) -lt 6 ]; then
-            make -j4 -C build
-        else
-            make -j$($(nproc)-2) -C build
-        fi
+        cmake --build build -- -j$(nproc)
     else
         echo "[ERROR] The build output dir does not exist. Run configure.sh first."
         exit 1
