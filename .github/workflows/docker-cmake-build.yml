@@ -14,8 +14,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      with:
-        repository: ibois-epfl/TTool
+      # with:
+      #   repository: ibois-epfl/TTool
+      #   path: TTool
+      #   ssh-key: ${{ secrets.SUBMODULE_SSH_KEY }}
+      #   persist-credentials: true
+
+    - name: Checkout submodules using a PAT
+      run: |
+        git config --file .gitmodules --get-regexp url | while read url; do
+          git config --file=.gitmodules $(echo "$url" | sed -E "s/git@github.com:|https:\/\/github.com\//https:\/\/${{ secrets.CI_PAT }}:${{ secrets.CI_PAT }}@github.com\//")
+        done
+        git submodule sync
+        git submodule update --init --recursive
+
 
     - name: Build the Docker image
       run: docker build --file Dockerfile --tag ttool .
