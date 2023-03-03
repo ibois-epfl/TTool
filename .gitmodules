@@ -1,4 +1,4 @@
 [submodule "deps/TSegment"]
 	branch = main
 	path = deps/TSegment
-	url = git@github.com:ibois-epfl/TSegment
+	url = https://github.com/ibois-epfl/TTool.git
