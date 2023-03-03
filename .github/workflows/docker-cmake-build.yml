@@ -1,5 +1,4 @@
 name: docker-cmake-build
-description: Buildind the app with a docker image
 
 on:
   push:
