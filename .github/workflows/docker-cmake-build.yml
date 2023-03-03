@@ -14,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        repository: ibois-epfl/TTool
 
     - name: Build the Docker image
       run: docker build --file Dockerfile --tag ttool .
