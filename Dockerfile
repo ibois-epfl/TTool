@@ -13,6 +13,3 @@ WORKDIR .
 # Config/build cmake 
 RUN ./configure.sh
 RUN ./build.sh
-
-# Launch built application
-CMD ["./build/ttool"]

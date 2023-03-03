@@ -25,6 +25,5 @@ jobs:
         git submodule sync
         git submodule update --init --recursive
 
-
     - name: Build the Docker image
       run: ./build_docker.sh
