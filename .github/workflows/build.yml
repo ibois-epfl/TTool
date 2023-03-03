@@ -34,11 +34,9 @@ jobs:
           repository: ibois-epfl/TTool
           token: ${{ secrets.ACCESS_TOKEN }}
 
-    - name: test
-      run: "POOOOOP" ${{ secrets.ACCESS_TOKEN }}
+    # - name: test
+    #   run: "POOOOOP" ${{ secrets.ACCESS_TOKEN }}
           # submodules: recursive
-
-
 
 
     - name: Configure CMake
