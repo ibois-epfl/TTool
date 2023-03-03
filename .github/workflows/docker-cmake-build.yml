@@ -14,12 +14,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      # with:
-      #   repository: ibois-epfl/TTool
-      #   path: TTool
-      #   ssh-key: ${{ secrets.SUBMODULE_SSH_KEY }}
-      #   persist-credentials: true
 
+    # this allows to run the submodule checkouts from the docker commands by using a PAT (Personal Access Token)
+    # for each collaborator a CI_PAT is needed
     - name: Checkout submodules using a PAT
       run: |
         git config --file .gitmodules --get-regexp url | while read url; do
@@ -30,4 +27,4 @@ jobs:
 
 
     - name: Build the Docker image
-      run: docker build --file Dockerfile --tag ttool .
+      run: ./build_docker.sh
