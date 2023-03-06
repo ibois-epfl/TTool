@@ -9,7 +9,7 @@ Make sure that [docker-desktop is installed](https://www.docker.com/products/doc
 ```bash
 ./build_docker.sh
 sudo docker run -it ttool /bin/bash
-./build/tool
+./build/ttool
 ```
 
 ## Development Environment Setup (for VSCode)
