@@ -1,4 +1,4 @@
-#include "TToolSegment.h"
+#include "TSegment.h"
 #include "camera.hh"
 
 #include <iostream>
@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 {
     std::cout << "TEST" << std::endl;
 
-    auto seg = ttoolsegment::Segmentation("");
+    auto seg = tsegment::Segmentation("");
     std::shared_ptr<Camera> camera_ptr(Camera::BuildCamera(""));  // --> "" to open live stream / original: Camera::BuildCamera(gp->frames)
     while (true) {
         camera_ptr->UpdateCamera();
