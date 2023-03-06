@@ -26,7 +26,14 @@ code TTool
 
 ![recommended extensions](./docs/dev-setup/recommended-extensions.png)
 
-4. 
+4. reopen in dev container - all the extensions for development should be installed automatically after
+
+![reopn in dev container](./docs/dev-setup/reopen-in-dev-container.gif)
+
+5. to test if one can build and run the project
+```
+./configure.sh; ./build.sh; ./build/ttool
+```
 
 ## CI/CD
 If you commit and push some code that does not influence the compilation (e.g. readme, docs, etc), add one of these texts to your commit message, it will stop the run of the github action.
