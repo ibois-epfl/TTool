@@ -49,7 +49,7 @@ include/divisible/*
 
 ## >>>>>>>>> vscode >>>>>>>>>
 # gen
-.vscode/*
+.vscode/**
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
