@@ -23,7 +23,9 @@ git clone --recurse-submodules -j8 git@github.com:ibois-epfl/TTool.git
 code TTool
 ```
 3. install recommended extensions when prompted
+
 ![recommended extensions](./docs/dev-setup/recommended-extensions.png)
+
 4. 
 
 ## CI/CD
