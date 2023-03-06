@@ -10,6 +10,8 @@ RUN apt-get -y install libopencv-dev=4.5.4+dfsg-9ubuntu4
 COPY . .
 WORKDIR .
 
+RUN find . -name "CMakeCache.txt" -type f -delete
+
 # Config/build cmake 
 RUN ./configure.sh
 RUN ./build.sh
