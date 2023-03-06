@@ -63,8 +63,8 @@ include/divisible/*
 # Built Visual Studio Code Extensions
 *.vsix
 
-# VScode config
-.vscode
+# # VScode config
+# .vscode/**
 
 # clion config
 .idea
