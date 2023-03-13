@@ -13,4 +13,15 @@ Result
 - [X] TSegment passing ref (&) instead of a copy of image
 - [x] TSegment fix on real camera
 - [x] TSegment separate `compute mask` (public), `get mask` (public) function and getter for `cv::Mat mask` (private)
-- [ ] Design the TTool dataflow
+- [X] Design the TTool dataflow
+
+# 2023.03.13 - 
+## Next Step
+- [ ] TTool::Visualizer (just for debugging no need to put too much time on it)
+- [ ] TTool:PoseInput (UI for user inputting initial pose) [Design]
+    - [ ] TTool:PoseInput Get familiar with CGAL [transformation](https://doc.cgal.org/latest/Kernel_23/classOptimal_bounding_box/index.html) and [OBB](https://doc.cgal.org/latest/Optimal_bounding_box/index.html)
+    - [ ] TTool:PoseInput LocalSystem class wrapping OBB and applying transformation to both OBB and actual 6D pose of the 3D Object
+    - [ ] TTool:PoseInput KeyMap class for handling user input from keyboard to the rotation and translation
+- [ ] TTool:PoseInput [Implement]
+    - [ ] TTool:PoseInput LocalSystem class
+    - [ ] TTool:PoseInput KeyMap class
