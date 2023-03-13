@@ -3,14 +3,31 @@
 
 ![example workflow](https://github.com/ibois-epfl/TTool/actions/workflows/docker-cmake-build.yml/badge.svg)
 
-## soft design - dataflow
+## simple dataflow
 
 ```mermaid
 graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
+cam[TTool::Camera]
+uii[TTool::PoseInput]
+seg[TSegment::Segmentation]
+mle[ML::PoseEstimator]
+tkr[TSLET::ObjectTracker]
+
+cam--image-->seg
+cam--image-->uii
+cam-.image.->mle
+
+seg--segmentationMask-->uii
+seg--segmentationMask-->tkr
+seg-.segmentationMask.->mle
+
+uii--initialPose-->tkr
+uii--toolheadID-->tkr
+
+mle-.initialPose.->tkr
+mle-.toolheadID.->tkr
+
+tkr--refinedPose-->AugmentedCarpentry
 ```
 
 
