@@ -3,26 +3,29 @@
 
 #include <iostream>
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     std::cout << "TEST" << std::endl;
-    while (true) 
+    while (true)
     {
         // 1 Tsegment
         auto seg = tsegment::Segmentation("/home/tpp/IBOIS/TTool/debug");
-        std::shared_ptr<Camera> camera_ptr(Camera::BuildCamera(""));  // --> "" to open live stream / original: Camera::BuildCamera(gp->frames)
-        while (true) {
+        std::shared_ptr<Camera> camera_ptr(Camera::BuildCamera("")); // --> "" to open live stream / original: Camera::BuildCamera(gp->frames)
+        while (true)
+        {
             camera_ptr->UpdateCamera();
             cv::imshow("From Camera", camera_ptr->image());
-            seg.consume_image(camera_ptr->image());
-            if (seg.is_ready()) {
-                // Create new thread and call -> 
-                auto mask_pair = seg.get_mask();
+            seg.ConsumeImage(camera_ptr->image());
+            if (seg.IsReady())
+            {
+                // Create new thread and call ->
+                auto mask_pair = seg.GetMask();
                 cv::imshow("Mask", mask_pair.second);
                 cv::waitKey(0);
                 break;
             }
-            if (cv::waitKey(1)==27) break;
+            if (cv::waitKey(1) == 27)
+                break;
 
             // step: 1
         }
@@ -34,13 +37,12 @@ int main(int argc, char** argv)
 
         // }
         // initialPose = TML.getInitialPose(iamges, mask_pair.second);
-        
+
         // // 2b UI pose input
         // while (bool)
         // {
         //     pose = UI.getPose();
         // }
-
 
         // // 3 TSlet
         // while (user is happy with the tracking)
