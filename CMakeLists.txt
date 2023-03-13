@@ -21,7 +21,13 @@ if(NOT Threads_FOUND)
     message(FATAL_ERROR "Threads not found")
 endif()
 
+# use local eigen
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
+find_library(GMP_LIB NAMES "gmp" PATHS ${CMAKE_LIBRARY_PATH} )
+
 target_include_directories(ttool PRIVATE 
                            ${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment
+                           ${CMAKE_CURRENT_SOURCE_DIR}/deps/CGAL/include
                            ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(ttool ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(ttool ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} Eigen3::Eigen gmp)
