@@ -3,31 +3,30 @@
 
 ![example workflow](https://github.com/ibois-epfl/TTool/actions/workflows/docker-cmake-build.yml/badge.svg)
 
-## simple dataflow
+## TTool Dataflow
 
 ```mermaid
 graph TD;
 cam[TTool::Camera]
-uii[TTool::PoseInput]
+uii["TTool::PoseInput / ML::PoseEstimator"]
 seg[TSegment::Segmentation]
-mle[ML::PoseEstimator]
+%% mle[ML::PoseEstimator]
 tkr[TSLET::ObjectTracker]
 
 cam--image-->seg
 cam--image-->uii
-cam-.image.->mle
 
 seg--segmentationMask-->uii
 seg--segmentationMask-->tkr
-seg-.segmentationMask.->mle
+
 
 uii--initialPose-->tkr
 uii--toolheadID-->tkr
 
-mle-.initialPose.->tkr
-mle-.toolheadID.->tkr
+%% uii<-->mle 
 
-tkr--refinedPose-->AugmentedCarpentry
+tkr--refinedPose-->TTool::Visualizer
+tkr--3DObject-->TTool::Visualizer
 ```
 
 
