@@ -8,9 +8,9 @@ Result
 
 ## Next Step
 - [x] TSegment according to [contribution style](https://github.com/ibois-epfl/augmented-carpentry/blob/main/CONTRIBUTING.md)
-- [ ] TSegment only exposed functions should be in public otherwise, private
+- [x] TSegment only exposed functions should be in public otherwise, private
 - [x] TSegment [Docstring](https://github.com/ibois-epfl/TSlam/blob/main/src/reconstruction/ts_geometric_solver.hh)
-- [ ] TSegment passing ref (&) instead of a copy of image
+- [X] TSegment passing ref (&) instead of a copy of image
 - [x] TSegment fix on real camera
 - [x] TSegment separate `compute mask` (public), `get mask` (public) function and getter for `cv::Mat mask` (private)
 - [ ] Design the TTool dataflow

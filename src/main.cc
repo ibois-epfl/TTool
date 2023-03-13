@@ -9,7 +9,8 @@ int main(int argc, char **argv)
     while (true)
     {
         // 1 Tsegment
-        auto seg = tsegment::Segmentation("/home/tpp/IBOIS/TTool/debug");
+        std::string dubugPath = "/home/tpp/IBOIS/TTool/debug";
+        auto seg = tsegment::Segmentation("");
         std::shared_ptr<Camera> camera_ptr(Camera::BuildCamera("")); // --> "" to open live stream / original: Camera::BuildCamera(gp->frames)
         while (true)
         {
