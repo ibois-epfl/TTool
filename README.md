@@ -3,6 +3,16 @@
 
 ![example workflow](https://github.com/ibois-epfl/TTool/actions/workflows/docker-cmake-build.yml/badge.svg)
 
+## soft design - dataflow
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
 
 ## Quick Start
 Make sure that [docker-desktop is installed](https://www.docker.com/products/docker-desktop/)
