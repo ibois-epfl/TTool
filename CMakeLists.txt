@@ -7,7 +7,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(BUILD_TSEGMENT_AS_API ON CACHE BOOL "Do not build tsegment exe")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
 
-add_executable(ttool src/main.cc src/camera.cc src/viewer.cc src/view.cc src/transformations.cc)
+FILE(GLOB glsl_SOURCES src/shader/*.glsl)
+source_group("shader" FILES ${glsl_SOURCES})
+
+add_executable(ttool src/main.cc src/camera.cc src/viewer.cc src/view.cc src/transformations.cc src/model.cc ${glsl_SOURCES})
 
 
 # target_include_directories(ttool PUBLIC deps/TSegment)
@@ -19,6 +22,16 @@ endif()
 find_package(Threads REQUIRED)
 if(NOT Threads_FOUND)
     message(FATAL_ERROR "Threads not found")
+endif()
+
+find_package(assimp REQUIRED)
+if(NOT assimp_FOUND)
+    message(FATAL_ERROR "assimp not found")
+endif()
+
+find_package(glog REQUIRED)
+if(NOT glog_FOUND)
+    message(FATAL_ERROR "glog not found")
 endif()
 
 find_package(OpenGL REQUIRED)
@@ -47,4 +60,6 @@ target_link_libraries(ttool
                       gmp
                       Qt5::Widgets
                       Qt5::OpenGL
-                      ${OPENGL_LIBRARIES})
+                      glog::glog 
+                      ${OPENGL_LIBRARIES}
+                      ${ASSIMP_LIBRARIES})

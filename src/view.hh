@@ -14,7 +14,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include "transformations.hh"
-// #include "model.hh"
+#include "model.hh"
 
 class View : public QOpenGLFunctions_3_3_Core
 {
