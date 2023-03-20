@@ -33,7 +33,8 @@ int main(int argc, char **argv)
 	// Initialize object(s) to with model file, starting pose, ...
 	int init_fid = gp->target_frame - 1 >= 0 ? gp->target_frame - 1 : gp->target_frame;
 	std::vector<Model*> objects;
-	for (int i = 0; i < gp->model_file.size(); ++i) {
+	for (int i = 0; i < gp->model_file.size(); ++i)
+    {
 		objects.push_back(new Model(gp->model_file[i],
                                     gt_poses[i][init_fid],
                                     1.0));
@@ -51,7 +52,8 @@ int main(int argc, char **argv)
     // Now Model can be initialized, this should be done after view is initialized
     // because Model needs OpenGL context to initialize
     // objects should be initialized before any rendering can be done
-    for (int i = 0; i < objects.size(); ++i) {
+    for (int i = 0; i < objects.size(); ++i)
+    {
         objects[i]->initialize();
         objects[i]->initBuffers();
 	}
