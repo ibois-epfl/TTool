@@ -13,7 +13,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
-// #include "transformations.hh"
+#include "transformations.hh"
 // #include "model.hh"
 
 class View : public QOpenGLFunctions_3_3_Core

@@ -29,9 +29,9 @@ View::View(void)
 
 	calibrationMatrices.push_back(Matx44f::eye());
 
-	// projectionMatrix = Transformations::perspectiveMatrix(40, 4.0f / 3.0f, 0.1, 1000.0);
+	projectionMatrix = Transformations::perspectiveMatrix(40, 4.0f / 3.0f, 0.1, 1000.0);
 
-	// lookAtMatrix = Transformations::lookAtMatrix(0, 0, 0, 0, 0, 1, 0, -1, 0);
+	lookAtMatrix = Transformations::lookAtMatrix(0, 0, 0, 0, 0, 1, 0, -1, 0);
 
 	currentLevel = 0;
 }
@@ -90,7 +90,7 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 
 	this->numLevels = numLevels;
 
-	// projectionMatrix = Transformations::perspectiveMatrix(K, width, height, zNear, zFar, true);
+	projectionMatrix = Transformations::perspectiveMatrix(K, width, height, zNear, zFar, true);
 
 	makeCurrent();
 
