@@ -10,6 +10,10 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
 FILE(GLOB glsl_SOURCES src/shader/*.glsl)
 source_group("shader" FILES ${glsl_SOURCES})
 
+# target_include_directories(ttool PUBLIC deps/TSegment)
+include(cmake/options.cmake)
+include(cmake/dependencies.cmake)
+
 if (BUILD_TTOOL_EXE)
     add_executable(ttool
                 src/main.cc
@@ -33,8 +37,3 @@ if (BUILD_TTOOL_EXE)
                         ${OPENGL_LIBRARIES}
                         ${ASSIMP_LIBRARIES})
 endif()
-
-# target_include_directories(ttool PUBLIC deps/TSegment)
-include(cmake/options.cmake)
-include(cmake/dependencies.cmake)
-
