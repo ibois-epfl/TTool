@@ -3,7 +3,7 @@
 #include "viewer.hh"
 #include "view.hh"
 #include "global_param.hh"
-#include "model.hh" // Just for testing
+#include "model.hh"
 #include "pose_io.hh"
 
 #include <iostream>
