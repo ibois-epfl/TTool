@@ -40,17 +40,4 @@ if (BUILD_TTOOL_EXE)
 
     find_package(Qt5Widgets REQUIRED)
     find_package(Qt5OpenGL REQUIRED)
-
-    target_include_directories(ttool PRIVATE 
-                            ${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment
-                            ${OpenCV_INCLUDE_DIRS}
-                            ${OPENGL_INCLUDE_DIR})
-    target_link_libraries(ttool
-                        ${OpenCV_LIBS}
-                        ${CMAKE_THREAD_LIBS_INIT}
-                        Qt5::Widgets
-                        Qt5::OpenGL
-                        glog::glog 
-                        ${OPENGL_LIBRARIES}
-                        ${ASSIMP_LIBRARIES})
 endif()

@@ -10,16 +10,29 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
 FILE(GLOB glsl_SOURCES src/shader/*.glsl)
 source_group("shader" FILES ${glsl_SOURCES})
 
-add_executable(ttool
-               src/main.cc
-               src/camera.cc
-               src/viewer.cc
-               src/view.cc
-               src/transformations.cc
-               src/model.cc
-               src/global_param.cc
-               ${glsl_SOURCES})
-
+if (BUILD_TTOOL_EXE)
+    add_executable(ttool
+                src/main.cc
+                src/camera.cc
+                src/viewer.cc
+                src/view.cc
+                src/transformations.cc
+                src/model.cc
+                src/global_param.cc
+                ${glsl_SOURCES})
+    target_include_directories(ttool PRIVATE 
+                            ${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment
+                            ${OpenCV_INCLUDE_DIRS}
+                            ${OPENGL_INCLUDE_DIR})
+    target_link_libraries(ttool
+                        ${OpenCV_LIBS}
+                        ${CMAKE_THREAD_LIBS_INIT}
+                        Qt5::Widgets
+                        Qt5::OpenGL
+                        glog::glog 
+                        ${OPENGL_LIBRARIES}
+                        ${ASSIMP_LIBRARIES})
+endif()
 
 # target_include_directories(ttool PUBLIC deps/TSegment)
 include(cmake/options.cmake)
