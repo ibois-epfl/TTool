@@ -6,6 +6,10 @@ ARG DEBIAN_FRONTEND=noninteractive # ignore user input required
 RUN apt-get -y update && apt-get install -y
 RUN apt-get -y install g++ cmake git
 RUN apt-get -y install libopencv-dev=4.5.4+dfsg-9ubuntu4
+RUN apt-get -y install libassimp-dev
+RUN apt-get -y install libgoogle-glog-dev
+RUN apt-get -y install freeglut3-dev
+RUN apt-get -y install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
 
 COPY . .
 WORKDIR .
