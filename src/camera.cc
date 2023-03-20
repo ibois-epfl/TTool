@@ -7,11 +7,9 @@ Camera* Camera::BuildCamera(const std::string& frames) {
 	struct stat buf;
 
 	Camera* grabber = NULL;
-	//if (0 != _stat(frames.c_str(), &buf)) {
 	if (0 != stat(frames.c_str(), &buf)) {
         std::cout << "Openning VideoLoaderCamera(1)\n";
 		grabber = new VideoLoaderCamera(2); // <-- TODO: set index as param, for external webcam (4), mounted webcam (2)
-	//} else if(_S_IFDIR & buf.st_mode) {
 	} else if(S_ISDIR(buf.st_mode)) {
 		grabber = new ImageLoaderCamera(frames);
 	} else {

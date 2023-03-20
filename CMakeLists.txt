@@ -10,7 +10,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
 FILE(GLOB glsl_SOURCES src/shader/*.glsl)
 source_group("shader" FILES ${glsl_SOURCES})
 
-add_executable(ttool src/main.cc src/camera.cc src/viewer.cc src/view.cc src/transformations.cc src/model.cc ${glsl_SOURCES})
+add_executable(ttool src/main.cc src/camera.cc src/viewer.cc src/view.cc src/transformations.cc src/model.cc src/global_param.cc ${glsl_SOURCES})
 
 
 # target_include_directories(ttool PUBLIC deps/TSegment)
