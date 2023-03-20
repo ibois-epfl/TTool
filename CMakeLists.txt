@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(BUILD_TSEGMENT_AS_API ON CACHE BOOL "Do not build tsegment exe")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
 
-add_executable(ttool src/main.cc src/camera.cc)
+add_executable(ttool src/main.cc src/camera.cc src/viewer.cc src/view.cc)
 
 
 # target_include_directories(ttool PUBLIC deps/TSegment)
@@ -21,13 +21,30 @@ if(NOT Threads_FOUND)
     message(FATAL_ERROR "Threads not found")
 endif()
 
+find_package(OpenGL REQUIRED)
+if(NOT OpenGL_FOUND)
+    message(FATAL_ERROR "OpenGL not found")
+endif()
+
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)
+
 # use local eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
-find_library(GMP_LIB NAMES "gmp" PATHS ${CMAKE_LIBRARY_PATH} )
+find_library(GMP_LIB NAMES "gmp" PATHS ${CMAKE_LIBRARY_PATH})
 
 target_include_directories(ttool PRIVATE 
                            ${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment
                            ${CMAKE_CURRENT_SOURCE_DIR}/deps/CGAL/include
-                           ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(ttool ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} Eigen3::Eigen gmp)
+                           ${OpenCV_INCLUDE_DIRS}
+                           ${OPENGL_INCLUDE_DIR})
+target_link_libraries(ttool
+                      ${OpenCV_LIBS}
+                      ${CMAKE_THREAD_LIBS_INIT}
+                      Eigen3::Eigen
+                      gmp
+                      Qt5::Widgets
+                      Qt5::OpenGL
+                      ${OPENGL_LIBRARIES})
