@@ -128,7 +128,7 @@ void Model::draw(QOpenGLShaderProgram *program, GLint primitives)
     for (uint i = 0; i < offsets.size() - 1; i++) {
         GLuint size = offsets.at(i + 1) - offsets.at(i);
         GLuint offset = offsets.at(i);
-        
+
         glDrawElements(primitives, size, GL_UNSIGNED_INT, (GLvoid*)(offset*sizeof(GLuint)));
     }
 }
@@ -260,7 +260,7 @@ void Model::loadModel(const string modelFilename)
     for(int i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace f = mesh->mFaces[i];
-        
+
         indices.push_back(f.mIndices[0]);
         indices.push_back(f.mIndices[1]);
         indices.push_back(f.mIndices[2]);
