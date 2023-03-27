@@ -38,6 +38,7 @@ int main(int argc, char **argv)
         objects.push_back(modelPtr);
 	}
 
+    // Initialize the visualizer
     ttool::Visualizer visualizer = ttool::Visualizer(gp, cameraPtr, std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()));
 
     while (true)
