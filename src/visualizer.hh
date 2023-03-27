@@ -34,16 +34,21 @@ namespace ttool
             // Initialize the viewer
             m_fragmentViewerPtr = std::make_shared<FragmentViewer>();
             m_fragmentViewerPtr->Init("Fragment Viewer", view, std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()), cameraPtr);
+
+            m_contourViewerPtr = std::make_shared<ContourViewer>();
+            m_contourViewerPtr->Init("Contour Viewer", view, std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()), cameraPtr);
         }
 
         void UpdateVisualizer(int frameId)
         {
             m_fragmentViewerPtr->UpdateViewer(frameId);
+            m_contourViewerPtr->UpdateViewer(frameId);
         }
 
     private:
         std::vector<std::shared_ptr<Model>> m_Objects;
         std::shared_ptr<FragmentViewer> m_fragmentViewerPtr;
+        std::shared_ptr<ContourViewer> m_contourViewerPtr;
     };
     
 }
