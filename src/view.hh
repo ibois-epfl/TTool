@@ -51,11 +51,11 @@ public:
 	int GetHeight() { return fullHeight; }
 	cv::Matx44f GetCalibrationMatrix();
 
-	void RenderSilhouette(Model *model, GLenum polyonMode, bool invertDepth = false, float r = 1.0f, float g = 1.0f, float b = 1.0f, bool drawAll = false);
-	void RenderSilhouette(std::vector<Model *> models, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
+	void RenderSilhouette(std::shared_ptr<Model> model, GLenum polyonMode, bool invertDepth = false, float r = 1.0f, float g = 1.0f, float b = 1.0f, bool drawAll = false);
+	void RenderSilhouette(std::vector<std::shared_ptr<Model>> models, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
 
-	void RenderShaded(Model *model, GLenum polyonMode, float r = 1.0f, float g = 0.5f, float b = 0.0f, bool drawAll = false);
-	void RenderShaded(std::vector<Model *> models, GLenum polyonMode, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
+	void RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, float r = 1.0f, float g = 0.5f, float b = 0.0f, bool drawAll = false);
+	void RenderShaded(std::vector<std::shared_ptr<Model>> models, GLenum polyonMode, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
 
 	void ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid);
 

@@ -43,27 +43,27 @@ class View;
 class ContourViewer : public Viewer
 {
 public:
-	void Init(const std::string &name, View *view, const std::vector<Model *> &objects, std::shared_ptr<Camera> camera);
+	void Init(const std::string &name, View *view, const std::vector<std::shared_ptr<Model>> &objects, std::shared_ptr<Camera> camera);
 	ContourViewer() = default;
 
 	void UpdateViewer(int save_index) override;
-	cv::Mat DrawContourOverlay(View *view, const std::vector<Model *> &objects, const cv::Mat &frame);
+	cv::Mat DrawContourOverlay(View *view, const std::vector<std::shared_ptr<Model>> &objects, const cv::Mat &frame);
 
 protected:
 	View *renderer_;
-	std::vector<Model *> objects_;
+	std::vector<std::shared_ptr<Model>> objects_;
 };
 
 class FragmentViewer : public Viewer
 {
 public:
-	void Init(const std::string &name, View *view, const std::vector<Model *> &objects, std::shared_ptr<Camera> camera);
+	void Init(const std::string &name, View *view, const std::vector<std::shared_ptr<Model>> &objects, std::shared_ptr<Camera> camera);
 	FragmentViewer() = default;
 
 	void UpdateViewer(int save_index) override;
-	cv::Mat DrawFragmentOverlay(View *view, const std::vector<Model *> &objects, const cv::Mat &frame);
+	cv::Mat DrawFragmentOverlay(View *view, const std::vector<std::shared_ptr<Model>> &objects, const cv::Mat &frame);
 
 protected:
 	View *renderer_;
-	std::vector<Model *> objects_;
+	std::vector<std::shared_ptr<Model>> objects_;
 };

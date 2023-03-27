@@ -213,9 +213,9 @@ static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 	return (pt(0) < width && pt(1) < height && pt(0) >= 0 && pt(1) >= 0);
 }
 
-void View::RenderSilhouette(Model *model, GLenum polyonMode, bool invertDepth, float r, float g, float b, bool drawAll)
+void View::RenderSilhouette(std::shared_ptr<Model> model, GLenum polyonMode, bool invertDepth, float r, float g, float b, bool drawAll)
 {
-	vector<Model *> models;
+	vector<std::shared_ptr<Model>> models;
 	models.push_back(model);
 
 	vector<Point3f> colors;
@@ -224,9 +224,9 @@ void View::RenderSilhouette(Model *model, GLenum polyonMode, bool invertDepth, f
 	RenderSilhouette(models, polyonMode, invertDepth, colors, drawAll);
 }
 
-void View::RenderShaded(Model *model, GLenum polyonMode, float r, float g, float b, bool drawAll)
+void View::RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, float r, float g, float b, bool drawAll)
 {
-	vector<Model *> models;
+	vector<std::shared_ptr<Model>> models;
 	models.push_back(model);
 
 	vector<Point3f> colors;
@@ -235,7 +235,7 @@ void View::RenderShaded(Model *model, GLenum polyonMode, float r, float g, float
 	RenderShaded(models, polyonMode, colors, drawAll);
 }
 
-void View::RenderSilhouette(vector<Model *> models, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
+void View::RenderSilhouette(vector<shared_ptr<Model>> models, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
 {
 	glViewport(0, 0, width, height);
 
@@ -249,7 +249,7 @@ void View::RenderSilhouette(vector<Model *> models, GLenum polyonMode, bool inve
 
 	for (int i = 0; i < models.size(); i++)
 	{
-		Model *model = models[i];
+		shared_ptr<Model> model = models[i];
 
 		if (model->isInitialized() || drawAll)
 		{
@@ -316,7 +316,7 @@ void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 	}
 }
 
-void View::RenderShaded(vector<Model *> models, GLenum polyonMode, const std::vector<cv::Point3f> &colors, bool drawAll)
+void View::RenderShaded(vector<std::shared_ptr<Model>> models, GLenum polyonMode, const std::vector<cv::Point3f> &colors, bool drawAll)
 {
 	glViewport(0, 0, width, height);
 
@@ -324,7 +324,7 @@ void View::RenderShaded(vector<Model *> models, GLenum polyonMode, const std::ve
 
 	for (int i = 0; i < models.size(); i++)
 	{
-		Model *model = models[i];
+		std::shared_ptr<Model> model = models[i];
 
 		if (model->isInitialized() || drawAll)
 		{

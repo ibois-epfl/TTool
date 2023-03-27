@@ -61,7 +61,7 @@ void ImageViewer::UpdateViewer(int save_index)
 			frame);
 }
 
-void ContourViewer::Init(const std::string &name, View *view, const std::vector<Model *> &objects, std::shared_ptr<Camera> camera_ptr)
+void ContourViewer::Init(const std::string &name, View *view, const std::vector<std::shared_ptr<Model>>&objects, std::shared_ptr<Camera> camera_ptr)
 {
 	camera_ptr_ = std::move(camera_ptr);
 	renderer_ = view;
@@ -85,10 +85,10 @@ void ContourViewer::UpdateViewer(int fid)
 			contour_img);
 }
 
-cv::Mat ContourViewer::DrawContourOverlay(View *view, const std::vector<Model *> &objects, const cv::Mat &frame)
+cv::Mat ContourViewer::DrawContourOverlay(View *view, const std::vector<std::shared_ptr<Model>> &objects, const cv::Mat &frame)
 {
 	view->setLevel(0);
-	view->RenderSilhouette(std::vector<Model *>(objects.begin(), objects.end()), GL_FILL);
+	view->RenderSilhouette(std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()), GL_FILL);
 
 	cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 	cv::Mat masks_map;
@@ -127,7 +127,7 @@ cv::Mat ContourViewer::DrawContourOverlay(View *view, const std::vector<Model *>
 	return result;
 }
 
-void FragmentViewer::Init(const std::string &name, View *view, const std::vector<Model *> &objects, std::shared_ptr<Camera> camera_ptr)
+void FragmentViewer::Init(const std::string &name, View *view, const std::vector<std::shared_ptr<Model>> &objects, std::shared_ptr<Camera> camera_ptr)
 {
 	camera_ptr_ = std::move(camera_ptr);
 	renderer_ = view;
@@ -151,14 +151,14 @@ void FragmentViewer::UpdateViewer(int fid)
 			res_img);
 }
 
-cv::Mat FragmentViewer::DrawFragmentOverlay(View *view, const std::vector<Model *> &objects, const cv::Mat &frame)
+cv::Mat FragmentViewer::DrawFragmentOverlay(View *view, const std::vector<std::shared_ptr<Model>>&objects, const cv::Mat &frame)
 {
 	// render the models with phong shading
 	view->setLevel(0);
 
 	std::vector<cv::Point3f> colors;
 	colors.push_back(cv::Point3f(1.0, 0.5, 0.0));
-	view->RenderShaded(std::vector<Model *>(objects.begin(), objects.end()), GL_FILL, colors, true);
+	view->RenderShaded(objects, GL_FILL, colors, true);
 
 	// download the rendering to the CPU
 	cv::Mat rendering = view->DownloadFrame(View::RGB);
