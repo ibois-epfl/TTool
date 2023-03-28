@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     // Initialize the visualizer
     ttool::Visualizer visualizer = ttool::Visualizer(gp, cameraPtr, std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()));
     cameraPtr->UpdateCamera();
-    
+
     ttool::Input input(objects[0]);
     input.SetPoseOutput(gp->input_pose_file);
     while (true)
@@ -52,29 +52,22 @@ int main(int argc, char **argv)
         std::string dubugPath = "/home/tpp/IBOIS/TTool/debug";
         auto seg = tsegment::Segmentation("");
         int fid = 0;
-        while (true)
+        while (!seg.IsReady())
         {
-            // cameraPtr->UpdateCamera();
-            // fid++;
-            visualizer.UpdateVisualizer(fid);
-            int key = cv::waitKey(1);
-            
-            input.ConsumeKey(key);
-            // seg.ConsumeImage(cameraPtr->image());
-            if (seg.IsReady())
+            if ('q' == cv::waitKey(1))
             {
-                // Create new thread and call ->
-                auto mask_pair = seg.GetMask();
-                cv::imshow("Mask", mask_pair.second);
-                cv::waitKey(0);
                 break;
             }
-            if (key == 27)
-                break;
 
-            // step: 1
+            visualizer.UpdateVisualizer(fid);
+            seg.ConsumeImage(cameraPtr->image());
+
+            cameraPtr->UpdateCamera();
+            ++fid;
         }
-
+        std::pair<bool, cv::Mat> mask_pair = seg.GetMask();
+        cv::Mat mask = mask_pair.second;
+        cv::imshow("Segmentation Mask", mask);
         // // 2a TML
         // while (bool)
         // {
@@ -83,11 +76,18 @@ int main(int argc, char **argv)
         // }
         // initialPose = TML.getInitialPose(iamges, mask_pair.second);
 
-        // // 2b UI pose input
-        // while (bool)
-        // {
-        //     pose = UI.getPose();
-        // }
+        // 2b UI pose input
+        while (true)
+        {
+            visualizer.UpdateVisualizer(fid);
+            int key = cv::waitKey(1);
+            input.ConsumeKey(key);
+            // Save the pose
+            if ('p' == key)
+            {
+                break;
+            }
+        }
 
         // // 3 TSlet
         // while (user is happy with the tracking)
