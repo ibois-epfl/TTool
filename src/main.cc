@@ -4,10 +4,12 @@
 #include "model.hh"
 #include "pose_io.hh"
 #include "visualizer.hh"
+#include "input.hh"
 
 #include <iostream>
 #include <QApplication>
 #include <QThread>
+
 
 int main(int argc, char **argv)
 {
@@ -40,7 +42,9 @@ int main(int argc, char **argv)
 
     // Initialize the visualizer
     ttool::Visualizer visualizer = ttool::Visualizer(gp, cameraPtr, std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()));
-
+    cameraPtr->UpdateCamera();
+    
+    ttool::Input input;
     while (true)
     {
         // 1 Tsegment
@@ -49,10 +53,18 @@ int main(int argc, char **argv)
         int fid = 0;
         while (true)
         {
-            cameraPtr->UpdateCamera();
+            // cameraPtr->UpdateCamera();
+            // fid++;
             visualizer.UpdateVisualizer(fid);
-            fid++;
-            seg.ConsumeImage(cameraPtr->image());
+            auto pose = objects[0]->getPose();
+            int key = cv::waitKey(1);
+            input.Rotate(objects[0]);
+            if ('b' == key)
+            {
+                // input.Rotate2(objects[0]);
+            }
+
+            // seg.ConsumeImage(cameraPtr->image());
             if (seg.IsReady())
             {
                 // Create new thread and call ->
@@ -61,7 +73,7 @@ int main(int argc, char **argv)
                 cv::waitKey(0);
                 break;
             }
-            if (cv::waitKey(1) == 27)
+            if (key == 27)
                 break;
 
             // step: 1
