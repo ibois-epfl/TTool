@@ -24,6 +24,7 @@ if (BUILD_TTOOL_EXE)
                 src/model.cc
                 src/global_param.cc
                 src/visualizer.hh
+                src/input.hh
                 ${glsl_SOURCES})
     target_include_directories(ttool PRIVATE 
                             ${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment

@@ -58,10 +58,17 @@ int main(int argc, char **argv)
             visualizer.UpdateVisualizer(fid);
             auto pose = objects[0]->getPose();
             int key = cv::waitKey(1);
-            input.Rotate(objects[0]);
-            if ('b' == key)
+            if ('a' == key)
             {
-                // input.Rotate2(objects[0]);
+                input.Rotate(objects[0], cv::Vec3f(1, 0, 0));
+            }
+            if ('s' == key)
+            {
+                input.Rotate(objects[0], cv::Vec3f(0, 1, 0));
+            }
+            if ('d' == key)
+            {
+                input.Rotate(objects[0], cv::Vec3f(0, 0, 1));
             }
 
             // seg.ConsumeImage(cameraPtr->image());
