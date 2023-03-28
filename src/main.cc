@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     ttool::Visualizer visualizer = ttool::Visualizer(gp, cameraPtr, std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()));
     cameraPtr->UpdateCamera();
     
-    ttool::Input input;
+    ttool::Input input(objects[0]);
     while (true)
     {
         // 1 Tsegment
@@ -56,21 +56,9 @@ int main(int argc, char **argv)
             // cameraPtr->UpdateCamera();
             // fid++;
             visualizer.UpdateVisualizer(fid);
-            auto pose = objects[0]->getPose();
             int key = cv::waitKey(1);
-            if ('a' == key)
-            {
-                input.Rotate(objects[0], cv::Vec3f(1, 0, 0));
-            }
-            if ('s' == key)
-            {
-                input.Rotate(objects[0], cv::Vec3f(0, 1, 0));
-            }
-            if ('d' == key)
-            {
-                input.Rotate(objects[0], cv::Vec3f(0, 0, 1));
-            }
-
+            
+            input.ConsumeKey(key);
             // seg.ConsumeImage(cameraPtr->image());
             if (seg.IsReady())
             {
