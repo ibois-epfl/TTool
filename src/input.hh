@@ -1,5 +1,8 @@
 #pragma once
 
+#include <fstream>
+#include <iomanip>
+
 #include "model.hh"
 #include "transformations.hh"
 
@@ -11,6 +14,17 @@ namespace ttool
         Input(std::shared_ptr<Model> model)
         {
             m_Model = model;
+            m_PoseOutput = "input_pose.txt";
+        }
+
+        /**
+         * @brief Set the pose output file
+         * 
+         * @param poseOutput 
+         */
+        void SetPoseOutput(std::string poseOutput)
+        {
+            m_PoseOutput = poseOutput;
         }
 
         /**
@@ -60,6 +74,27 @@ namespace ttool
             case 'o':
                 Rotate(m_Model, 1.0f, cv::Vec3f(0.0f, -1.0f, 0.0f));
                 break;
+            // Save the pose of the model
+            case 'p':
+            {
+                cv::Matx44f pose = m_Model->getPose();
+                std::ofstream fs;
+                fs.open(m_PoseOutput, std::ios_base::app);
+                if (!fs.is_open()) {
+                    std::cerr << "failed to open pose file, press any key to exit" << std::endl;
+                    getchar();
+                    exit(-1);
+                }
+
+                std::time_t t = std::time(nullptr);
+                std::tm tm = *std::localtime(&t);
+                fs << "# " << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << std::endl;
+                fs << pose(0, 0) << " " << pose(0, 1) << " " << pose(0, 2) << " " << pose(1, 0) << " "
+                    << pose(1, 1) << " " << pose(1, 2) << " " << pose(2, 0) << " " << pose(2, 1) << " "
+                    << pose(2, 2) << " " << pose(0, 3) << " " << pose(1, 3) << " " << pose(2, 3) << std::endl;
+                fs.close();
+            }
+                break;
             default:
                 break;
             }
@@ -106,6 +141,7 @@ namespace ttool
 
         private:
         std::shared_ptr<Model> m_Model;
+        std::string m_PoseOutput;
     };
     
 

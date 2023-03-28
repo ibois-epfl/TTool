@@ -74,6 +74,7 @@ namespace tk {
         float marker_len{};
         float offset_x{};
         std::string gt_pose_file;
+        std::string input_pose_file;
         std::string tk_pose_file;
         std::string fps_file;
 

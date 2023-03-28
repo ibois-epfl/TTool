@@ -109,6 +109,7 @@ namespace tk {
         /////////////////////////////////////
         // output
         /////////////////////////////////////
+        ReadValue(fs, "input_pose_file", input_pose_file);
         ReadValue(fs, "tk_pose_file", tk_pose_file);
         ReadValue(fs, "fps_file", fps_file);
         ReadValue(fs, "result_video_file", result_video_file);

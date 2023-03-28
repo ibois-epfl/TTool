@@ -45,6 +45,7 @@ int main(int argc, char **argv)
     cameraPtr->UpdateCamera();
     
     ttool::Input input(objects[0]);
+    input.SetPoseOutput(gp->input_pose_file);
     while (true)
     {
         // 1 Tsegment
