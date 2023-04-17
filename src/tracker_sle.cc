@@ -306,9 +306,9 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 	}
 }
 
-void SLETracker::EstimatePoses(cv::Matx44f& init_pose) {
-    auto frame = camera_ptr_->image();
+void SLETracker::EstimatePoses(cv::Matx44f& init_pose) {}
 
+void SLETracker::EstimatePoses(cv::Matx44f& init_pose, cv::Mat frame) {
     std::vector<cv::Mat> imagePyramid;
     imagePyramid.push_back(frame);
 

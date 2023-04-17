@@ -11,17 +11,16 @@ class Viewer;
 class Tracker {
 public:
 	Tracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects);
-	void Init(std::shared_ptr<Camera> camera_ptr) {
-		camera_ptr_ = std::move(camera_ptr);
-	}
+	void Init() {}
 
 	static Tracker* GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<std::shared_ptr<Object3D>>& objects);
 
 	virtual void ToggleTracking(int objectIndex, bool undistortedFrame);
 	virtual void EstimatePoses();
     virtual void EstimatePoses(cv::Matx44f& init_pose) = 0;
-    virtual void PreProcess() {}
-	virtual void PostProcess() {}
+	virtual void EstimatePoses(cv::Matx44f& init_pose, cv::Mat frame) = 0;
+    virtual void PreProcess(cv::Mat frame) {}
+	virtual void PostProcess(cv::Mat frame) {}
 
 	void reset();
 
@@ -43,8 +42,6 @@ protected:
 
 	std::vector<std::shared_ptr<Object3D>> objects;
 	
-	std::shared_ptr<Camera> camera_ptr_ = nullptr;
-
 	View* view;
 	cv::Matx33f K;
 	//cv::Matx14f distCoeffs;
@@ -60,9 +57,9 @@ class TrackerBase : public Tracker {
 public:
 	TrackerBase(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects);
 
-	virtual void PreProcess() override;
-	virtual void PostProcess() override;
-	virtual void UpdateHist();
+	virtual void PreProcess(cv::Mat frame) override;
+	virtual void PostProcess(cv::Mat frame) override;
+	virtual void UpdateHist(cv::Mat frame);
 
 protected:
 	void DetectEdge(const cv::Mat& img, cv::Mat& edge_map);

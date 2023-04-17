@@ -90,25 +90,7 @@ void Tracker::ToggleTracking(int objectIndex, bool undistortedFrame) {
 	}
 }
 
-void Tracker::EstimatePoses() {
-	auto frame = camera_ptr_->image();
-
-
-	std::vector<cv::Mat> imagePyramid;
-	cv::Mat frameCpy = frame.clone();
-	imagePyramid.push_back(frameCpy);
-
-	for (int l = 1; l < 4; l++) {
-		cv::resize(frame, frameCpy, cv::Size(frame.cols / pow(2, l), frame.rows / pow(2, l)));
-		imagePyramid.push_back(frameCpy);
-	}
-
-	if (initialized) {
-		Track(imagePyramid, objects);
-
-		//CheckPose(objects);
-	}
-}
+void Tracker::EstimatePoses() {}
 
 cv::Rect Tracker::Compute2DROI(std::shared_ptr<Object3D> object, const cv::Size& maxSize, int offset) {
 	// PROJECT THE 3D BOUNDING BOX AS 2D ROI
@@ -254,17 +236,15 @@ void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
 	cv::Canny(img_gray, img_edge, CANNY_LOW_THRESH, CANNY_HIGH_THRESH);
 }
 
-void TrackerBase::PreProcess() {
-	UpdateHist();
+void TrackerBase::PreProcess(cv::Mat frame) {
+	UpdateHist(frame);
 }
 
-void TrackerBase::PostProcess() {
-	UpdateHist();
+void TrackerBase::PostProcess(cv::Mat frame) {
+	UpdateHist(frame);
 }
 
-void TrackerBase::UpdateHist() {
-	auto frame = camera_ptr_->image();
-
+void TrackerBase::UpdateHist(cv::Mat frame) {
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
 		view->setLevel(0);

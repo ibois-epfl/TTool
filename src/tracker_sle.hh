@@ -6,6 +6,7 @@ class SLETracker: public SLTracker {
 public:
 	SLETracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects);
     void EstimatePoses(cv::Matx44f& init_pose);
+	void EstimatePoses(cv::Matx44f& init_pose, cv::Mat frame);
 
 protected:
 	void Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shared_ptr<Object3D>>& objects, int runs = 1) override;
