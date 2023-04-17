@@ -25,3 +25,9 @@ Result
 - [ ] TTool:PoseInput [Implement]
     - [ ] TTool:PoseInput LocalSystem class
     - [ ] TTool:PoseInput KeyMap class
+
+# 2023.04.17
+`TSLET` is included in the TTool. For now it it relatively the same as original repo TSLET where we call `Tracker` and use it. The change is `PreProcess`, `EstimatePoses`, `PostProcess` must receive frame image. This was we can pass the segmentation result to the `Tracker` to track the segmentation mask instead. `T1racker::Init()` is not used anymore, as we are no longer passing a camera pointer to the tracker.
+
+Here, the initial pose is intentionally set to be a bit off. After the TSegment has the mask, the tracking starts (frame id increases again), and the pose is then fine tuned.
+![](2023.04.17/TSLET-integration.gif)
