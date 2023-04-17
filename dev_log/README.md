@@ -15,16 +15,19 @@ Result
 - [x] TSegment separate `compute mask` (public), `get mask` (public) function and getter for `cv::Mat mask` (private)
 - [X] Design the TTool dataflow
 
-# 2023.03.13 - 
+# 2023.03.13
 ## Next Step
-- [ ] TTool::Visualizer (just for debugging no need to put too much time on it)
-- [ ] TTool:PoseInput (UI for user inputting initial pose) [Design]
+- [x] TTool::Visualizer (just for debugging no need to put too much time on it)
+- [x] TTool:PoseInput (UI for user inputting initial pose) [Design]
     - [ ] TTool:PoseInput Get familiar with CGAL [transformation](https://doc.cgal.org/latest/Kernel_23/classOptimal_bounding_box/index.html) and [OBB](https://doc.cgal.org/latest/Optimal_bounding_box/index.html)
     - [ ] TTool:PoseInput LocalSystem class wrapping OBB and applying transformation to both OBB and actual 6D pose of the 3D Object
     - [ ] TTool:PoseInput KeyMap class for handling user input from keyboard to the rotation and translation
-- [ ] TTool:PoseInput [Implement]
+- [x] TTool:PoseInput [Implement]
     - [ ] TTool:PoseInput LocalSystem class
     - [ ] TTool:PoseInput KeyMap class
+
+# 2023.03.20 - TTool::Visualizer
+`ttool::Visualizer` is implemented. In TSLET, all the viewers are inside the `Tracker`. However, we decided not to do so as the tracker should only do the tracking. Thus, `ttool::Visualizer` does so instead. `UpdateVisualizer` is used to update all the viewers inside.
 
 # 2023.04.17
 `TSLET` is included in the TTool. For now it it relatively the same as original repo TSLET where we call `Tracker` and use it. The change is `PreProcess`, `EstimatePoses`, `PostProcess` must receive frame image. This was we can pass the segmentation result to the `Tracker` to track the segmentation mask instead. `T1racker::Init()` is not used anymore, as we are no longer passing a camera pointer to the tracker.
