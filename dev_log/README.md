@@ -29,7 +29,7 @@ Result
 # 2023.03.20 - TTool::Visualizer
 `ttool::Visualizer` is implemented. In TSLET, all the viewers are inside the `Tracker`. However, we decided not to do so as the tracker should only do the tracking. Thus, `ttool::Visualizer` does so instead. `UpdateVisualizer` is used to update all the viewers inside.
 
-# 2023.03.27 - TTool::Input
+# 2023.03.27 - 2023.03.28 - TTool::Input
 `TTool::Input` is implemented. In order to do pose adjustment, the user can control it with keybinding
 ![](2023.03.27/Input.jpg)
 
