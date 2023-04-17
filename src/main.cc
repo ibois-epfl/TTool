@@ -99,7 +99,6 @@ int main(int argc, char **argv)
 
         cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
         std::shared_ptr<Tracker> trackerPtr(Tracker::GetTracker(gp->tracker_mode, K, distCoeffs, objects));
-        trackerPtr->Init();
 
 		for (int oid = 0; oid < objects.size(); ++oid)
 			trackerPtr->ToggleTracking(oid, true);
