@@ -29,6 +29,12 @@ Result
 # 2023.03.20 - TTool::Visualizer
 `ttool::Visualizer` is implemented. In TSLET, all the viewers are inside the `Tracker`. However, we decided not to do so as the tracker should only do the tracking. Thus, `ttool::Visualizer` does so instead. `UpdateVisualizer` is used to update all the viewers inside.
 
+# 2023.03.27 - TTool::Input
+`TTool::Input` is implemented. In order to do pose adjustment, the user can control it with keybinding
+![](2023.03.27/Input.jpg)
+
+![](2023.03.27/IMG_2117.gif)
+
 # 2023.04.17
 `TSLET` is included in the TTool. For now it it relatively the same as original repo TSLET where we call `Tracker` and use it. The change is `PreProcess`, `EstimatePoses`, `PostProcess` must receive frame image. This was we can pass the segmentation result to the `Tracker` to track the segmentation mask instead. `T1racker::Init()` is not used anymore, as we are no longer passing a camera pointer to the tracker.
 
