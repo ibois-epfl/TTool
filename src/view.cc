@@ -145,6 +145,14 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 	// doneCurrent();
 }
 
+float View::getZNear() {
+	return zn;
+}
+
+float View::getZFar() {
+	return zf;
+}
+
 void View::setLevel(int level)
 {
 	currentLevel = level;
@@ -154,6 +162,10 @@ void View::setLevel(int level)
 
 	width += width % 4;
 	height += height % 4;
+}
+
+int View::getLevel() {
+	return currentLevel;
 }
 
 bool View::initRenderingBuffers()
@@ -365,6 +377,56 @@ void View::RenderShaded(vector<std::shared_ptr<Model>> models, GLenum polyonMode
 	}
 
 	glFinish();
+}
+
+void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f>& projections, cv::Rect& boundingRect) {
+	Vec3f lbn = model->getLBN();
+	Vec3f rtf = model->getRTF();
+
+	Vec4f Plbn = Vec4f(lbn[0], lbn[1], lbn[2], 1.0);
+	Vec4f Prbn = Vec4f(rtf[0], lbn[1], lbn[2], 1.0);
+	Vec4f Pltn = Vec4f(lbn[0], rtf[1], lbn[2], 1.0);
+	Vec4f Plbf = Vec4f(lbn[0], lbn[1], rtf[2], 1.0);
+	Vec4f Pltf = Vec4f(lbn[0], rtf[1], rtf[2], 1.0);
+	Vec4f Prtn = Vec4f(rtf[0], rtf[1], lbn[2], 1.0);
+	Vec4f Prbf = Vec4f(rtf[0], lbn[1], rtf[2], 1.0);
+	Vec4f Prtf = Vec4f(rtf[0], rtf[1], rtf[2], 1.0);
+
+	vector<Vec4f> points3D;
+	points3D.push_back(Plbn);
+	points3D.push_back(Prbn);
+	points3D.push_back(Pltn);
+	points3D.push_back(Plbf);
+	points3D.push_back(Pltf);
+	points3D.push_back(Prtn);
+	points3D.push_back(Prbf);
+	points3D.push_back(Prtf);
+
+	Matx44f pose = model->getPose();
+	Matx44f normalization = model->getNormalization();
+
+	Point2f lt(FLT_MAX, FLT_MAX);
+	Point2f rb(-FLT_MAX, -FLT_MAX);
+
+	for (auto & i : points3D) {
+		Vec4f p = calibrationMatrices[currentLevel] * pose * normalization * i;
+
+		if (p[2] == 0)
+			continue;
+
+		Point2f p2d = Point2f(p[0] / p[2], p[1] / p[2]);
+		projections.push_back(p2d);
+
+		if (p2d.x < lt.x) lt.x = p2d.x;
+		if (p2d.x > rb.x) rb.x = p2d.x;
+		if (p2d.y < lt.y) lt.y = p2d.y;
+		if (p2d.y > rb.y) rb.y = p2d.y;
+	}
+
+	boundingRect.x = lt.x;
+	boundingRect.y = lt.y;
+	boundingRect.width = rb.x - lt.x;
+	boundingRect.height = rb.y - lt.y;
 }
 
 Mat View::DownloadFrame(View::FrameType type)

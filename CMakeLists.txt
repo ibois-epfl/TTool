@@ -10,21 +10,14 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
 FILE(GLOB glsl_SOURCES src/shader/*.glsl)
 source_group("shader" FILES ${glsl_SOURCES})
 
+FILE(GLOB ttool_SOURCES src/*.cc src/*.hh)
 # target_include_directories(ttool PUBLIC deps/TSegment)
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
 if (BUILD_TTOOL_EXE)
     add_executable(ttool
-                src/main.cc
-                src/camera.cc
-                src/viewer.cc
-                src/view.cc
-                src/transformations.cc
-                src/model.cc
-                src/global_param.cc
-                src/visualizer.hh
-                src/input.hh
+                ${ttool_SOURCES}
                 ${glsl_SOURCES})
     target_include_directories(ttool PRIVATE 
                             ${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment

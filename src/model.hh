@@ -16,7 +16,7 @@
  *  individual vertex colors. The model data is uploaded to the GPU in
  *  form of VertexBufferObjects.
  */
-class Model
+class Model : public std::enable_shared_from_this<Model>
 {
     
 public:

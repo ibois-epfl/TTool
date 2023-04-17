@@ -46,6 +46,10 @@ public:
 	void init(const cv::Matx33f &K, int width, int height, float zNear, float zFar, int numLevels);
 
 	void setLevel(int level);
+	int getLevel();
+
+	float getZNear();
+	float getZFar();
 
 	int GetWidth() { return fullWidth; }
 	int GetHeight() { return fullHeight; }
@@ -58,6 +62,8 @@ public:
 	void RenderShaded(std::vector<std::shared_ptr<Model>> models, GLenum polyonMode, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
 
 	void ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid);
+
+	void ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f>& projections, cv::Rect& boundingRect);
 
 	cv::Mat DownloadFrame(View::FrameType type);
 
