@@ -41,3 +41,33 @@ Result
 
 Here, the initial pose is intentionally set to be a bit off. After the TSegment has the mask, the tracking starts (frame id increases again), and the pose is then fine tuned.
 ![](2023.04.17/TSLET-integration.gif)
+
+Information about dependencies related to `Tracker`
+```
+tracker.hh
+    #include "object3d.hh"
+    #include "object3d.cc"
+
+    #include "template_view.hh"
+    #include "template_view.cc"
+
+        #include "tclc_histograms.hh"
+        #include "tclc_histograms.cc"
+
+        #include "signed_distance_transform2d.hh"
+        #include "signed_distance_transform2d.cc"
+
+
+tracker.cc
+    #include "histogram.hh"     // This is the crucial part of the tracker
+    #include "histogram.cc"     // This is the crucial part of the tracker
+
+    #include "search_line.hh"   // This is the crucial part of the tracker
+    #include "search_line.cc"   // This is the crucial part of the tracker
+
+    #include "tracker_sle.hh"
+    #include "tracker_sle.cc"
+
+        #include "m_func.hh"
+        #include "m_func.cc"
+```
