@@ -28,6 +28,15 @@ namespace ttool
         }
 
         /**
+         * @brief Get the pose
+         * 
+         */
+        cv::Matx44f GetPose()
+        {
+            return m_Model->getPose();
+        }
+
+        /**
          * @brief Consume a key press and perform the corresponding action
          * 
          * @param key translate (w, s, a, d, q, e) or rotate (i, k, j, l, u, o

@@ -92,6 +92,7 @@ int main(int argc, char **argv)
                 break;
             }
         }
+        gtPoses[0][initFid] = input.GetPose();
 
         // 3 TSlet
         // Start tracker with camera
