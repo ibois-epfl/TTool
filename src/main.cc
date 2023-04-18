@@ -49,6 +49,7 @@ int main(int argc, char **argv)
 
     ttool::Input input(modelManagerPtr);
     input.SetPoseOutput(gp->input_pose_file);
+    int oid = modelManagerPtr->GetObject()->getModelID();
     while (true)
     {
         // 1 Tsegment
@@ -93,8 +94,9 @@ int main(int argc, char **argv)
         // }
         // initialPose = TML.getInitialPose(iamges, mask_pair.second);
 
+        int initFid = 0;
         // 2b UI pose input
-        while (true)
+        while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             visualizer.UpdateVisualizer(fid);
             int key = cv::waitKey(1);
@@ -104,10 +106,9 @@ int main(int argc, char **argv)
             {
                 break;
             }
+            gtPoses[modelManagerPtr->GetObject()->getModelID()][initFid] = input.GetPose();
         }
-        int initFid = 0;
-        gtPoses[0][initFid] = input.GetPose();
-
+        
         // 3 TSlet
         // Start tracker with camera
         cv::cvtColor(mask, mask, cv::COLOR_GRAY2RGB);
@@ -119,7 +120,7 @@ int main(int argc, char **argv)
         trackerPtr->ToggleTracking(0, true);
 		trackerPtr->PreProcess(mask);
 
-        while (true)
+        while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             int key = cv::waitKey(1);
             if ('q' == key)
@@ -134,7 +135,6 @@ int main(int argc, char **argv)
             trackerPtr->PostProcess(mask);
             ++fid;
         }
-        break;
     }
 
     return 0;
