@@ -29,6 +29,10 @@ namespace ttool
             {
                 objects[i]->initBuffers();
                 objects[i]->initialize();
+
+                // In case of multiple objects, each object should have a unique model ID for the viewer to render the contour correctly
+                // Originally in the SLET, the model ID is set in the Tracker class, but here we set it here
+                objects[i]->setModelID(i + 1);
             }
 
             // Initialize the viewer

@@ -18,7 +18,9 @@ Tracker::Tracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& o
 	this->K = K;
 
 	for (int i = 0; i < objects.size(); i++) {
-		objects[i]->setModelID(i + 1);
+		if (objects[i]->getModelID() == 0) {
+			objects[i]->setModelID(i + 1);
+		}
 		this->objects.push_back(objects[i]);
 		this->objects[i]->initBuffers();
 		// Maybe this should be move to the run_on_video where the histogram is generated, otherwise segmentation fault
