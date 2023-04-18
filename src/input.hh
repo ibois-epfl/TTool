@@ -1,19 +1,22 @@
 #pragma once
 
+#define KEY_UP 82
+
 #include <fstream>
 #include <iomanip>
 
 #include "model.hh"
 #include "transformations.hh"
+#include "d_model_manager.hh"
 
 namespace ttool
 {
     struct Input
     {
         public:
-        Input(std::shared_ptr<Model> model)
+        Input(std::shared_ptr<DModelManager> modelManagerPtr)
         {
-            m_Model = model;
+            m_ModelManagerPtr = modelManagerPtr;
             m_PoseOutput = "input_pose.txt";
         }
 
@@ -33,7 +36,7 @@ namespace ttool
          */
         cv::Matx44f GetPose()
         {
-            return m_Model->getPose();
+            return m_ModelManagerPtr->GetObject()->getPose();
         }
 
         /**
@@ -43,50 +46,56 @@ namespace ttool
          */
         void ConsumeKey(char key)
         {
+            if (-1 != int(key))
+                std::cout << "Key: " << std::isprint(key) << " " << int(key) << std::endl;
             switch (key)
             {
+            // Change the model
+            case char(KEY_UP):
+                m_ModelManagerPtr->IncreaseObjectID();
+                break;
             // Translate the model
             case 'w':
-                Translate(m_Model, cv::Vec3f(0.0f, -1.0f, 0.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, -1.0f, 0.0f));
                 break;
             case 's':
-                Translate(m_Model, cv::Vec3f(0.0f, 1.0f, 0.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, 1.0f, 0.0f));
                 break;
             case 'a':
-                Translate(m_Model, cv::Vec3f(-1.0f, 0.0f, 0.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(-1.0f, 0.0f, 0.0f));
                 break;
             case 'd':
-                Translate(m_Model, cv::Vec3f(1.0f, 0.0f, 0.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(1.0f, 0.0f, 0.0f));
                 break;
             case 'q':
-                Translate(m_Model, cv::Vec3f(0.0f, 0.0f, -1.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, 0.0f, -1.0f));
                 break;
             case 'e':
-                Translate(m_Model, cv::Vec3f(0.0f, 0.0f, 1.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, 0.0f, 1.0f));
                 break;
             // Rotate the model
             case 'i':
-                Rotate(m_Model, 1.0f, cv::Vec3f(1.0f, 0.0f, 0.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), 1.0f, cv::Vec3f(1.0f, 0.0f, 0.0f));
                 break;
             case 'k':
-                Rotate(m_Model, 1.0f, cv::Vec3f(-1.0f, 0.0f, 0.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), 1.0f, cv::Vec3f(-1.0f, 0.0f, 0.0f));
                 break;
             case 'j':
-                Rotate(m_Model, 1.0f, cv::Vec3f(0.0f, 0.0f, 1.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), 1.0f, cv::Vec3f(0.0f, 0.0f, 1.0f));
                 break;
             case 'l':
-                Rotate(m_Model, 1.0f, cv::Vec3f(0.0f, 0.0f, -1.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), 1.0f, cv::Vec3f(0.0f, 0.0f, -1.0f));
                 break;
             case 'u':
-                Rotate(m_Model, 1.0f, cv::Vec3f(0.0f, 1.0f, 0.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), 1.0f, cv::Vec3f(0.0f, 1.0f, 0.0f));
                 break;
             case 'o':
-                Rotate(m_Model, 1.0f, cv::Vec3f(0.0f, -1.0f, 0.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), 1.0f, cv::Vec3f(0.0f, -1.0f, 0.0f));
                 break;
             // Save the pose of the model
             case 'p':
             {
-                cv::Matx44f pose = m_Model->getPose();
+                cv::Matx44f pose = m_ModelManagerPtr->GetObject()->getPose();
                 std::ofstream fs;
                 fs.open(m_PoseOutput, std::ios_base::app);
                 if (!fs.is_open()) {
@@ -149,8 +158,8 @@ namespace ttool
         }
 
         private:
-        std::shared_ptr<Model> m_Model;
         std::string m_PoseOutput;
+        std::shared_ptr<DModelManager> m_ModelManagerPtr;
     };
     
 

@@ -6,6 +6,7 @@
 #include "visualizer.hh"
 #include "input.hh"
 #include "tracker.hh"
+#include "d_model_manager.hh"
 
 #include <iostream>
 #include <QApplication>
@@ -41,25 +42,12 @@ int main(int argc, char **argv)
 	std::vector<std::vector<cv::Matx44f> > gtPoses;
 	poseReader->Read(gp->gt_pose_file, gtPoses);
 
-	// Initialize object(s) to with model file, starting pose, ...
-    std::vector<float> distances = { 200.0f, 400.0f, 600.0f };
-	int initFid = gp->target_frame - 1 >= 0 ? gp->target_frame - 1 : gp->target_frame;
-	std::vector<std::shared_ptr<Object3D>> objects;
-	for (int i = 0; i < gp->model_file.size(); ++i)
-    {
-        std::shared_ptr<Object3D> objPtr = std::make_shared<Object3D>(gp->model_file[i],
-                                                                      gtPoses[i][initFid],
-                                                                      1.0,
-                                                                      0.55f,
-                                                                      distances);
-        objects.push_back(objPtr);
-	}
-
+    std::shared_ptr<ttool::DModelManager> modelManagerPtr = std::make_shared<ttool::DModelManager>(gp->model_file, gtPoses);
     // Initialize the visualizer
-    ttool::Visualizer visualizer = ttool::Visualizer(gp, cameraPtr, std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()));
+    ttool::Visualizer visualizer = ttool::Visualizer(gp, cameraPtr, modelManagerPtr);
     cameraPtr->UpdateCamera();
 
-    ttool::Input input(objects[0]);
+    ttool::Input input(modelManagerPtr);
     input.SetPoseOutput(gp->input_pose_file);
     while (true)
     {
@@ -67,18 +55,26 @@ int main(int argc, char **argv)
         std::string dubugPath = "/home/tpp/IBOIS/TTool/debug";
         auto seg = tsegment::Segmentation("");
         int fid = 0;
-        while ('p' != cv::waitKey(1) && gp->frames == "")
+        int key = cv::waitKey(1);
+        while ('p' != key && gp->frames == "")
         {
-            visualizer.UpdateVisualizer(fid);
-            cameraPtr->UpdateCamera();
-        }
-
-        while (!seg.IsReady())
-        {
-            if ('q' == cv::waitKey(1))
+            if ('q' == key)
             {
                 break;
             }
+            input.ConsumeKey(key);
+            visualizer.UpdateVisualizer(fid);
+            cameraPtr->UpdateCamera();
+            key = cv::waitKey(1);
+        }
+        while (!seg.IsReady())
+        {
+            int key = cv::waitKey(1);
+            if ('q' == key)
+            {
+                break;
+            }
+            input.ConsumeKey(key);
 
             visualizer.UpdateVisualizer(fid);
             seg.ConsumeImage(cameraPtr->image());
@@ -109,6 +105,7 @@ int main(int argc, char **argv)
                 break;
             }
         }
+        int initFid = 0;
         gtPoses[0][initFid] = input.GetPose();
 
         // 3 TSlet
@@ -116,18 +113,21 @@ int main(int argc, char **argv)
         cv::cvtColor(mask, mask, cv::COLOR_GRAY2RGB);
 
         cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
+        std::vector<std::shared_ptr<Object3D>>objects = {modelManagerPtr->GetObject()};
         std::shared_ptr<Tracker> trackerPtr(Tracker::GetTracker(gp->tracker_mode, K, distCoeffs, objects));
 
-		for (int oid = 0; oid < objects.size(); ++oid)
-			trackerPtr->ToggleTracking(oid, true);
+        trackerPtr->ToggleTracking(0, true);
 		trackerPtr->PreProcess(mask);
 
         while (true)
         {
-            if ('q' == cv::waitKey(1))
+            int key = cv::waitKey(1);
+            if ('q' == key)
             {
                 break;
             }
+            input.ConsumeKey(key);
+
             trackerPtr->EstimatePoses(gtPoses[0][initFid], mask);
             visualizer.UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
