@@ -15,12 +15,23 @@
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
-    std::string config_file = "/home/tpp/IBOIS/TTool/model_drill_scaled/config.yml";
+    std::string config_file = argv[1];
 
     tk::GlobalParam* gp = tk::GlobalParam::Instance();
 	gp->ParseConfig(config_file);
 
-	std::shared_ptr<Camera> cameraPtr(Camera::BuildCamera(gp->frames));  // --> "" to open live stream / original: Camera::BuildCamera(gp->frames)
+	std::shared_ptr<Camera> cameraPtr;
+    if (gp->frames == "")
+    {
+        std::cout << "Using camera: " << gp->camera_id << std::endl;
+        cameraPtr.reset(Camera::BuildCamera(gp->camera_id));
+    }
+    else
+    {
+        std::cout << "Using frames: " << gp->frames << std::endl;
+        cameraPtr.reset(Camera::BuildCamera(gp->frames));
+    }
+
 	gp->image_width = cameraPtr->width;
 	gp->image_height = cameraPtr->height;
     cv::Matx33f K = cv::Matx33f(gp->fx, 0, gp->cx, 0, gp->fy, gp->cy, 0, 0, 1);
@@ -56,6 +67,12 @@ int main(int argc, char **argv)
         std::string dubugPath = "/home/tpp/IBOIS/TTool/debug";
         auto seg = tsegment::Segmentation("");
         int fid = 0;
+        while ('p' != cv::waitKey(1) && gp->frames == "")
+        {
+            visualizer.UpdateVisualizer(fid);
+            cameraPtr->UpdateCamera();
+        }
+
         while (!seg.IsReady())
         {
             if ('q' == cv::waitKey(1))
