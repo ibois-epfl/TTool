@@ -1,0 +1,53 @@
+%YAML:1.0
+################
+# common vars
+################
+undistort_frame: 0
+unit_model: 1
+prev_gt: 0  # ??
+timeout: 1  # ??
+target_frame: 1  # ??
+alpha_fg: 0.1  # ??
+alpha_bg: 0.2  # ??
+
+fx: 561.60752462847097  # for IBOIS camera
+fy: 562.91538638344332  # for IBOIS camera
+cx: 641.38172226013501  # for IBOIS camera
+cy: 341.56306804983251  # for IBOIS camera
+#fx: 929.500  # for IBOIS camera
+#fy: 935.203  # for IBOIS camera
+#cx: 356.485  # for IBOIS camera
+#cy: 251.174  # for IBOIS camera
+
+zn: 1  # ??
+zf: 4000  # ??
+
+line_len: 16  # ??
+sl_seg: 2  # ??
+
+hist_offset: 100  # ??
+hist_rad: 40  # ??
+search_rad: 25  # ??
+
+show_result: 0  # ?
+bench_mode: 0 # ??  # original: 1
+# rbot 0, slet 1, slct 2, slft 3
+tracker_mode: 1
+
+################
+# input
+################
+gt_pose_file: "./model_drill_scaled/gt_pose.txt"
+model_file: ["./model_drill_scaled/drill_scaled_1000.obj"]
+frames: ""
+camera_id: 2
+################
+# output
+################
+input_pose_file: "./model_drill_scaled/input_pose.txt"
+tk_pose_file: "./model_drill_scaled/out/regular.tk"
+result_video_file: "./model_drill_scaled/out/regular_tk.avi"
+result_img_dir: "./model_drill_scaled/out/regular"
+err_file: "./model_drill_scaled/out/regular.err"
+fps_file: "./model_drill_scaled/out/regular.fps"
+report_file: "./model_drill_scaled/out/_report.txt"
