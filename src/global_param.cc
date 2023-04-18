@@ -74,6 +74,7 @@ namespace tk {
         ReadValue(fs, "unit_model", unit_model);
 
         ReadValue(fs, "frames", frames);
+        ReadValue(fs, "camera_id", camera_id);
 
         ReadValue(fs, "fx", fx);
         ReadValue(fs, "fy", fy);
@@ -180,6 +181,7 @@ namespace tk {
 
 
         DumpValue(os, "frames", gp.frames);
+        DumpValue(os, "camera_id", gp.camera_id);
 
         DumpValue(os, "fx", gp.fx);
         DumpValue(os, "fy", gp.fy);

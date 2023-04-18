@@ -24,6 +24,19 @@ Camera* Camera::BuildCamera(const std::string& frames) {
 	}
 }
 
+Camera* Camera::BuildCamera(const int cameraId) {
+	struct stat buf;
+
+	Camera* grabber = new VideoLoaderCamera(cameraId); // <-- TODO: set index as param, for external webcam (4), mounted webcam (2)
+
+	if (-1 == grabber->width) {
+		delete grabber;
+		return NULL;
+	}	else {
+		return grabber;
+	}
+}
+
 const cv::Mat& Camera::image() const { return image_; }
 
 void Camera::preprocess() {

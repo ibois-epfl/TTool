@@ -19,6 +19,7 @@ class VideoLoaderCamera;
 class Camera {
 public:
 	static Camera* BuildCamera(const std::string& frames);
+	static Camera* BuildCamera(int cameraID);
 
 	virtual bool UpdateCamera() = 0;
 

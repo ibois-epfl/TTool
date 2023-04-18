@@ -23,6 +23,7 @@ namespace tk {
         //std::string init_pose;
 
         std::string frames;
+        int camera_id;
 
         int image_width{}, image_height{};
         float fx{}, fy{}, cx{}, cy{};
