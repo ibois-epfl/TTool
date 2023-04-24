@@ -8,6 +8,7 @@
 #include "tracker.hh"
 #include "d_model_manager.hh"
 
+#include <algorithm>
 #include <iostream>
 #include <QApplication>
 #include <QThread>
@@ -49,10 +50,10 @@ int main(int argc, char **argv)
 
     ttool::Input input(modelManagerPtr);
     input.SetPoseOutput(gp->input_pose_file);
-    int oid = modelManagerPtr->GetObject()->getModelID();
     while (true)
     {
         // 1 Tsegment
+        int oid = modelManagerPtr->GetObject()->getModelID();
         std::string dubugPath = "/home/tpp/IBOIS/TTool/debug";
         auto seg = tsegment::Segmentation("");
         int fid = 0;
@@ -68,23 +69,24 @@ int main(int argc, char **argv)
             cameraPtr->UpdateCamera();
             key = cv::waitKey(1);
         }
-        while (!seg.IsReady())
-        {
-            int key = cv::waitKey(1);
-            if ('q' == key)
-            {
-                break;
-            }
-            input.ConsumeKey(key);
+        // while (!seg.IsReady())
+        // {
+        //     int key = cv::waitKey(1);
+        //     if ('q' == key)
+        //     {
+        //         break;
+        //     }
+        //     input.ConsumeKey(key);
 
-            visualizer.UpdateVisualizer(fid);
-            seg.ConsumeImage(cameraPtr->image());
+        //     visualizer.UpdateVisualizer(fid);
+        //     seg.ConsumeImage(cameraPtr->image());
 
-            cameraPtr->UpdateCamera();
-            ++fid;
-        }
-        std::pair<bool, cv::Mat> mask_pair = seg.GetMask();
-        cv::Mat mask = mask_pair.second;
+        //     cameraPtr->UpdateCamera();
+        //     ++fid;
+        // }
+        // std::pair<bool, cv::Mat> mask_pair = seg.GetMask();
+        // cv::Mat mask = mask_pair.second;
+        cv::Mat mask = cv::imread("/home/tpp/IBOIS/TTool/debug/mask.jpg", cv::IMREAD_GRAYSCALE);
         // cv::imshow("Segmentation Mask", mask);
         // // 2a TML
         // while (bool)
@@ -96,6 +98,7 @@ int main(int argc, char **argv)
 
         int initFid = 0;
         // 2b UI pose input
+        std::cout << "Please input the pose of the object" << std::endl;
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             visualizer.UpdateVisualizer(fid);
@@ -106,9 +109,9 @@ int main(int argc, char **argv)
             {
                 break;
             }
-            gtPoses[modelManagerPtr->GetObject()->getModelID()][initFid] = input.GetPose();
+            int gtID = std::clamp(modelManagerPtr->GetObject()->getModelID() - 1, 0, (int)gtPoses.size() - 1);
+            gtPoses[gtID][initFid] = input.GetPose();
         }
-        
         // 3 TSlet
         // Start tracker with camera
         cv::cvtColor(mask, mask, cv::COLOR_GRAY2RGB);
@@ -116,10 +119,10 @@ int main(int argc, char **argv)
         cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
         std::vector<std::shared_ptr<Object3D>>objects = {modelManagerPtr->GetObject()};
         std::shared_ptr<Tracker> trackerPtr(Tracker::GetTracker(gp->tracker_mode, K, distCoeffs, objects));
-
+        // 0 beacuse the only fisrt object is tracked (we create a vector of one object)
         trackerPtr->ToggleTracking(0, true);
-		trackerPtr->PreProcess(mask);
-
+		// trackerPtr->PreProcess(mask);
+        trackerPtr->PreProcess(cameraPtr->image());
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             int key = cv::waitKey(1);
@@ -128,11 +131,19 @@ int main(int argc, char **argv)
                 break;
             }
             input.ConsumeKey(key);
+            // Break before the new object's gtID is used to estimate the pose of the previous object (snapshotted by the tracker)
+            if (oid != modelManagerPtr->GetObject()->getModelID())
+            {
+                break;
+            }
 
-            trackerPtr->EstimatePoses(gtPoses[0][initFid], mask);
+            int gtID = std::clamp(modelManagerPtr->GetObject()->getModelID() - 1, 0, (int)gtPoses.size() - 1);
+            // trackerPtr->EstimatePoses(gtPoses[gtID][initFid], mask);
+            trackerPtr->EstimatePoses(gtPoses[gtID][initFid], cameraPtr->image());
             visualizer.UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
-            trackerPtr->PostProcess(mask);
+            // trackerPtr->PostProcess(mask);
+            trackerPtr->PostProcess(cameraPtr->image());
             ++fid;
         }
     }
