@@ -46,8 +46,8 @@ namespace ttool
          */
         void ConsumeKey(char key)
         {
-            if (-1 != int(key))
-                std::cout << "Key: " << std::isprint(key) << " " << int(key) << std::endl;
+            // if (-1 != int(key))
+            //     std::cout << "Key: " << std::isprint(key) << " " << int(key) << std::endl;
             switch (key)
             {
             // Change the model
@@ -96,6 +96,8 @@ namespace ttool
             case 'p':
             {
                 cv::Matx44f pose = m_ModelManagerPtr->GetObject()->getPose();
+                std::cout << "pose: " << pose << std::endl;
+                m_ModelManagerPtr->GetObject()->setInitialPose(pose);
                 std::ofstream fs;
                 fs.open(m_PoseOutput, std::ios_base::app);
                 if (!fs.is_open()) {
