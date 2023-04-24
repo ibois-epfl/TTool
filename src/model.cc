@@ -154,9 +154,9 @@ void Model::setPrePose(const Matx44f &T_cm)
     this->T_pm = T_cm;
 }
 
-void Model::setInitialPose(const Matx44f &T_cm)
+void Model::setInitialPose(const Matx44f &Ti)
 {
-    T_i = T_cm;
+    this->T_i = Ti;
 }
 
 Matx44f Model::getNormalization()
@@ -216,7 +216,6 @@ void Model::setModelID(int i)
 void Model::reset()
 {
     initialized = false;
-    
     T_cm = T_i;
 }
 
