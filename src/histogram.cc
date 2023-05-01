@@ -14,8 +14,12 @@ RBOTHist::RBOTHist(const std::vector<std::shared_ptr<Object3D>>& objects) {
 	objs = objects;
 	std::cout << "RBOTHist::RBOTHist" << std::endl;
 	for (int i = 0; i < objects.size(); ++i) {
-		objects[i]->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(objects[i], 32, 40, 10.0f)));
+		if (objects[i]->getTCLCHistograms() == nullptr)
+			objects[i]->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(objects[i], 32, 40, 10.0f)));
+		else
+			std::cout << "RBOTHist::RBOTHist: TCLCHistograms already exists!" << std::endl;
 	}
+	std::cout << "RBOTHist::RBOTHist done!" << std::endl;
 }
 
 void RBOTHist::Update(const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, int oid, float afg, float abg){

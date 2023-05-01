@@ -50,6 +50,23 @@ int main(int argc, char **argv)
 
     ttool::Input input(modelManagerPtr);
     input.SetPoseOutput(gp->input_pose_file);
+
+    // Initialize the tracker
+    std::vector<std::shared_ptr<Tracker>> trackers;
+    for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
+    {
+        cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
+        if (trackers.size() < modelManagerPtr->GetObject()->getModelID())
+        {
+            std::vector<std::shared_ptr<Object3D>>objects = {modelManagerPtr->GetObject()};
+            std::shared_ptr<Tracker> trackerPtr(Tracker::GetTracker(gp->tracker_mode, K, distCoeffs, objects));
+            trackerPtr->ToggleTracking(0, true);
+            trackers.push_back(trackerPtr);
+        }
+        modelManagerPtr->IncreaseObjectID();
+    }
+
+
     while (true)
     {
         // 1 Tsegment
@@ -117,12 +134,9 @@ int main(int argc, char **argv)
         // Start tracker with camera
         cv::cvtColor(mask, mask, cv::COLOR_GRAY2RGB);
 
-        cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
-        std::vector<std::shared_ptr<Object3D>>objects = {modelManagerPtr->GetObject()};
-        std::shared_ptr<Tracker> trackerPtr(Tracker::GetTracker(gp->tracker_mode, K, distCoeffs, objects));
-        // 0 beacuse the only fisrt object is tracked (we create a vector of one object)
-        trackerPtr->ToggleTracking(0, true);
-		// trackerPtr->PreProcess(mask);
+        std::shared_ptr<Tracker> trackerPtr = trackers[oid - 1];
+
+        // trackerPtr->PreProcess(mask);
         trackerPtr->PreProcess(cameraPtr->image());
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
@@ -147,6 +161,9 @@ int main(int argc, char **argv)
             trackerPtr->PostProcess(cameraPtr->image());
             ++fid;
         }
+        std::cout << "Restarting Object " << oid << " changed to >> ";
+        oid = modelManagerPtr->GetObject()->getModelID();
+        std::cout << oid << std::endl;
     }
 
     return 0;

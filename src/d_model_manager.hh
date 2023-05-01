@@ -75,6 +75,15 @@ namespace ttool
             m_ObjectID = (m_ObjectID + 1) % m_Objects.size();
         }
 
+        /**
+         * @brief Get number of objects
+         * 
+         */
+        int GetNumObjects()
+        {
+            return m_Objects.size();
+        }
+
         private:
         std::vector<std::shared_ptr<Object3D>> m_Objects;
         int m_ObjectID = 0;
