@@ -68,6 +68,7 @@ int main(int argc, char **argv)
             visualizer.UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
             key = cv::waitKey(1);
+            oid = modelManagerPtr->GetObject()->getModelID();
         }
         // while (!seg.IsReady())
         // {
