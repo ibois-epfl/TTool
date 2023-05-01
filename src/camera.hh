@@ -52,6 +52,7 @@ public:
 	virtual bool UpdateCamera() override {
 		bool ret = false;
 		ret = cap_.read(image_);
+		preprocess();
 		frame_index_++;
 		return ret;
 	}

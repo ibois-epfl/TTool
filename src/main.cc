@@ -84,31 +84,30 @@ int main(int argc, char **argv)
             oid = modelManagerPtr->GetObject()->getModelID();
         }
 
-        std::cout << "Calculating segmentation mask for object " << oid << std::endl;
-        while (modelID2mask.find(oid) == modelID2mask.end() && !seg.IsReady())
-        {
-            int key = cv::waitKey(1);
-            input.ConsumeKey(key);
+        // std::cout << "Calculating segmentation mask for object " << oid << std::endl;
+        // while (modelID2mask.find(oid) == modelID2mask.end() && !seg.IsReady())
+        // {
+        //     int key = cv::waitKey(1);
+        //     input.ConsumeKey(key);
 
-            visualizer.UpdateVisualizer(fid);
-            seg.ConsumeImage(cameraPtr->image());
+        //     visualizer.UpdateVisualizer(fid);
+        //     seg.ConsumeImage(cameraPtr->image());
 
-            cameraPtr->UpdateCamera();
-            ++fid;
-        }
+        //     cameraPtr->UpdateCamera();
+        //     ++fid;
+        // }
 
-        if (modelID2mask.find(oid) == modelID2mask.end())
-        {
-            std::pair<bool, cv::Mat> mask_pair = seg.GetMask();
-            cv::Mat mask = mask_pair.second;
-            cv::cvtColor(mask, mask, cv::COLOR_GRAY2RGB);
+        // if (modelID2mask.find(oid) == modelID2mask.end())
+        // {
+        //     std::pair<bool, cv::Mat> mask_pair = seg.GetMask();
+        //     cv::Mat mask = mask_pair.second;
+        //     cv::cvtColor(mask, mask, cv::COLOR_GRAY2RGB);
 
-            modelID2mask.insert(std::make_pair(oid, mask));
-        }
+        //     modelID2mask.insert(std::make_pair(oid, mask));
+        // }
+        cv::Mat mask = cameraPtr->image();
+        // cv::Mat mask = modelID2mask[oid];
 
-        cv::Mat mask = modelID2mask[oid];
-
-        // cv::imshow("Segmentation Mask", mask);
         // // 2a TML
         // while (bool)
         // {
@@ -133,7 +132,13 @@ int main(int argc, char **argv)
             input.ConsumeKey(key);
         }
         // 3 TSlet
-        objectTracker.FeedNewFrame(oid, mask);
+        // auto mask = cameraPtr->image();
+        bool useMask = false;
+        if (useMask)
+            objectTracker.FeedNewFrame(oid, mask);
+        else
+            objectTracker.FeedNewFrame(oid, cameraPtr->image());
+        cv::imshow("Segmentation Mask 137", mask);
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             int key = cv::waitKey(1);
@@ -147,10 +152,17 @@ int main(int argc, char **argv)
                 break;
             }
 
-            objectTracker.EstimatePose(oid, mask);
+            if (useMask)
+                objectTracker.EstimatePose(oid, mask);
+            else
+                objectTracker.EstimatePose(oid, cameraPtr->image());
             visualizer.UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
-            objectTracker.FeedNewFrame(oid, mask);
+            if (useMask)
+                objectTracker.FeedNewFrame(oid, mask);
+            else
+                objectTracker.FeedNewFrame(oid, cameraPtr->image());
+            // mask = cameraPtr->image();
             ++fid;
 
             input.ConsumeKey(key);

@@ -55,6 +55,7 @@ namespace tslet
 
             std::shared_ptr<Tracker> trackerPtr = modelID2tracker[modelID];
             cv::Matx44f init_pose = modelID2pose[modelID];
+            cv::imshow("What Tracker Sees", frame);
             trackerPtr->EstimatePoses(init_pose, frame);
         }
 
