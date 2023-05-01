@@ -7,6 +7,7 @@
 #include "input.hh"
 #include "tracker.hh"
 #include "d_model_manager.hh"
+#include "object_tracker.hh"
 
 #include <algorithm>
 #include <iostream>
@@ -52,17 +53,10 @@ int main(int argc, char **argv)
     input.SetPoseOutput(gp->input_pose_file);
 
     // Initialize the tracker
-    std::vector<std::shared_ptr<Tracker>> trackers;
+    tslet::ObjectTracker objectTracker;
     for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
     {
-        cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
-        if (trackers.size() < modelManagerPtr->GetObject()->getModelID())
-        {
-            std::vector<std::shared_ptr<Object3D>>objects = {modelManagerPtr->GetObject()};
-            std::shared_ptr<Tracker> trackerPtr(Tracker::GetTracker(gp->tracker_mode, K, distCoeffs, objects));
-            trackerPtr->ToggleTracking(0, true);
-            trackers.push_back(trackerPtr);
-        }
+        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), gp->tracker_mode, K);
         modelManagerPtr->IncreaseObjectID();
     }
 
@@ -94,10 +88,6 @@ int main(int argc, char **argv)
         while (modelID2mask.find(oid) == modelID2mask.end() && !seg.IsReady())
         {
             int key = cv::waitKey(1);
-            if ('q' == key)
-            {
-                break;
-            }
             input.ConsumeKey(key);
 
             visualizer.UpdateVisualizer(fid);
@@ -127,27 +117,23 @@ int main(int argc, char **argv)
         // }
         // initialPose = TML.getInitialPose(iamges, mask_pair.second);
 
-        int initFid = 0;
         // 2b UI pose input
         std::cout << "Please input the pose of the object" << std::endl;
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             visualizer.UpdateVisualizer(fid);
             int key = cv::waitKey(1);
-            input.ConsumeKey(key);
             // Save the pose
             if ('p' == key)
             {
                 break;
             }
-            int gtID = std::clamp(modelManagerPtr->GetObject()->getModelID() - 1, 0, (int)gtPoses.size() - 1);
-            gtPoses[gtID][initFid] = input.GetPose();
+            objectTracker.SetPose(modelManagerPtr->GetObject()->getModelID(), input.GetPose());
+
+            input.ConsumeKey(key);
         }
         // 3 TSlet
-        // Start tracker with camera
-        std::shared_ptr<Tracker> trackerPtr = trackers[oid - 1];
-
-        trackerPtr->PreProcess(mask);
+        objectTracker.FeedNewFrame(oid, mask);
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             int key = cv::waitKey(1);
@@ -155,19 +141,19 @@ int main(int argc, char **argv)
             {
                 break;
             }
-            input.ConsumeKey(key);
             // Break before the new object's gtID is used to estimate the pose of the previous object (snapshotted by the tracker)
             if (oid != modelManagerPtr->GetObject()->getModelID())
             {
                 break;
             }
 
-            int gtID = std::clamp(modelManagerPtr->GetObject()->getModelID() - 1, 0, (int)gtPoses.size() - 1);
-            trackerPtr->EstimatePoses(gtPoses[gtID][initFid], mask);
+            objectTracker.EstimatePose(oid, mask);
             visualizer.UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
-            trackerPtr->PostProcess(mask);
+            objectTracker.FeedNewFrame(oid, mask);
             ++fid;
+
+            input.ConsumeKey(key);
         }
         std::cout << "Restarting Object " << oid << " changed to >> ";
         oid = modelManagerPtr->GetObject()->getModelID();
