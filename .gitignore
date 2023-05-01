@@ -71,3 +71,6 @@ include/divisible/*
 .idea
 
 model_*/**/*
+!model_*/**/*.obj
+!saw_*/**/*.obj
+!circular_*/**/*.obj
