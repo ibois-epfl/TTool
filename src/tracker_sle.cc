@@ -291,16 +291,16 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 		cv::Matx44f T_cm = deltaT * objects[o]->getPose();
        if (avg < 0.025) {
            objects[o]->setPose(init_pose);
-           std::cout << "[RESET] Mean scores: " << avg << "\n";
+        //    std::cout << "[RESET] Mean scores: " << avg << "\n";
        }
        else if (avg < 0.2) {
 //           objects[o]->setPose(init_pose);
 //           objects[o]->setPose(objects[0]->getPose());
-            std::cout << "[FREEZED] Mean scores: " << avg << "\n";
+            // std::cout << "[FREEZED] Mean scores: " << avg << "\n";
 //            objects[o]->setPose(init_pose);
        }
        else {
-           std::cout << "[UPDATE] ROI " << roi.area() << " avg: " << avg << "\n";
+        //    std::cout << "[UPDATE] ROI " << roi.area() << " avg: " << avg << "\n";
            objects[o]->setPose(T_cm);
        }
 	}

@@ -38,7 +38,7 @@ tracker_mode: 1
 # input
 ################
 gt_pose_file: "./live_camera/gt_pose.txt"
-model_file: ["./model_drill_scaled/drill_scaled_1000.obj", "./circular_blade_scaled/circular_blade_scaled.obj"]
+model_file: ["./model_drill_scaled/drill_scaled_1000.obj", "./saw_blade_scaled/saw_blade_thin_verythin.obj", "./circular_blade_scaled/circular_blade_scaled.obj"]
 frames: ""
 camera_id: 2
 ################
