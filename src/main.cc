@@ -66,6 +66,8 @@ int main(int argc, char **argv)
         modelManagerPtr->IncreaseObjectID();
     }
 
+    // Cache segmentations for each object
+    std::map<int, cv::Mat> modelID2mask;
 
     while (true)
     {
@@ -87,24 +89,35 @@ int main(int argc, char **argv)
             key = cv::waitKey(1);
             oid = modelManagerPtr->GetObject()->getModelID();
         }
-        // while (!seg.IsReady())
-        // {
-        //     int key = cv::waitKey(1);
-        //     if ('q' == key)
-        //     {
-        //         break;
-        //     }
-        //     input.ConsumeKey(key);
 
-        //     visualizer.UpdateVisualizer(fid);
-        //     seg.ConsumeImage(cameraPtr->image());
+        std::cout << "Calculating segmentation mask for object " << oid << std::endl;
+        while (modelID2mask.find(oid) == modelID2mask.end() && !seg.IsReady())
+        {
+            int key = cv::waitKey(1);
+            if ('q' == key)
+            {
+                break;
+            }
+            input.ConsumeKey(key);
 
-        //     cameraPtr->UpdateCamera();
-        //     ++fid;
-        // }
-        // std::pair<bool, cv::Mat> mask_pair = seg.GetMask();
-        // cv::Mat mask = mask_pair.second;
-        cv::Mat mask = cv::imread("/home/tpp/IBOIS/TTool/debug/mask.jpg", cv::IMREAD_GRAYSCALE);
+            visualizer.UpdateVisualizer(fid);
+            seg.ConsumeImage(cameraPtr->image());
+
+            cameraPtr->UpdateCamera();
+            ++fid;
+        }
+
+        if (modelID2mask.find(oid) == modelID2mask.end())
+        {
+            std::pair<bool, cv::Mat> mask_pair = seg.GetMask();
+            cv::Mat mask = mask_pair.second;
+            cv::cvtColor(mask, mask, cv::COLOR_GRAY2RGB);
+
+            modelID2mask.insert(std::make_pair(oid, mask));
+        }
+
+        cv::Mat mask = modelID2mask[oid];
+
         // cv::imshow("Segmentation Mask", mask);
         // // 2a TML
         // while (bool)
@@ -132,12 +145,9 @@ int main(int argc, char **argv)
         }
         // 3 TSlet
         // Start tracker with camera
-        cv::cvtColor(mask, mask, cv::COLOR_GRAY2RGB);
-
         std::shared_ptr<Tracker> trackerPtr = trackers[oid - 1];
 
-        // trackerPtr->PreProcess(mask);
-        trackerPtr->PreProcess(cameraPtr->image());
+        trackerPtr->PreProcess(mask);
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             int key = cv::waitKey(1);
@@ -153,12 +163,10 @@ int main(int argc, char **argv)
             }
 
             int gtID = std::clamp(modelManagerPtr->GetObject()->getModelID() - 1, 0, (int)gtPoses.size() - 1);
-            // trackerPtr->EstimatePoses(gtPoses[gtID][initFid], mask);
-            trackerPtr->EstimatePoses(gtPoses[gtID][initFid], cameraPtr->image());
+            trackerPtr->EstimatePoses(gtPoses[gtID][initFid], mask);
             visualizer.UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
-            // trackerPtr->PostProcess(mask);
-            trackerPtr->PostProcess(cameraPtr->image());
+            trackerPtr->PostProcess(mask);
             ++fid;
         }
         std::cout << "Restarting Object " << oid << " changed to >> ";
