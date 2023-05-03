@@ -26,11 +26,30 @@ public:
 	const cv::Mat& image() const;
 
     void preprocess();
+
+	void SetK(std::vector<float> K) {
+		m_K = K;
+	}
+
+	void SetDistCoeff(std::vector<float> distCoeff) {
+		m_distCoeff = distCoeff;
+	}
+
+	void SetPreprocessSize(int width, int height) {
+		m_preprocessWidth = width;
+		m_preprocessHeight = height;
+	}
+
 	int width = -1;
 	int height = -1;
 protected:
 	cv::Mat image_;
 	int frame_index_ = 0;
+
+	std::vector<float> m_K;
+	std::vector<float> m_distCoeff;
+	int m_preprocessWidth;
+	int m_preprocessHeight;
 };
 
 class VideoLoaderCamera: public Camera {
