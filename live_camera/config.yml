@@ -35,6 +35,15 @@ bench_mode: 0 # ??  # original: 1
 tracker_mode: 1
 
 ################
+# camera
+################
+K: [5.6179718862595769e+02, 0., 6.4349424059711373e+02, 0., 5.6146049053435411e+02, 3.4430617832682464e+02, 0., 0., 1.]
+dist_coeff: [-2.4776321654659408e-01, 7.4589742789025762e-02, 2.0010415733276928e-04, 2.3476155179987635e-04, -1.0510058960990047e-02]
+# Camera preprocess will resize to this
+preprocess_width: 1280
+preprocess_height: 720
+
+################
 # input
 ################
 gt_pose_file: "./live_camera/gt_pose.txt"

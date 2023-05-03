@@ -62,6 +62,12 @@ namespace tk {
         std::vector<float> scales;
         std::vector<int> iters;
 
+        // camera
+        std::vector<float> K{};
+        std::vector<float> dist_coeff{};
+        int preprocess_width{};
+        int preprocess_height{};
+
         // output
         std::string out_path;
         bool video_file_on{};

@@ -68,6 +68,14 @@ namespace tk {
         cv::FileNode node;
 
         /////////////////////////////////////
+        // camera
+        /////////////////////////////////////
+        ReadArray(fs, "K", K);
+        ReadArray(fs, "dist_coeff", dist_coeff);
+        ReadValue(fs, "preprocess_width", preprocess_width);
+        ReadValue(fs, "preprocess_height", preprocess_height);
+
+        /////////////////////////////////////
         // input
         /////////////////////////////////////
         ReadArray(fs, "model_file", model_file);
