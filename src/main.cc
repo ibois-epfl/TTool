@@ -35,6 +35,10 @@ int main(int argc, char **argv)
         cameraPtr.reset(Camera::BuildCamera(gp->frames));
     }
 
+    cameraPtr->SetK(gp->K);
+    cameraPtr->SetDistCoeff(gp->dist_coeff);
+    cameraPtr->SetPreprocessSize(gp->preprocess_width, gp->preprocess_height);
+
 	gp->image_width = cameraPtr->width;
 	gp->image_height = cameraPtr->height;
     cv::Matx33f K = cv::Matx33f(gp->fx, 0, gp->cx, 0, gp->fy, gp->cy, 0, 0, 1);
