@@ -9,7 +9,6 @@
 		"dockerfile": "../Dockerfile"
 	},
 	"runArgs": [
-		"-v=/dev/video0:/dev/video0"
 	],
 	"customizations": {
 		"vscode": {
