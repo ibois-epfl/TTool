@@ -27,8 +27,12 @@ public:
 
     void preprocess();
 
-	void SetK(std::vector<float> K) {
+	void SetK(cv::Matx33f K) {
 		m_K = K;
+	}
+
+	cv::Matx33f GetK() {
+		return m_K;
 	}
 
 	void SetDistCoeff(std::vector<float> distCoeff) {
@@ -46,7 +50,7 @@ protected:
 	cv::Mat image_;
 	int frame_index_ = 0;
 
-	std::vector<float> m_K;
+	cv::Matx33f m_K;
 	std::vector<float> m_distCoeff;
 	int m_preprocessWidth;
 	int m_preprocessHeight;

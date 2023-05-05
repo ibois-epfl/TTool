@@ -2,7 +2,7 @@
 
 - [ ] - Reset / lower threshold 
 - [x] *(URGENT)* Load the distortionCoeff, and the K parameters from the path, tracker should use the K, and distCoeff from the same vars as cameraPtr
-- [ ] *(URGENT)* load calibration distortion matrix from external zml file instead of hardcoded *be sure that all across the source code the same calibration file is consumed*
+- [ ] *(URGENT)* load calibration distortion matrix from external zml file instead of hardcoded *be sure that all across the source code the same calibration file is consumed* see https://github.com/ibois-epfl/TSlam/blob/88e61aee7063de8da604e5488d5b65a138f2878a/utils/tslam_reconstruct.cc
 - [ ] branch with segmentation, main without segmentation
 - [ ] change to local axis for translation and orientation manipulation for the pose input (as in blender)
 - [ ] Reset it to text initial pose User *we have reset to text gt pose and reset to checkpoint pose* 

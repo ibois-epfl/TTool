@@ -14,7 +14,7 @@ namespace ttool
     public:
         Visualizer(tk::GlobalParam* gp, std::shared_ptr<Camera> cameraPtr, std::shared_ptr<DModelManager> modelManagerPtr)
         {
-            cv::Matx33f K = cv::Matx33f(gp->fx, 0, gp->cx, 0, gp->fy, gp->cy, 0, 0, 1);
+            cv::Matx33f K = cameraPtr->GetK();
 
             // Initialize the view
             View* view = View::Instance();

@@ -10,6 +10,7 @@ target_frame: 1  # ??
 alpha_fg: 0.1  # ??
 alpha_bg: 0.2  # ??
 
+# not use this anymore
 fx: 561.60752462847097  # for IBOIS camera
 fy: 562.91538638344332  # for IBOIS camera
 cx: 641.38172226013501  # for IBOIS camera
@@ -49,7 +50,7 @@ preprocess_height: 720
 gt_pose_file: "./live_camera/gt_pose.txt"
 model_file: ["./model_drill_scaled/drill_scaled_1000.obj", "./saw_blade_scaled/saw_blade_thin_verythin.obj", "./circular_blade_scaled/circular_blade_scaled.obj"]
 frames: ""
-camera_id: 0
+camera_id: 2
 ################
 # output
 ################

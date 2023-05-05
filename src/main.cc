@@ -35,13 +35,14 @@ int main(int argc, char **argv)
         cameraPtr.reset(Camera::BuildCamera(gp->frames));
     }
 
-    cameraPtr->SetK(gp->K);
+    cv::Matx33f K = cv::Matx33f(gp->K[0], gp->K[1], gp->K[2], gp->K[3], gp->K[4], gp->K[5], gp->K[6], gp->K[7], gp->K[8]);
+
+    cameraPtr->SetK(K);
     cameraPtr->SetDistCoeff(gp->dist_coeff);
     cameraPtr->SetPreprocessSize(gp->preprocess_width, gp->preprocess_height);
 
 	gp->image_width = cameraPtr->width;
 	gp->image_height = cameraPtr->height;
-    cv::Matx33f K = cv::Matx33f(gp->fx, 0, gp->cx, 0, gp->fy, gp->cy, 0, 0, 1);
 
  	// Set the pose reader
 	std::unique_ptr<PoseReader> poseReader(new PoseReaderRBOT);
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
 
     std::shared_ptr<ttool::DModelManager> modelManagerPtr = std::make_shared<ttool::DModelManager>(gp->model_file, gtPoses);
     // Initialize the visualizer
-    ttool::Visualizer visualizer = ttool::Visualizer(gp, cameraPtr, modelManagerPtr);
+    ttool::Visualizer visualizer = ttool::Visualizer(cameraPtr, modelManagerPtr);
     cameraPtr->UpdateCamera();
 
     ttool::Input input(modelManagerPtr);
