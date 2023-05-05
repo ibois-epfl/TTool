@@ -279,7 +279,6 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
            }
         }
         avg /= cnt;
-//        std::cout << "Mean score: " << avg << "\n";
 
 		view->RenderSilhouette(objects[o], GL_FILL, true);
 		cv::Mat depth_inv_map = view->DownloadFrame(View::DEPTH);
@@ -289,15 +288,12 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 
         auto deltaT = Transformations::exp(-wJTJ.inv(cv::DECOMP_CHOLESKY) * JT);
 		cv::Matx44f T_cm = deltaT * objects[o]->getPose();
-       if (avg < 0.025) {
-        //    objects[o]->setPose(init_pose);
-        //    std::cout << "[RESET] Mean scores: " << avg << "\n";
+       if (avg < 0.0125) {
+           objects[o]->setPose(init_pose);
+           std::cout << "[RESET] Mean scores: " << avg << "\n";
        }
        else if (avg < 0.2) {
-//           objects[o]->setPose(init_pose);
-//           objects[o]->setPose(objects[0]->getPose());
             std::cout << "[FREEZED] Mean scores: " << avg << "\n";
-//            objects[o]->setPose(init_pose);
        }
        else {
            std::cout << "[UPDATE] ROI " << roi.area() << " avg: " << avg << "\n";
