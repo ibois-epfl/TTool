@@ -70,6 +70,7 @@ namespace tk {
         /////////////////////////////////////
         // camera
         /////////////////////////////////////
+        ReadValue(fs, "camera_config_file", camera_config_file);
         ReadArray(fs, "K", K);
         ReadArray(fs, "dist_coeff", dist_coeff);
         ReadValue(fs, "preprocess_width", preprocess_width);

@@ -35,11 +35,13 @@ int main(int argc, char **argv)
         cameraPtr.reset(Camera::BuildCamera(gp->frames));
     }
 
-    cv::Matx33f K = cv::Matx33f(gp->K[0], gp->K[1], gp->K[2], gp->K[3], gp->K[4], gp->K[5], gp->K[6], gp->K[7], gp->K[8]);
+    cameraPtr->ReadFromFile(gp->camera_config_file);
 
-    cameraPtr->SetK(K);
-    cameraPtr->SetDistCoeff(gp->dist_coeff);
-    cameraPtr->SetPreprocessSize(gp->preprocess_width, gp->preprocess_height);
+    // cv::Matx33f K = cv::Matx33f(gp->K[0], gp->K[1], gp->K[2], gp->K[3], gp->K[4], gp->K[5], gp->K[6], gp->K[7], gp->K[8]);
+
+    // cameraPtr->SetK(K);
+    // cameraPtr->SetDistCoeff(gp->dist_coeff);
+    // cameraPtr->SetPreprocessSize(gp->preprocess_width, gp->preprocess_height);
 
 	gp->image_width = cameraPtr->width;
 	gp->image_height = cameraPtr->height;
@@ -61,7 +63,7 @@ int main(int argc, char **argv)
     tslet::ObjectTracker objectTracker;
     for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
     {
-        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), gp->tracker_mode, K);
+        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), gp->tracker_mode, cameraPtr->GetK());
         modelManagerPtr->IncreaseObjectID();
     }
 

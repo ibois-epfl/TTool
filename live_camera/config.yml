@@ -38,11 +38,12 @@ tracker_mode: 1
 ################
 # camera
 ################
-K: [5.6179718862595769e+02, 0., 6.4349424059711373e+02, 0., 5.6146049053435411e+02, 3.4430617832682464e+02, 0., 0., 1.]
-dist_coeff: [-2.4776321654659408e-01, 7.4589742789025762e-02, 2.0010415733276928e-04, 2.3476155179987635e-04, -1.0510058960990047e-02]
+camera_config_file: "./live_camera/calibration_orange_B_1280_720_r.yml"
+K: [1, 0., 1, 0., 1, 2, 0., 0., 1.] # not used
+dist_coeff: [0, 0, 0, 0, 0] # not used
 # Camera preprocess will resize to this
-preprocess_width: 1280
-preprocess_height: 720
+preprocess_width: 128 # not used
+preprocess_height: 72 # not used
 
 ################
 # input

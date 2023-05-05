@@ -63,6 +63,7 @@ namespace tk {
         std::vector<int> iters;
 
         // camera
+        std::string camera_config_file;
         std::vector<float> K{};
         std::vector<float> dist_coeff{};
         int preprocess_width{};

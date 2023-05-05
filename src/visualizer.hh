@@ -18,7 +18,7 @@ namespace ttool
 
             // Initialize the view
             View* view = View::Instance();
-            view->init(K, gp->image_width, gp->image_height, gp->zn, gp->zf, 4);
+            view->init(K, cameraPtr->GetPreprocessWidth(), cameraPtr->GetPreprocessHeight(), gp->zn, gp->zf, 4);
 
             m_ModelManagerPtr = modelManagerPtr;
             m_ModelManagerPtr->InitModels();

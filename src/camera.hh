@@ -5,7 +5,6 @@
 #include <sstream>
 #include <iomanip>
 #include <opencv2/opencv.hpp>
-// #include <glog/logging.h>
 
 #ifdef WIN32
 #include "base/dirent_win.h"
@@ -27,22 +26,38 @@ public:
 
     void preprocess();
 
-	void SetK(cv::Matx33f K) {
+	void SetK(cv::Matx33f K)
+	{
 		m_K = K;
 	}
 
-	cv::Matx33f GetK() {
+	cv::Matx33f GetK()
+	{
 		return m_K;
 	}
 
-	void SetDistCoeff(std::vector<float> distCoeff) {
+	void SetDistCoeff(std::vector<float> distCoeff)
+	{
 		m_distCoeff = distCoeff;
 	}
 
-	void SetPreprocessSize(int width, int height) {
+	void SetPreprocessSize(int width, int height)
+	{
 		m_preprocessWidth = width;
 		m_preprocessHeight = height;
 	}
+
+	int GetPreprocessWidth()
+	{
+		return m_preprocessWidth;
+	}
+
+	int GetPreprocessHeight()
+	{
+		return m_preprocessHeight;
+	}
+
+	void ReadFromFile(std::string filePath);
 
 	int width = -1;
 	int height = -1;
