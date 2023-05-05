@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
     std::shared_ptr<ttool::DModelManager> modelManagerPtr = std::make_shared<ttool::DModelManager>(gp->model_file, gtPoses);
     // Initialize the visualizer
-    ttool::Visualizer visualizer = ttool::Visualizer(cameraPtr, modelManagerPtr);
+    ttool::Visualizer visualizer = ttool::Visualizer(gp, cameraPtr, modelManagerPtr);
     cameraPtr->UpdateCamera();
 
     ttool::Input input(modelManagerPtr);
