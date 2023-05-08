@@ -55,10 +55,10 @@ camera_id: 2
 ################
 # output
 ################
-input_pose_file: "./model_drill_scaled/input_pose.txt"
-tk_pose_file: "./model_drill_scaled/out/regular.tk"
-result_video_file: "./model_drill_scaled/out/regular_tk.avi"
-result_img_dir: "./model_drill_scaled/out/regular"
-err_file: "./model_drill_scaled/out/regular.err"
-fps_file: "./model_drill_scaled/out/regular.fps"
-report_file: "./model_drill_scaled/out/_report.txt"
+input_pose_file: "./live_camera/input_pose.txt"
+tk_pose_file: "./live_camera/out/regular.tk"
+result_video_file: "./live_camera/out/regular_tk.avi"
+result_img_dir: "./live_camera/out/regular"
+err_file: "./live_camera/out/regular.err"
+fps_file: "./live_camera/out/regular.fps"
+report_file: "./live_camera/out/_report.txt"
