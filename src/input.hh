@@ -54,6 +54,9 @@ namespace ttool
             case char(KEY_UP):
                 m_ModelManagerPtr->IncreaseObjectID();
                 break;
+            case 'r':
+                m_ModelManagerPtr->ResetObjectToGroundTruth();
+                break;
             // Translate the model
             case 'w':
                 Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, -1.0f, 0.0f));
@@ -113,8 +116,8 @@ namespace ttool
                     << pose(1, 1) << " " << pose(1, 2) << " " << pose(2, 0) << " " << pose(2, 1) << " "
                     << pose(2, 2) << " " << pose(0, 3) << " " << pose(1, 3) << " " << pose(2, 3) << std::endl;
                 fs.close();
-            }
                 break;
+            }
             default:
                 break;
             }

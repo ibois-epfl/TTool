@@ -4,10 +4,10 @@
 - [x] *(URGENT)* Load the distortionCoeff, and the K parameters from the path, tracker should use the K, and distCoeff from the same vars as cameraPtr
 - [x] *(URGENT)* load calibration distortion matrix from external zml file instead of hardcoded *be sure that all across the source code the same calibration file is consumed* see https://github.com/ibois-epfl/TSlam/blob/88e61aee7063de8da604e5488d5b65a138f2878a/utils/tslam_reconstruct.cc
 - [x] branch with segmentation, main without segmentation
-- [x] change to local axis for translation and orientation manipulation for the pose input (as in blender)
-- [ ] Reset it to text initial pose User *we have reset to text gt pose and reset to checkpoint pose* 
+- [x] change to local axis for translation and orientation manipulation for the pose input (as in blender) (seems like local translation does not make any change, so only did rotation)
+- [x] Reset it to text initial pose User *we have reset to text gt pose and reset to checkpoint pose* 
 - [ ] Stop and freeze ('q' during the tracking) 50%
-- [ ] Overwrite the initial pose wiht one keymap User
+- [ ] Overwrite the initial pose with one keymap User
 - [ ] Reset the color histogram when rerun
 - [ ] Input write locally the pose and the mask for each tool head
 

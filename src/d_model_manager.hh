@@ -43,7 +43,17 @@ namespace ttool
                 // In case of multiple objects, each object should have a unique model ID for the viewer to render the contour correctly
                 // Originally in the SLET, the model ID is set in the Tracker class, but here we set it here
                 m_Objects[i]->setModelID(i + 1);
+                m_GroundTruthPoses[i + 1] = m_Objects[i]->getPose();
             }
+        }
+
+        /**
+         * @brief Reset the object to ground truth (from a text file)
+         * 
+         */
+        void ResetObjectToGroundTruth()
+        {
+            m_Objects[m_ObjectID]->setPose(m_GroundTruthPoses[m_ObjectID + 1]);
         }
 
         /**
@@ -86,6 +96,7 @@ namespace ttool
 
         private:
         std::vector<std::shared_ptr<Object3D>> m_Objects;
+        std::map<int, cv::Matx44f> m_GroundTruthPoses;
         int m_ObjectID = 0;
     };
 }
