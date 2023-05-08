@@ -151,10 +151,13 @@ namespace ttool
             cv::Matx44f pose = model->getPose();
             cv::Matx44f normalization = model->getNormalization();
 
-            auto worldCenter = (pose * normalization) * cv::Vec4f(center(0), center(1), center(2), 1.0f);
+            cv::Vec4f localAxis = (pose * normalization) * cv::Vec4f(axis(0), axis(1), axis(2), 0.0f);
+
+            cv::Vec4f worldCenter = (pose * normalization) * cv::Vec4f(center(0), center(1), center(2), 1.0f);
             worldCenter = worldCenter / worldCenter(3);
             pose = Transformations::translationMatrix(-worldCenter(0), -worldCenter(1), -worldCenter(2)) * pose;
-            pose = Transformations::rotationMatrix(angle, axis) * pose;
+            // pose = Transformations::rotationMatrix(angle, axis) * pose;
+            pose = Transformations::rotationMatrix(angle, cv::Vec3f(localAxis(0), localAxis(1), localAxis(2))) * pose;
             pose = Transformations::translationMatrix(worldCenter(0), worldCenter(1), worldCenter(2)) * pose;
             model->setPose(pose);
         }
