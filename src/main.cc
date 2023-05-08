@@ -51,6 +51,7 @@ int main(int argc, char **argv)
 
     ttool::Input input(modelManagerPtr);
     input.SetPoseOutput(gp->input_pose_file);
+    input.SetGtPoseOutput(gp->gt_pose_file);
 
     // Initialize the tracker
     tslet::ObjectTracker objectTracker;

@@ -7,7 +7,7 @@
 - [x] change to local axis for translation and orientation manipulation for the pose input (as in blender) (seems like local translation does not make any change, so only did rotation)
 - [x] Reset it to text initial pose User *we have reset to text gt pose and reset to checkpoint pose* 
 - [ ] Stop and freeze ('q' during the tracking) 50%
-- [ ] Overwrite the initial pose with one keymap User
+- [x] Overwrite the initial pose with one keymap User ('y')
 - [ ] Reset the color histogram when rerun
 - [ ] Input write locally the pose and the mask for each tool head
 

@@ -30,6 +30,11 @@ namespace ttool
             m_PoseOutput = poseOutput;
         }
 
+        void SetGtPoseOutput(std::string gtPoseOutput)
+        {
+            m_GtPoseOutput = gtPoseOutput;
+        }
+
         /**
          * @brief Get the pose
          * 
@@ -95,6 +100,45 @@ namespace ttool
             case 'o':
                 Rotate(m_ModelManagerPtr->GetObject(), 1.0f, cv::Vec3f(0.0f, -1.0f, 0.0f));
                 break;
+            case 'y':
+            {
+                cv::Matx44f pose = m_ModelManagerPtr->GetObject()->getPose();
+                std::cout << "pose: " << pose << std::endl;
+                m_ModelManagerPtr->GetObject()->setInitialPose(pose);
+
+                std::ifstream fsRead(m_GtPoseOutput);
+                std::vector<std::string> lines;
+                std::string line;
+                if (fsRead.is_open())
+                {
+                    while (getline(fsRead, line))
+                    {
+                        lines.push_back(line);
+                    }
+                }
+                fsRead.close();
+
+                int lineIndex = m_ModelManagerPtr->GetObject()->getModelID() - 1;
+                lines[lineIndex + 2] = 
+                      std::to_string(pose(0, 0)) + " " + std::to_string(pose(0, 1)) + " " + std::to_string(pose(0, 2)) + " " + std::to_string(pose(1, 0)) + " "
+                    + std::to_string(pose(1, 1)) + " " + std::to_string(pose(1, 2)) + " " + std::to_string(pose(2, 0)) + " " + std::to_string(pose(2, 1)) + " "
+                    + std::to_string(pose(2, 2)) + " " + std::to_string(pose(0, 3)) + " " + std::to_string(pose(1, 3)) + " " + std::to_string(pose(2, 3));
+                
+                std::ofstream fsWrite;
+                fsWrite.open(m_GtPoseOutput);
+                if (!fsWrite.is_open())
+                {
+                    std::cerr << "failed to open pose file, press any key to exit" << std::endl;
+                    getchar();
+                    exit(-1);
+                }
+                for (auto &line : lines)
+                {
+                    fsWrite << line << std::endl;
+                }
+                fsWrite.close();
+                break;
+            }
             // Save the pose of the model
             case 'p':
             {
@@ -167,6 +211,7 @@ namespace ttool
 
         private:
         std::string m_PoseOutput;
+        std::string m_GtPoseOutput;
         std::shared_ptr<DModelManager> m_ModelManagerPtr;
     };
     
