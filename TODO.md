@@ -6,9 +6,9 @@
 - [x] branch with segmentation, main without segmentation
 - [x] change to local axis for translation and orientation manipulation for the pose input (as in blender) (seems like local translation does not make any change, so only did rotation)
 - [x] Reset it to text initial pose User *we have reset to text gt pose and reset to checkpoint pose* 
-- [ ] Stop and freeze ('q' during the tracking) 50%
+- [x] Stop and freeze ('q' during the tracking) ('y' during tracking will write the pose to gt_pose and stop the tracking) 50%
 - [x] Overwrite the initial pose with one keymap User ('y')
-- [ ] Reset the color histogram when rerun
+- [x] Reset the color histogram when rerun -> histogram get make of the projected frame and use that for the new histogram. each time the new tracking occur, the histogram is updated to the user input pose before the tracking start. So technicall it has already been done.
 - [ ] Input write locally the pose and the mask for each tool head
 
 
