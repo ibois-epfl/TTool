@@ -11,7 +11,7 @@ namespace ttool
     struct DModelManager
     {
         public:
-        DModelManager(std::vector<cv::String> modelFile, std::vector<cv::Matx44f> gtPoses, std::shared_ptr<Config> configPtr)
+        DModelManager(std::vector<cv::String> modelFile, std::vector<cv::Matx44f> &gtPoses, std::shared_ptr<Config> configPtr)
         {
             // Initialize object(s) to with model file, starting pose, ...
             std::vector<float> distances = { 200.0f, 400.0f, 600.0f };
