@@ -38,6 +38,7 @@ namespace ttool
             float Zn;
             float Zf;
             
+            // Unordered maps are used to help Setters more dynamic typed
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::string>>> stringVectorMembers = {
                 {"modelFiles", std::ref(ModelFiles)}
             };
@@ -65,6 +66,12 @@ namespace ttool
                 {"cameraConfigFile", std::ref(CameraConfigFile)}
             };
 
+            /**
+             * @brief Set the Value object
+             * 
+             * @param key key of the value to set
+             * @param value value to set
+             */
             void setValue(std::string key, std::vector<std::string> value)
             {
                 SET_UNORDERED_MAP_VALUE(stringVectorMembers, key, value);
@@ -76,6 +83,12 @@ namespace ttool
                 }
             }
 
+            /**
+             * @brief Set the Value object
+             * 
+             * @param key key of the value to set
+             * @param value value to set
+             */
             void setValue(std::string key, std::vector<std::vector<float>> value)
             {
                 SET_UNORDERED_MAP_VALUE(floatVectorVectorMembers, key, value);
@@ -87,6 +100,12 @@ namespace ttool
                 }
             }
 
+            /**
+             * @brief Set the Value object
+             * 
+             * @param key key of the value to set
+             * @param value value to set
+             */
             void setValue(std::string key, int value)
             {
                 SET_UNORDERED_MAP_VALUE(intMembers, key, value);
@@ -97,6 +116,12 @@ namespace ttool
                 }
             }
 
+            /**
+             * @brief Set the Value object
+             * 
+             * @param key key of the value to set
+             * @param value value to set
+             */
             void setValue(std::string key, float value)
             {
                 SET_UNORDERED_MAP_VALUE(floatMembers, key, value);
@@ -107,6 +132,12 @@ namespace ttool
                 }
             }
 
+            /**
+             * @brief Set the Value object
+             * 
+             * @param key key of the value to set
+             * @param value value to set
+             */
             void setValue(std::string key, std::string value)
             {
                 SET_UNORDERED_MAP_VALUE(stringMembers, key, value);
@@ -127,6 +158,10 @@ namespace ttool
                 LoadConfigFile();
             }
 
+            /**
+             * @brief Read the config file and set the values to the ConfigData object
+             * 
+             */
             void LoadConfigFile()
             {
                 cv::FileStorage fs(m_ConfigFile, cv::FileStorage::READ);
@@ -151,9 +186,17 @@ namespace ttool
                 m_ConfigData.setValue("alphaBackground", (float)fs["alphaBackground"]);
 
                 m_ConfigData.setValue("zn", (float)fs["zn"]);
-                m_ConfigData.setValue("zf", (float)fs["zf"]);
+                m_ConfigData.setValue("zf", (float)fs["zf"]);           
 
+                return fs.release();
+            }
 
+            /**
+             * @brief Print the config file to the console
+             * 
+             */
+            void PrintConfigFile()
+            {
                 std::cout << "Config file loaded: " << m_ConfigFile << std::endl;
                 std::cout << "Model files: " << std::endl;
                 for (auto& modelFile : m_ConfigData.ModelFiles)
@@ -180,12 +223,12 @@ namespace ttool
                 std::cout << "Alpha background: " << m_ConfigData.AlphaBackground << std::endl;
                 std::cout << "Zn: " << m_ConfigData.Zn << std::endl;
                 std::cout << "Zf: " << m_ConfigData.Zf << std::endl;
-            
-
-                return fs.release();
             }
 
-
+            /**
+             * @brief Dump the ConfigData to the config file in the disk
+             * 
+             */
             void DumpConfigFile()
             {
                 cv::FileStorage fs(m_ConfigFile, cv::FileStorage::WRITE);
@@ -211,13 +254,27 @@ namespace ttool
                 fs.release();
             }
 
+            /**
+             * @brief Get the Config Data object. This object is const meaning that it cannot be modified. To modify the config file, use the write function.
+             * 
+             * 
+             * @return const ConfigData& 
+             */
             const ConfigData& GetConfigData() const
             {
                 return m_ConfigData;
             }
 
+            /**
+             * @brief Write a value to the config file.
+             * 
+             * @tparam T type of the value to write
+             * @param key key of the value to write
+             * @param value value to write
+             * @param dumpConfigFile whether to dump the config file to the disk
+             */
             template<typename T>
-            void write(std::string key, T value)
+            void write(std::string key, T value, bool dumpConfigFile = true)
             {
                 m_ConfigData.setValue(key, value);
                 DumpConfigFile();
