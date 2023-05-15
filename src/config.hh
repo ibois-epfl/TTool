@@ -135,6 +135,7 @@ namespace ttool
                 std::vector<std::string> modelFiles;
                 fs["modelFiles"] >> modelFiles;
                 m_ConfigData.setValue("modelFiles", modelFiles);
+
                 std::vector<std::vector<float>> groundTruthPoses;
                 fs["groundTruthPoses"] >> groundTruthPoses;
                 m_ConfigData.setValue("groundTruthPoses", groundTruthPoses);

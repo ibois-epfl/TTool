@@ -1,6 +1,5 @@
 #pragma once
 
-#include "global_param.hh"
 #include "camera.hh"
 #include "view.hh"
 #include "viewer.hh"
@@ -12,13 +11,13 @@ namespace ttool
     struct Visualizer
     {
     public:
-        Visualizer(tk::GlobalParam* gp, std::shared_ptr<Camera> cameraPtr, std::shared_ptr<DModelManager> modelManagerPtr)
+        Visualizer(std::shared_ptr<Camera> cameraPtr, std::shared_ptr<DModelManager> modelManagerPtr, int zn, int zf)
         {
             cv::Matx33f K = cameraPtr->GetK();
 
             // Initialize the view
             View* view = View::Instance();
-            view->init(K, cameraPtr->GetPreprocessWidth(), cameraPtr->GetPreprocessHeight(), gp->zn, gp->zf, 4);
+            view->init(K, cameraPtr->GetPreprocessWidth(), cameraPtr->GetPreprocessHeight(), zn, zf, 4);
 
             m_ModelManagerPtr = modelManagerPtr;
             m_ModelManagerPtr->InitModels();

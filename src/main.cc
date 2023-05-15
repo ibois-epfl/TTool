@@ -1,5 +1,4 @@
 #include "camera.hh"
-#include "global_param.hh"
 #include "model.hh"
 #include "pose_io.hh"
 #include "visualizer.hh"
@@ -7,6 +6,7 @@
 #include "tracker.hh"
 #include "d_model_manager.hh"
 #include "object_tracker.hh"
+#include "config.hh"
 
 #include <algorithm>
 #include <iostream>
@@ -18,46 +18,64 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
     std::string config_file = argv[1];
-
-    tk::GlobalParam* gp = tk::GlobalParam::Instance();
-	gp->ParseConfig(config_file);
-
+    ttool::Config config(config_file);
 	std::shared_ptr<Camera> cameraPtr;
-    if (gp->frames == "")
+    if (config.GetConfigData().Frames == "")
     {
-        std::cout << "Using camera: " << gp->camera_id << std::endl;
-        cameraPtr.reset(Camera::BuildCamera(gp->camera_id));
+        std::cout << "Using camera: " << config.GetConfigData().CameraID << std::endl;
+        cameraPtr.reset(Camera::BuildCamera(config.GetConfigData().CameraID));
     }
     else
     {
-        std::cout << "Using frames: " << gp->frames << std::endl;
-        cameraPtr.reset(Camera::BuildCamera(gp->frames));
+        std::cout << "Using frames: " << config.GetConfigData().Frames << std::endl;
+        cameraPtr.reset(Camera::BuildCamera(config.GetConfigData().Frames));
     }
 
-    cameraPtr->ReadFromFile(gp->camera_config_file);
+    cameraPtr->ReadFromFile(config.GetConfigData().CameraConfigFile);
 
-	gp->image_width = cameraPtr->width;
-	gp->image_height = cameraPtr->height;
+	// gp->image_width = cameraPtr->width;
+	// gp->image_height = cameraPtr->height;
 
  	// Set the pose reader
-	std::unique_ptr<PoseReader> poseReader(new PoseReaderRBOT);
-	std::vector<std::vector<cv::Matx44f> > gtPoses;
-	poseReader->Read(gp->gt_pose_file, gtPoses);
+	std::vector<cv::Matx44f> gtPoses;
+	for (std::vector<float> gtPose : config.GetConfigData().GroundTruthPoses)
+    {
+        float m00 = gtPose[0];
+        float m01 = gtPose[1];
+        float m02 = gtPose[2];
+        float m10 = gtPose[3];
+        float m11 = gtPose[4];
+        float m12 = gtPose[5];
+        float m20 = gtPose[6];
+        float m21 = gtPose[7];
+        float m22 = gtPose[8];
+        float m03 = gtPose[9];
+        float m13 = gtPose[10];
+        float m23 = gtPose[11];
 
-    std::shared_ptr<ttool::DModelManager> modelManagerPtr = std::make_shared<ttool::DModelManager>(gp->model_file, gtPoses);
+        gtPoses.push_back(cv::Matx44f(
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23,
+        0, 0, 0, 1));
+    }
+
+    std::shared_ptr<ttool::DModelManager> modelManagerPtr = std::make_shared<ttool::DModelManager>(config.GetConfigData().ModelFiles, gtPoses);
+    modelManagerPtr->SetPoseOutput(config_file);
+
     // Initialize the visualizer
-    ttool::Visualizer visualizer = ttool::Visualizer(gp, cameraPtr, modelManagerPtr);
+    ttool::Visualizer visualizer = ttool::Visualizer(cameraPtr, modelManagerPtr, config.GetConfigData().Zn, config.GetConfigData().Zf);
     cameraPtr->UpdateCamera();
 
     ttool::Input input(modelManagerPtr);
-    input.SetPoseOutput(gp->input_pose_file);
-    input.SetGtPoseOutput(gp->gt_pose_file);
+    // input.SetPoseOutput(gp->input_pose_file);
+    // input.SetGtPoseOutput(gp->gt_pose_file);
 
     // Initialize the tracker
     tslet::ObjectTracker objectTracker;
     for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
     {
-        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), gp->tracker_mode, cameraPtr->GetK());
+        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), cameraPtr->GetK());
         modelManagerPtr->IncreaseObjectID();
     }
 
@@ -70,7 +88,7 @@ int main(int argc, char **argv)
         int oid = modelManagerPtr->GetObject()->getModelID();
         int fid = 0;
         int key = cv::waitKey(1);
-        while ('p' != key && gp->frames == "")
+        while ('p' != key && config.GetConfigData().Frames == "")
         {
             if ('q' == key)
             {

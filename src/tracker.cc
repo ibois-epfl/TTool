@@ -4,7 +4,6 @@
 #include "view.hh"
 #include "histogram.hh"
 #include "tracker.hh"
-#include "global_param.hh"
 #include "object3d.hh"
 #include "search_line.hh"
 #include "tracker_sle.hh"
@@ -31,8 +30,6 @@ Tracker::Tracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& o
 
 Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<std::shared_ptr<Object3D>>& objects) {
 	Tracker* poseEstimator = NULL;
-
-	tk::GlobalParam* gp = tk::GlobalParam::Instance();
 
 	poseEstimator = new SLETracker(K, objects);
 
@@ -264,8 +261,6 @@ void TrackerBase::UpdateHist(cv::Mat frame) {
 SLTracker::SLTracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects)
 	: TrackerBase(K, objects)
 {
-	tk::GlobalParam* gp = tk::GlobalParam::Instance();
-
 	search_line = std::make_shared<SearchLine>();
 }
 

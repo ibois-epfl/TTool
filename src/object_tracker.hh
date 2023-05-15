@@ -10,13 +10,13 @@ namespace tslet
     struct ObjectTracker
     {
         public:
-        void Consume(int modelID, std::shared_ptr<Object3D> object, int trackerMode, cv::Matx33f K)
+        void Consume(int modelID, std::shared_ptr<Object3D> object, cv::Matx33f K)
         {
             cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
             if (!hasTracker(modelID))
             {
                 std::vector<std::shared_ptr<Object3D>>objects = {object};
-                std::shared_ptr<Tracker> trackerPtr(Tracker::GetTracker(trackerMode, K, distCoeffs, objects));
+                std::shared_ptr<Tracker> trackerPtr(Tracker::GetTracker(1, K, distCoeffs, objects));
                 modelID2tracker[modelID] = trackerPtr;
                 trackerPtr->ToggleTracking(0, true);
             }
