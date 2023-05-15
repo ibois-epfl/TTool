@@ -9,15 +9,11 @@
 - [x] Stop and freeze ('q' during the tracking) ('y' during tracking will write the pose to gt_pose and stop the tracking) 50%
 - [x] Overwrite the initial pose with one keymap User ('y')
 - [x] Reset the color histogram when rerun -> histogram get make of the projected frame and use that for the new histogram. each time the new tracking occur, the histogram is updated to the user input pose before the tracking start. So technicall it has already been done.
-- [ ] Input write locally the pose and the mask for each tool head
-
+- [x] Input write locally the pose and the mask for each tool head
 
 - [ ] Visualization keymap (help keystroke overlay)
 - [ ] Integrate the download in the github repository (CMake config download links)
 - [ ] Complete all the datasets, and place it on another repository
-
-- [ ] get args from the terminal, with default param from the yaml config file from SLET "/home/tpp/TTool/live_camera/config.yml"
-
 
 - [ ] Debugging of all the viewers *(Fragmentation nd contour views and stuff into the video)
 - [ ] (Optional) visualize bbox
