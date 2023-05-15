@@ -1,64 +1,23 @@
 %YAML:1.0
 ################
-# common vars
+# common vars TRACKER
 ################
-undistort_frame: 0
-unit_model: 1
-prev_gt: 0  # ??
-timeout: 1  # ??
-target_frame: 1  # ??
-alpha_fg: 0.1  # ??
-alpha_bg: 0.2  # ??
-
-# not use this anymore
-fx: 561.60752462847097  # for IBOIS camera
-fy: 562.91538638344332  # for IBOIS camera
-cx: 641.38172226013501  # for IBOIS camera
-cy: 341.56306804983251  # for IBOIS camera
-#fx: 929.500  # for IBOIS camera
-#fy: 935.203  # for IBOIS camera
-#cx: 356.485  # for IBOIS camera
-#cy: 251.174  # for IBOIS camera
+alphaForeground: 0.1  # ??
+alphaBackground: 0.2  # ??
 
 zn: 1  # ??
 zf: 4000  # ??
 
-line_len: 16  # ??
-sl_seg: 2  # ??
+histOffset: 100  # ??
+histRad: 40  # ??
+searchRad: 25  # ??
 
-hist_offset: 100  # ??
-hist_rad: 40  # ??
-search_rad: 25  # ??
+cameraConfigFile: "./live_camera/calibration_orange_B_1280_720_r.yml"
 
-show_result: 0  # ?
-bench_mode: 0 # ??  # original: 1
-# rbot 0, slet 1, slct 2, slft 3
-tracker_mode: 1
-
-################
-# camera
-################
-camera_config_file: "./live_camera/calibration_orange_B_1280_720_r.yml"
-K: [1, 0., 1, 0., 1, 2, 0., 0., 1.] # not used
-dist_coeff: [0, 0, 0, 0, 0] # not used
-# Camera preprocess will resize to this
-preprocess_width: 128 # not used
-preprocess_height: 72 # not used
-
-################
-# input
-################
-gt_pose_file: "./live_camera/gt_pose.txt"
-model_file: ["./model_drill_scaled/drill_scaled_1000.obj", "./saw_blade_scaled/saw_blade_thin_verythin.obj", "./circular_blade_scaled/circular_blade_scaled.obj"]
+groundTruthPoses: [
+  [0.774474, -0.432610, 0.461565, -0.160787, 0.571050, 0.805017, -0.611834, -0.697679, 0.372705, 11.744253, 14.884766, 188.102844],
+  [0.899114, -0.233195, -0.370431, 0.419063, 0.21414, 0.882346, -0.126434, -0.948561, 0.290258, 10.8038, 20.7629, 188.825],
+  [-0.49464369, 0.47779492, 0.72597826, -0.81523484, 0.034418296, -0.57811087, -0.30120492, -0.87779891, 0.37248972, -67, 6, 211]]
+modelFiles: ["./model_drill_scaled/drill_scaled_1000.obj", "./saw_blade_scaled/saw_blade_thin_verythin.obj", "./circular_blade_scaled/circular_blade_scaled.obj"]
 frames: ""
-camera_id: 2
-################
-# output
-################
-input_pose_file: "./live_camera/input_pose.txt"
-tk_pose_file: "./live_camera/out/regular.tk"
-result_video_file: "./live_camera/out/regular_tk.avi"
-result_img_dir: "./live_camera/out/regular"
-err_file: "./live_camera/out/regular.err"
-fps_file: "./live_camera/out/regular.fps"
-report_file: "./live_camera/out/_report.txt"
+cameraID: 2

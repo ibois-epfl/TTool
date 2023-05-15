@@ -1,0 +1,217 @@
+#pragma once
+
+#define SET_UNORDERED_MAP_VALUE(unorderedMap, key, value) \
+    auto it = unorderedMap.find(key); \
+    if (it != unorderedMap.end()) \
+        it->second.get() = value;
+
+#include <opencv2/opencv.hpp>
+#include <string>
+#include <iostream>
+#include <vector>
+#include <variant>
+#include <functional>
+#include <unordered_map>
+
+namespace ttool
+{
+    struct ConfigData
+    {
+        public:
+            // Model
+            std::vector<std::string> ModelFiles;
+            std::vector<std::vector<float>> GroundTruthPoses;
+
+            // Camera
+            std::string Frames;
+            int CameraID;
+            std::string CameraConfigFile;
+
+            // Histogram
+            int HistOffset;
+            int HistRad;
+            int SearchRad;
+            float AlphaForeground;
+            float AlphaBackground;
+
+            // Visualizer
+            float Zn;
+            float Zf;
+            
+            std::unordered_map<std::string, std::reference_wrapper<std::vector<std::string>>> stringVectorMembers = {
+                {"modelFiles", std::ref(ModelFiles)}
+            };
+
+            std::unordered_map<std::string, std::reference_wrapper<std::vector<std::vector<float>>>> floatVectorVectorMembers = {
+                {"groundTruthPoses", std::ref(GroundTruthPoses)}
+            };
+
+            std::unordered_map<std::string, std::reference_wrapper<int>> intMembers = {
+                {"cameraID", std::ref(CameraID)},
+                {"histOffset", std::ref(HistOffset)},
+                {"histRad", std::ref(HistRad)},
+                {"searchRad", std::ref(SearchRad)}
+            };
+
+            std::unordered_map<std::string, std::reference_wrapper<float>> floatMembers = {
+                {"alphaForeground", std::ref(AlphaForeground)},
+                {"alphaBackground", std::ref(AlphaBackground)},
+                {"zn", std::ref(Zn)},
+                {"zf", std::ref(Zf)}
+            };
+
+            std::unordered_map<std::string, std::reference_wrapper<std::string>> stringMembers = {
+                {"frames", std::ref(Frames)},
+                {"cameraConfigFile", std::ref(CameraConfigFile)}
+            };
+
+            void setValue(std::string key, std::vector<std::string> value)
+            {
+                SET_UNORDERED_MAP_VALUE(stringVectorMembers, key, value);
+                return;
+                if (auto it = stringVectorMembers.find(key); it != stringVectorMembers.end())
+                {
+                    it->second.get().clear();
+                    it->second.get() = value;
+                }
+            }
+
+            void setValue(std::string key, std::vector<std::vector<float>> value)
+            {
+                SET_UNORDERED_MAP_VALUE(floatVectorVectorMembers, key, value);
+                return;
+                if (auto it = floatVectorVectorMembers.find(key); it != floatVectorVectorMembers.end())
+                {
+                    it->second.get().clear();
+                    it->second.get() = value;
+                }
+            }
+
+            void setValue(std::string key, int value)
+            {
+                SET_UNORDERED_MAP_VALUE(intMembers, key, value);
+                return;
+                if (auto it = intMembers.find(key); it != intMembers.end())
+                {
+                    it->second.get() = value;
+                }
+            }
+
+            void setValue(std::string key, float value)
+            {
+                SET_UNORDERED_MAP_VALUE(floatMembers, key, value);
+                return;
+                if (auto it = floatMembers.find(key); it != floatMembers.end())
+                {
+                    it->second.get() = value;
+                }
+            }
+
+            void setValue(std::string key, std::string value)
+            {
+                SET_UNORDERED_MAP_VALUE(stringMembers, key, value);
+                return;
+                if (auto it = stringMembers.find(key); it != stringMembers.end())
+                {
+                    it->second.get() = value;
+                }
+            }
+    };
+
+    class Config
+    {
+        public:
+            Config(std::string configFile)
+            {
+                m_ConfigFile = configFile;
+                LoadConfigFile();
+            }
+
+            void LoadConfigFile()
+            {
+                cv::FileStorage fs(m_ConfigFile, cv::FileStorage::READ);
+                if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__) + " could not open file:" + m_ConfigFile);
+
+                std::vector<std::string> modelFiles;
+                fs["modelFiles"] >> modelFiles;
+                m_ConfigData.setValue("modelFiles", modelFiles);
+                std::vector<std::vector<float>> groundTruthPoses;
+                fs["groundTruthPoses"] >> groundTruthPoses;
+                m_ConfigData.setValue("groundTruthPoses", groundTruthPoses);
+
+                m_ConfigData.setValue("frames", (std::string)fs["frames"]);
+                m_ConfigData.setValue("cameraID", (int)fs["cameraID"]);
+                m_ConfigData.setValue("cameraConfigFile", (std::string)fs["cameraConfigFile"]);
+
+                m_ConfigData.setValue("histOffset", (int)fs["histOffset"]);
+                m_ConfigData.setValue("histRad", (int)fs["histRad"]);
+                m_ConfigData.setValue("searchRad", (int)fs["searchRad"]);
+                m_ConfigData.setValue("alphaForeground", (float)fs["alphaForeground"]);
+                m_ConfigData.setValue("alphaBackground", (float)fs["alphaBackground"]);
+
+                m_ConfigData.setValue("zn", (float)fs["zn"]);
+                m_ConfigData.setValue("zf", (float)fs["zf"]);
+
+
+                std::cout << "Config file loaded: " << m_ConfigFile << std::endl;
+                std::cout << "Model files: " << std::endl;
+                for (auto& modelFile : m_ConfigData.ModelFiles)
+                {
+                    std::cout << "\t" << modelFile << std::endl;
+                }   
+                std::cout << "Ground truth poses: " << std::endl;
+                for (auto& groundTruthPose : m_ConfigData.GroundTruthPoses)
+                {
+                    std::cout << "\t";
+                    for (auto& value : groundTruthPose)
+                    {
+                        std::cout << value << " ";
+                    }
+                    std::cout << std::endl;
+                }
+                std::cout << "Frames: " << m_ConfigData.Frames << std::endl;
+                std::cout << "Camera ID: " << m_ConfigData.CameraID << std::endl;
+                std::cout << "Camera config file: " << m_ConfigData.CameraConfigFile << std::endl;
+                std::cout << "Hist offset: " << m_ConfigData.HistOffset << std::endl;
+                std::cout << "Hist rad: " << m_ConfigData.HistRad << std::endl;
+                std::cout << "Search rad: " << m_ConfigData.SearchRad << std::endl;
+                std::cout << "Alpha foreground: " << m_ConfigData.AlphaForeground << std::endl;
+                std::cout << "Alpha background: " << m_ConfigData.AlphaBackground << std::endl;
+                std::cout << "Zn: " << m_ConfigData.Zn << std::endl;
+                std::cout << "Zf: " << m_ConfigData.Zf << std::endl;
+            
+
+                return fs.release();
+            }
+
+
+            void DumpConfigFile()
+            {
+                cv::FileStorage fs(m_ConfigFile, cv::FileStorage::WRITE);
+
+                fs.release();
+            }
+
+            const ConfigData& GetConfigData() const
+            {
+                return m_ConfigData;
+            }
+
+            template<typename T>
+            void write(std::string key, T value)
+            {
+                // m_ConfigData[key] = value;
+                DumpConfigFile();
+            }
+
+            void write(std::string key, std::string value)
+            {
+                cv::FileStorage fs(m_ConfigFile, cv::FileStorage::WRITE);
+                fs << key << value;
+                fs.release();
+            }
+        private:
+            std::string m_ConfigFile;
+            ConfigData m_ConfigData;
+    };
+}
