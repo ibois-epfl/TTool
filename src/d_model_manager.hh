@@ -1,29 +1,33 @@
 #pragma once
 
+#include "object3d.hh"
+#include "config.hh"
+
 #include <opencv2/opencv.hpp>
 
-#include "object3d.hh"
 
 namespace ttool
 {
     struct DModelManager
     {
         public:
-        DModelManager(std::vector<cv::String> modelFile, std::vector<std::vector<cv::Matx44f>> gtPoses)
+        DModelManager(std::vector<cv::String> modelFile, std::vector<cv::Matx44f> gtPoses, std::shared_ptr<Config> configPtr)
         {
             // Initialize object(s) to with model file, starting pose, ...
-            int targetFrame = 1;
             std::vector<float> distances = { 200.0f, 400.0f, 600.0f };
-            int initFid = targetFrame - 1 >= 0 ? targetFrame - 1 : targetFrame;
             for (int i = 0; i < modelFile.size(); ++i)
             {
+                std::cout << modelFile[i] << std::endl;
+                std::cout << gtPoses[i] << std::endl;
                 std::shared_ptr<Object3D> objPtr = std::make_shared<Object3D>(modelFile[i],
-                                                                            gtPoses[i][initFid],
+                                                                            gtPoses[i],
                                                                             1.0,
                                                                             0.55f,
                                                                             distances);
                 m_Objects.push_back(objPtr);
             }
+
+            m_ConfigPtr = configPtr;
         }
 
         /**
@@ -94,9 +98,48 @@ namespace ttool
             return m_Objects.size();
         }
 
+        /**
+         * @brief Save all the poses of the model to the specified config file (m_PoseOutput)
+         * 
+         */
+        void SavePosesToConfig()
+        {
+            std::vector<std::vector<float>> poses;
+            for (int i = 0; i < m_Objects.size(); ++i)
+            {
+                cv::Matx44f pose = m_Objects[i]->getPose();
+                float m00 = pose(0, 0);
+                float m01 = pose(0, 1);
+                float m02 = pose(0, 2);
+                float m03 = pose(0, 3); 
+                float m10 = pose(1, 0);
+                float m11 = pose(1, 1);
+                float m12 = pose(1, 2);
+                float m13 = pose(1, 3);
+                float m20 = pose(2, 0);
+                float m21 = pose(2, 1);
+                float m22 = pose(2, 2);
+                float m23 = pose(2, 3);
+
+
+                poses.push_back(
+                    std::vector<float>{m00, m01, m02,
+                                       m10, m11, m12,
+                                       m20, m21, m22,
+                                       m03, m13, m23});
+            }
+            
+            std::cout << m_PoseOutput << std::endl;
+            
+            m_ConfigPtr->GetConfigData().setValue("groundTruthPoses", poses);
+            m_ConfigPtr->write("eiei", "hey");
+        }
+
         private:
+        std::string m_PoseOutput;
         std::vector<std::shared_ptr<Object3D>> m_Objects;
         std::map<int, cv::Matx44f> m_GroundTruthPoses;
         int m_ObjectID = 0;
+        std::shared_ptr<Config> m_ConfigPtr;
     };
 }

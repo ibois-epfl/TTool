@@ -105,38 +105,7 @@ namespace ttool
                 cv::Matx44f pose = m_ModelManagerPtr->GetObject()->getPose();
                 std::cout << "pose: " << pose << std::endl;
                 m_ModelManagerPtr->GetObject()->setInitialPose(pose);
-
-                std::ifstream fsRead(m_GtPoseOutput);
-                std::vector<std::string> lines;
-                std::string line;
-                if (fsRead.is_open())
-                {
-                    while (getline(fsRead, line))
-                    {
-                        lines.push_back(line);
-                    }
-                }
-                fsRead.close();
-
-                int lineIndex = m_ModelManagerPtr->GetObject()->getModelID() - 1;
-                lines[lineIndex + 2] = 
-                      std::to_string(pose(0, 0)) + " " + std::to_string(pose(0, 1)) + " " + std::to_string(pose(0, 2)) + " " + std::to_string(pose(1, 0)) + " "
-                    + std::to_string(pose(1, 1)) + " " + std::to_string(pose(1, 2)) + " " + std::to_string(pose(2, 0)) + " " + std::to_string(pose(2, 1)) + " "
-                    + std::to_string(pose(2, 2)) + " " + std::to_string(pose(0, 3)) + " " + std::to_string(pose(1, 3)) + " " + std::to_string(pose(2, 3));
-                
-                std::ofstream fsWrite;
-                fsWrite.open(m_GtPoseOutput);
-                if (!fsWrite.is_open())
-                {
-                    std::cerr << "failed to open pose file, press any key to exit" << std::endl;
-                    getchar();
-                    exit(-1);
-                }
-                for (auto &line : lines)
-                {
-                    fsWrite << line << std::endl;
-                }
-                fsWrite.close();
+                m_ModelManagerPtr->SavePosesToConfig();
                 break;
             }
             // Save the pose of the model

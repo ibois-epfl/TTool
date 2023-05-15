@@ -189,11 +189,29 @@ namespace ttool
             void DumpConfigFile()
             {
                 cv::FileStorage fs(m_ConfigFile, cv::FileStorage::WRITE);
+                if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__) + " could not open file:" + m_ConfigFile);
+
+                fs << "alphaForeground" << m_ConfigData.AlphaForeground;
+                fs << "alphaBackground" << m_ConfigData.AlphaBackground;
+
+                fs << "zn" << m_ConfigData.Zn;
+                fs << "zf" << m_ConfigData.Zf;
+
+                fs << "histOffset" << m_ConfigData.HistOffset;
+                fs << "histRad" << m_ConfigData.HistRad;
+                fs << "searchRad" << m_ConfigData.SearchRad;
+                
+                fs << "cameraConfigFile" << m_ConfigData.CameraConfigFile;
+                
+                fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;
+                fs << "modelFiles" << m_ConfigData.ModelFiles;
+                fs << "frames" << m_ConfigData.Frames;
+                fs << "cameraID" << m_ConfigData.CameraID;
 
                 fs.release();
             }
 
-            const ConfigData& GetConfigData() const
+            ConfigData GetConfigData()
             {
                 return m_ConfigData;
             }

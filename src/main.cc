@@ -18,27 +18,24 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
     std::string config_file = argv[1];
-    ttool::Config config(config_file);
+    std::shared_ptr<ttool::Config> config = std::make_shared<ttool::Config>(config_file);
 	std::shared_ptr<Camera> cameraPtr;
-    if (config.GetConfigData().Frames == "")
+    if (config->GetConfigData().Frames == "")
     {
-        std::cout << "Using camera: " << config.GetConfigData().CameraID << std::endl;
-        cameraPtr.reset(Camera::BuildCamera(config.GetConfigData().CameraID));
+        std::cout << "Using camera: " << config->GetConfigData().CameraID << std::endl;
+        cameraPtr.reset(Camera::BuildCamera(config->GetConfigData().CameraID));
     }
     else
     {
-        std::cout << "Using frames: " << config.GetConfigData().Frames << std::endl;
-        cameraPtr.reset(Camera::BuildCamera(config.GetConfigData().Frames));
+        std::cout << "Using frames: " << config->GetConfigData().Frames << std::endl;
+        cameraPtr.reset(Camera::BuildCamera(config->GetConfigData().Frames));
     }
 
-    cameraPtr->ReadFromFile(config.GetConfigData().CameraConfigFile);
-
-	// gp->image_width = cameraPtr->width;
-	// gp->image_height = cameraPtr->height;
+    cameraPtr->ReadFromFile(config->GetConfigData().CameraConfigFile);
 
  	// Set the pose reader
 	std::vector<cv::Matx44f> gtPoses;
-	for (std::vector<float> gtPose : config.GetConfigData().GroundTruthPoses)
+	for (std::vector<float> gtPose : config->GetConfigData().GroundTruthPoses)
     {
         float m00 = gtPose[0];
         float m01 = gtPose[1];
@@ -60,11 +57,10 @@ int main(int argc, char **argv)
         0, 0, 0, 1));
     }
 
-    std::shared_ptr<ttool::DModelManager> modelManagerPtr = std::make_shared<ttool::DModelManager>(config.GetConfigData().ModelFiles, gtPoses);
-    modelManagerPtr->SetPoseOutput(config_file);
+    std::shared_ptr<ttool::DModelManager> modelManagerPtr = std::make_shared<ttool::DModelManager>(config->GetConfigData().ModelFiles, gtPoses, config);
 
     // Initialize the visualizer
-    ttool::Visualizer visualizer = ttool::Visualizer(cameraPtr, modelManagerPtr, config.GetConfigData().Zn, config.GetConfigData().Zf);
+    ttool::Visualizer visualizer = ttool::Visualizer(cameraPtr, modelManagerPtr, config->GetConfigData().Zn, config->GetConfigData().Zf);
     cameraPtr->UpdateCamera();
 
     ttool::Input input(modelManagerPtr);
@@ -88,7 +84,7 @@ int main(int argc, char **argv)
         int oid = modelManagerPtr->GetObject()->getModelID();
         int fid = 0;
         int key = cv::waitKey(1);
-        while ('p' != key && config.GetConfigData().Frames == "")
+        while ('p' != key && config->GetConfigData().Frames == "")
         {
             if ('q' == key)
             {
