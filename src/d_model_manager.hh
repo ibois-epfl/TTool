@@ -131,8 +131,7 @@ namespace ttool
             
             std::cout << m_PoseOutput << std::endl;
             
-            m_ConfigPtr->GetConfigData().setValue("groundTruthPoses", poses);
-            m_ConfigPtr->write("eiei", "hey");
+            m_ConfigPtr->write("groundTruthPoses", poses);
         }
 
         private:

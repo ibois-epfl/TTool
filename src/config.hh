@@ -211,7 +211,7 @@ namespace ttool
                 fs.release();
             }
 
-            ConfigData GetConfigData()
+            const ConfigData& GetConfigData() const
             {
                 return m_ConfigData;
             }
@@ -219,16 +219,10 @@ namespace ttool
             template<typename T>
             void write(std::string key, T value)
             {
-                // m_ConfigData[key] = value;
+                m_ConfigData.setValue(key, value);
                 DumpConfigFile();
             }
 
-            void write(std::string key, std::string value)
-            {
-                cv::FileStorage fs(m_ConfigFile, cv::FileStorage::WRITE);
-                fs << key << value;
-                fs.release();
-            }
         private:
             std::string m_ConfigFile;
             ConfigData m_ConfigData;
