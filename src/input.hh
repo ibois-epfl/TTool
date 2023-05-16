@@ -8,31 +8,17 @@
 #include "model.hh"
 #include "transformations.hh"
 #include "d_model_manager.hh"
+#include "visualizer.hh"
 
 namespace ttool
 {
     struct Input
     {
         public:
-        Input(std::shared_ptr<DModelManager> modelManagerPtr)
+        Input(std::shared_ptr<DModelManager> modelManagerPtr, std::shared_ptr<Visualizer> visualizerPtr)
         {
             m_ModelManagerPtr = modelManagerPtr;
-            m_PoseOutput = "input_pose.txt";
-        }
-
-        /**
-         * @brief Set the pose output file
-         * 
-         * @param poseOutput 
-         */
-        void SetPoseOutput(std::string poseOutput)
-        {
-            m_PoseOutput = poseOutput;
-        }
-
-        void SetGtPoseOutput(std::string gtPoseOutput)
-        {
-            m_GtPoseOutput = gtPoseOutput;
+            m_VisualizerPtr = visualizerPtr;
         }
 
         /**
@@ -114,22 +100,11 @@ namespace ttool
                 cv::Matx44f pose = m_ModelManagerPtr->GetObject()->getPose();
                 std::cout << "pose: " << pose << std::endl;
                 m_ModelManagerPtr->GetObject()->setInitialPose(pose);
-                std::ofstream fs;
-                fs.open(m_PoseOutput, std::ios_base::app);
-                if (!fs.is_open()) {
-                    std::cerr << "failed to open pose file, press any key to exit" << std::endl;
-                    getchar();
-                    exit(-1);
-                }
-
-                std::time_t t = std::time(nullptr);
-                std::tm tm = *std::localtime(&t);
-                fs << "# " << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << std::endl;
-                fs << pose(0, 0) << " " << pose(0, 1) << " " << pose(0, 2) << " " << pose(1, 0) << " "
-                    << pose(1, 1) << " " << pose(1, 2) << " " << pose(2, 0) << " " << pose(2, 1) << " "
-                    << pose(2, 2) << " " << pose(0, 3) << " " << pose(1, 3) << " " << pose(2, 3) << std::endl;
-                fs.close();
                 break;
+            }
+            case 'h':
+            {
+                m_VisualizerPtr->ToggleShowKeymaps();
             }
             default:
                 break;
@@ -179,9 +154,8 @@ namespace ttool
         }
 
         private:
-        std::string m_PoseOutput;
-        std::string m_GtPoseOutput;
         std::shared_ptr<DModelManager> m_ModelManagerPtr;
+        std::shared_ptr<Visualizer> m_VisualizerPtr;
     };
     
 

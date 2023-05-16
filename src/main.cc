@@ -7,6 +7,7 @@
 #include "d_model_manager.hh"
 #include "object_tracker.hh"
 #include "config.hh"
+#include "event.hh"
 
 #include <algorithm>
 #include <iostream>
@@ -60,10 +61,10 @@ int main(int argc, char **argv)
     std::shared_ptr<ttool::DModelManager> modelManagerPtr = std::make_shared<ttool::DModelManager>(config->GetConfigData().ModelFiles, gtPoses, config);
 
     // Initialize the visualizer
-    ttool::Visualizer visualizer = ttool::Visualizer(cameraPtr, modelManagerPtr, config->GetConfigData().Zn, config->GetConfigData().Zf);
+    std::shared_ptr<ttool::Visualizer> visualizerPtr = std::make_shared<ttool::Visualizer>(cameraPtr, modelManagerPtr, config->GetConfigData().Zn, config->GetConfigData().Zf);
     cameraPtr->UpdateCamera();
 
-    ttool::Input input(modelManagerPtr);
+    ttool::Input input(modelManagerPtr, visualizerPtr);
 
     // Initialize the tracker
     tslet::ObjectTracker objectTracker;
@@ -73,11 +74,9 @@ int main(int argc, char **argv)
         modelManagerPtr->IncreaseObjectID();
     }
 
-    // Cache segmentations for each object
-    std::map<int, cv::Mat> modelID2mask;
-
     while (true)
     {
+        visualizerPtr->UpdateEvent(ttool::EventType::ReadyLiveCamera);
         // 1 Tsegment
         int oid = modelManagerPtr->GetObject()->getModelID();
         int fid = 0;
@@ -89,13 +88,11 @@ int main(int argc, char **argv)
                 break;
             }
             input.ConsumeKey(key);
-            visualizer.UpdateVisualizer(fid);
+            visualizerPtr->UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
             key = cv::waitKey(1);
             oid = modelManagerPtr->GetObject()->getModelID();
         }
-
-        cv::Mat mask = cameraPtr->image();
         // cv::Mat mask = modelID2mask[oid];
 
         // // 2a TML
@@ -108,9 +105,10 @@ int main(int argc, char **argv)
 
         // 2b UI pose input
         std::cout << "Please input the pose of the object" << std::endl;
+        visualizerPtr->UpdateEvent(ttool::EventType::PoseInput);
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
-            visualizer.UpdateVisualizer(fid);
+            visualizerPtr->UpdateVisualizer(fid);
             int key = cv::waitKey(1);
             // Save the pose
             if ('p' == key)
@@ -122,6 +120,7 @@ int main(int argc, char **argv)
             input.ConsumeKey(key);
         }
         // 3 TSlet
+        visualizerPtr->UpdateEvent(ttool::EventType::Tracking);
         objectTracker.FeedNewFrame(oid, cameraPtr->image());
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
@@ -142,7 +141,7 @@ int main(int argc, char **argv)
             }
 
             objectTracker.EstimatePose(oid, cameraPtr->image());
-            visualizer.UpdateVisualizer(fid);
+            visualizerPtr->UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
             objectTracker.FeedNewFrame(oid, cameraPtr->image());
             ++fid;

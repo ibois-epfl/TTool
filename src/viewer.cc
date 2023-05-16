@@ -1,7 +1,6 @@
 #include <opencv2/highgui.hpp>
 
 #include "viewer.hh"
-// #include "model.hh"
 #include "view.hh"
 
 void Viewer::StartSavingImages(const std::filesystem::path &path)
@@ -77,7 +76,10 @@ void ContourViewer::UpdateViewer(int fid)
 	PrintID(fid, contour_img);
 
 	if (display_images_)
+	{
+		DrawInterface(contour_img);
 		ShowImage(contour_img);
+	}
 
 	if (save_images_)
 		cv::imwrite(
@@ -143,7 +145,10 @@ void FragmentViewer::UpdateViewer(int fid)
 	PrintID(fid, res_img);
 
 	if (display_images_)
+	{
+		DrawInterface(res_img);
 		ShowImage(res_img);
+	}
 
 	if (save_images_)
 		cv::imwrite(

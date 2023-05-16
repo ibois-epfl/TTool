@@ -5,6 +5,7 @@
 #include "viewer.hh"
 #include "model.hh"
 #include "d_model_manager.hh"
+#include "event.hh"
 
 namespace ttool
 {
@@ -41,6 +42,18 @@ namespace ttool
             m_fragmentViewerPtr->UpdateViewer(frameId);
             m_contourViewerPtr->UpdateViewer(frameId);
 
+        }
+
+        void ToggleShowKeymaps()
+        {
+            m_fragmentViewerPtr->ToggleShowKeymaps();
+            m_contourViewerPtr->ToggleShowKeymaps();
+        }
+
+        void UpdateEvent(ttool::EventType event)
+        {
+            m_fragmentViewerPtr->UpdateEvent(event);
+            m_contourViewerPtr->UpdateEvent(event);
         }
 
     private:
