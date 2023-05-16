@@ -11,7 +11,7 @@
 - [x] Reset the color histogram when rerun -> histogram get make of the projected frame and use that for the new histogram. each time the new tracking occur, the histogram is updated to the user input pose before the tracking start. So technicall it has already been done.
 - [x] Input write locally the pose and the mask for each tool head
 
-- [ ] Visualization keymap (help keystroke overlay)
+- [x] Visualization keymap (help keystroke overlay)
 - [ ] Integrate the download in the github repository (CMake config download links)
 - [ ] Complete all the datasets, and place it on another repository
 
