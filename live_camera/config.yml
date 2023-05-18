@@ -1,23 +1,26 @@
 %YAML:1.0
-################
-# common vars TRACKER
-################
-alphaForeground: 0.1  # ??
-alphaBackground: 0.2  # ??
-
-zn: 1  # ??
-zf: 4000  # ??
-
-histOffset: 100  # ??
-histRad: 40  # ??
-searchRad: 25  # ??
-
-cameraConfigFile: "./live_camera/calibration_orange_B_1280_720_r.yml"
-
-groundTruthPoses: [
-  [0.774474, -0.432610, 0.461565, -0.160787, 0.571050, 0.805017, -0.611834, -0.697679, 0.372705, 11.744253, 14.884766, 188.102844],
-  [0.899114, -0.233195, -0.370431, 0.419063, 0.21414, 0.882346, -0.126434, -0.948561, 0.290258, 10.8038, 20.7629, 188.825],
-  [-0.49464369, 0.47779492, 0.72597826, -0.81523484, 0.034418296, -0.57811087, -0.30120492, -0.87779891, 0.37248972, -67, 6, 211]]
-modelFiles: ["./model_drill_scaled/drill_scaled_1000.obj", "./saw_blade_scaled/saw_blade_thin_verythin.obj", "./circular_blade_scaled/circular_blade_scaled.obj"]
+---
+alphaForeground: 1.0000000149011612e-01
+alphaBackground: 2.0000000298023224e-01
+zn: 1.
+zf: 4000.
+histOffset: 100
+histRad: 40
+searchRad: 25
+cameraConfigFile: "./live_camera/calibration_orange_A_1280_720_r.yml"
+groundTruthPoses:
+   - [ 4.18836743e-01, -3.68688226e-01, 8.29848886e-01, -5.16453326e-01,
+       6.54956579e-01, 5.51646948e-01, -7.46899962e-01, -6.59628093e-01,
+       8.39086547e-02, 1.41097794e+01, -5.40889883e+00, 1.65185211e+02 ]
+   - [ 7.52709329e-01, -4.69818085e-01, -4.61201519e-01, 6.56516969e-01,
+       5.87971985e-01, 4.72531378e-01, 4.91689444e-02, -6.58461034e-01,
+       7.51010895e-01, 3.58369598e+01, -1.39099693e+01, 1.90539810e+02 ]
+   - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
+       6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
+       -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
+modelFiles:
+   - "./model_drill_scaled/drill_scaled_1000.obj"
+   - "./saw_blade_scaled/saw_blade_thin_verythin.obj"
+   - "./circular_blade_scaled/circular_blade_scaled.obj"
 frames: ""
-cameraID: 2
+cameraID: 0

@@ -288,11 +288,11 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 
         auto deltaT = Transformations::exp(-wJTJ.inv(cv::DECOMP_CHOLESKY) * JT);
 		cv::Matx44f T_cm = deltaT * objects[o]->getPose();
-       if (avg < 0.0125) {
+       if (avg < 0.0125 / 2) {
            objects[o]->setPose(init_pose);
            std::cout << "[RESET] Mean scores: " << avg << "\n";
        }
-       else if (avg < 0.2) {
+       else if (avg < 0.2 / 2) {
             std::cout << "[FREEZED] Mean scores: " << avg << "\n";
        }
        else {

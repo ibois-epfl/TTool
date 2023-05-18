@@ -1,5 +1,20 @@
 # Roadmap week-by-week
 
+- [ ] See why pressing y also stops the tracking
+- [ ] Merge 1ere and 2eme stages together
+- [ ] Complete all the datasets, and place it on another repository Zenodo
+- [ ] In cmake config add a download link to the dataset (see as in tslam)
+- [ ] add one single visualization with a transparent  + shader for the model + the green thick contoursp (nomore 3 windows, just one)
+- [ ] video exporter (see the TSlet video)
+- [ ] design/refactor an API for TTool
+- [ ] write smoke test to integrate to build (docstring)
+- [ ] clean out the code that we do not use from tslet and other dependecies
+
+- [ ] Integration in AC (AC interface)
+- [ ] Toolhead classifier
+- [ ] Design an evaluation protocol to estimate the precision of our final tracked pose
+- [ ] (optional) Toolhead global pose estimator
+
 - [x] - Reset / lower threshold 0.025 -> 0.0125
 - [x] *(URGENT)* Load the distortionCoeff, and the K parameters from the path, tracker should use the K, and distCoeff from the same vars as cameraPtr
 - [x] *(URGENT)* load calibration distortion matrix from external zml file instead of hardcoded *be sure that all across the source code the same calibration file is consumed* see https://github.com/ibois-epfl/TSlam/blob/88e61aee7063de8da604e5488d5b65a138f2878a/utils/tslam_reconstruct.cc
@@ -12,11 +27,8 @@
 - [x] Input write locally the pose and the mask for each tool head
 
 - [x] Visualization keymap (help keystroke overlay)
-- [ ] Integrate the download in the github repository (CMake config download links)
-- [ ] Complete all the datasets, and place it on another repository
 
-- [ ] Debugging of all the viewers *(Fragmentation nd contour views and stuff into the video)
-- [ ] (Optional) visualize bbox
+- [x] (Optional) visualize bbox
 - [x] Try with the real calibration
 
 On hold

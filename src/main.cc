@@ -18,6 +18,7 @@
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
+
     std::string config_file = argv[1];
     std::shared_ptr<ttool::Config> config = std::make_shared<ttool::Config>(config_file);
 	std::shared_ptr<Camera> cameraPtr;
