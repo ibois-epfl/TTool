@@ -77,39 +77,16 @@ int main(int argc, char **argv)
 
     while (true)
     {
-        visualizerPtr->UpdateEvent(ttool::EventType::ReadyLiveCamera);
-        // 1 Tsegment
         int oid = modelManagerPtr->GetObject()->getModelID();
         int fid = 0;
         int key = cv::waitKey(1);
-        while ('p' != key && config->GetConfigData().Frames == "")
-        {
-            if ('q' == key)
-            {
-                break;
-            }
-            input.ConsumeKey(key);
-            visualizerPtr->UpdateVisualizer(fid);
-            cameraPtr->UpdateCamera();
-            key = cv::waitKey(1);
-            oid = modelManagerPtr->GetObject()->getModelID();
-        }
-        // cv::Mat mask = modelID2mask[oid];
-
-        // // 2a TML
-        // while (bool)
-        // {
-        //     images = camera_ptr->image();
-
-        // }
-        // initialPose = TML.getInitialPose(iamges, mask_pair.second);
-
         // 2b UI pose input
         std::cout << "Please input the pose of the object" << std::endl;
         visualizerPtr->UpdateEvent(ttool::EventType::PoseInput);
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             visualizerPtr->UpdateVisualizer(fid);
+            cameraPtr->UpdateCamera();
             int key = cv::waitKey(1);
             // Save the pose
             if ('p' == key)

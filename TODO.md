@@ -1,7 +1,7 @@
 # Roadmap week-by-week
 
 - [x] See why pressing y also stops the tracking
-- [ ] Merge 1ere and 2eme stages together
+- [x] Merge 1ere and 2eme stages together
 - [ ] Complete all the datasets, and place it on another repository Zenodo
 - [ ] In cmake config add a download link to the dataset (see as in tslam)
 - [ ] add one single visualization with a transparent  + shader for the model + the green thick contoursp (nomore 3 windows, just one)
