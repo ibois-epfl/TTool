@@ -1,6 +1,6 @@
 # Roadmap week-by-week
 
-- [ ] See why pressing y also stops the tracking
+- [x] See why pressing y also stops the tracking
 - [ ] Merge 1ere and 2eme stages together
 - [ ] Complete all the datasets, and place it on another repository Zenodo
 - [ ] In cmake config add a download link to the dataset (see as in tslam)

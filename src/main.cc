@@ -130,11 +130,6 @@ int main(int argc, char **argv)
             {
                 break;
             }
-            if ('y' == key)
-            {
-                input.ConsumeKey(key);
-                break;
-            }
             // Break before the new object's gtID is used to estimate the pose of the previous object (snapshotted by the tracker)
             if (oid != modelManagerPtr->GetObject()->getModelID())
             {
