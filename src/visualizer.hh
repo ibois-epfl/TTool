@@ -30,7 +30,7 @@ namespace ttool
             m_fragmentViewerPtr->Init("Fragment Viewer", view, std::vector<std::shared_ptr<Model>>(), m_CameraPtr);
 
             m_contourViewerPtr = std::make_shared<ContourViewer>();
-            m_contourViewerPtr->Init("Contour Viewer", view, std::vector<std::shared_ptr<Model>>{m_ModelManagerPtr->GetObject()}, m_CameraPtr);
+            m_contourViewerPtr->Init("Contour Viewer", view, std::vector<std::shared_ptr<Model>>(), m_CameraPtr);
         }
 
         void UpdateVisualizer(int frameId)
