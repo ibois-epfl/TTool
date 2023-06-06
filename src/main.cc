@@ -69,11 +69,6 @@ int main(int argc, char **argv)
 
     // Initialize the tracker
     tslet::ObjectTracker objectTracker;
-    for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
-    {
-        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), cameraPtr->GetK());
-        modelManagerPtr->IncreaseObjectID();
-    }
 
     while (true)
     {
@@ -81,8 +76,8 @@ int main(int argc, char **argv)
         int fid = 0;
         int key = cv::waitKey(1);
 
-        // // Initialize the tracker with the curent object
-        // objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), cameraPtr->GetK());
+        // Initialize the tracker with the curent object
+        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), cameraPtr->GetK());
 
         // 2b UI pose input
         std::cout << "Please input the pose of the object" << std::endl;
@@ -96,25 +91,6 @@ int main(int argc, char **argv)
             if ('p' == key)
             {
                 break;
-            }
-            if ('r' == key)
-            {
-                std::cout << "Resetting the object" << std::endl;
-                for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
-                {
-                    modelManagerPtr->GetObject()->reset();
-                    modelManagerPtr->IncreaseObjectID();
-                }
-                if ('r' == cv::waitKey(0))
-                {
-                    std::cout << "Reinitializing the object" << std::endl;
-                    for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
-                    {
-                        modelManagerPtr->GetObject()->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(modelManagerPtr->GetObject(), 32, 40, 10.0f)));
-                        modelManagerPtr->GetObject()->initialize();
-                        modelManagerPtr->IncreaseObjectID();
-                    }
-                }
             }
             objectTracker.SetPose(modelManagerPtr->GetObject()->getModelID(), input.GetPose());
 
