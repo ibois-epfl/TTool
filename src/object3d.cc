@@ -106,7 +106,7 @@ std::shared_ptr<TCLCHistograms> Object3D::getTCLCHistograms()
 }
 
 void Object3D::SetTCLCHistograms(std::shared_ptr<TCLCHistograms> histograms) {
-	tclcHistograms = histograms;
+    tclcHistograms = histograms;
 }
 
 void Object3D::generateTemplates()
@@ -216,8 +216,9 @@ void Object3D::reset()
 {
     Model::reset();
     
-		if (tclcHistograms)
-			tclcHistograms->clear();
+    if (tclcHistograms)
+        this->tclcHistograms = NULL;
+        // tclcHistograms->clear();
     
     trackingLost = false;
 }

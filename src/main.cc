@@ -97,6 +97,25 @@ int main(int argc, char **argv)
             {
                 break;
             }
+            if ('r' == key)
+            {
+                std::cout << "Resetting the object" << std::endl;
+                for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
+                {
+                    modelManagerPtr->GetObject()->reset();
+                    modelManagerPtr->IncreaseObjectID();
+                }
+                if ('r' == cv::waitKey(0))
+                {
+                    std::cout << "Reinitializing the object" << std::endl;
+                    for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
+                    {
+                        modelManagerPtr->GetObject()->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(modelManagerPtr->GetObject(), 32, 40, 10.0f)));
+                        modelManagerPtr->GetObject()->initialize();
+                        modelManagerPtr->IncreaseObjectID();
+                    }
+                }
+            }
             objectTracker.SetPose(modelManagerPtr->GetObject()->getModelID(), input.GetPose());
 
             input.ConsumeKey(key);
