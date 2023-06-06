@@ -8,6 +8,8 @@ set(BUILD_TSEGMENT_AS_API ON CACHE BOOL "Do not build tsegment exe")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
 
 set(MODEL_NAMES 
+    "circular_blade_scaled"
+    "saw_blade_scaled"
     "ck30"
     "drillBit_14_105"
     "drillBit_20_110"
@@ -20,9 +22,9 @@ set(MODEL_NAMES
 )
 
 foreach(MODEL_NAME IN LISTS MODEL_NAMES)
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}.zip")
-        message(STATUS "Downloading tool head files from https://zenodo.org/record/8005648/files/${MODEL_NAME}.zip")
-        file(DOWNLOAD "https://zenodo.org/record/8005648/files/${MODEL_NAME}.zip" "${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}.zip")
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}")
+        message(STATUS "Downloading tool head files from https://zenodo.org/record/8006652/files/${MODEL_NAME}.zip")
+        file(DOWNLOAD "https://zenodo.org/record/8006652/files/${MODEL_NAME}.zip" "${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}.zip")
         file(ARCHIVE_EXTRACT INPUT "${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}.zip" DESTINATION "${PROJECT_SOURCE_DIR}/assets/toolheads/")
         execute_process(
             COMMAND ${CMAKE_COMMAND} -E rm ${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}.zip
