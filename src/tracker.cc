@@ -30,10 +30,11 @@ Tracker::Tracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& o
 
 Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<std::shared_ptr<Object3D>>& objects) {
 	Tracker* poseEstimator = NULL;
-
+	std::cout << "Gettomg tracker " << id << std::endl;
 	poseEstimator = new SLETracker(K, objects);
 
 	CHECK(poseEstimator) << "Check |tracker_mode| in yml file";
+	std::cout << "CHECK(poseEstimator)" << id << std::endl;
 	return poseEstimator;
 }
 
@@ -221,6 +222,7 @@ void Tracker::ShowMask(const cv::Mat& masks, cv::Mat& buf) {
 TrackerBase::TrackerBase(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects) 
 : Tracker(K, objects) 
 {
+	std::cout << "Tracker" << std::endl;
 	hists = new RBOTHist(objects);
 	//hists = new TestHist(objects);
 	//hists = new GlobalHist(objects);
@@ -245,6 +247,7 @@ void TrackerBase::PostProcess(cv::Mat frame) {
 }
 
 void TrackerBase::UpdateHist(cv::Mat frame) {
+	std::cout << "UpdateHist " << hists << std::endl;
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
 		view->setLevel(0);
@@ -261,6 +264,7 @@ void TrackerBase::UpdateHist(cv::Mat frame) {
 SLTracker::SLTracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects)
 	: TrackerBase(K, objects)
 {
+	std::cout << "SLTracker" << std::endl;
 	search_line = std::make_shared<SearchLine>();
 }
 
@@ -272,7 +276,7 @@ void SLTracker::GetBundleProb(const cv::Mat& frame, int oid) {
 
 	int level = view->getLevel();
 	int upscale = pow(2, level);
-
+	std::cout << "GetBundleProb: " << level << std::endl;
 	std::shared_ptr<TCLCHistograms> tclcHistograms = objects[oid]->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();

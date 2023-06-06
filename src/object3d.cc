@@ -101,6 +101,7 @@ Object3D::~Object3D()
 
 std::shared_ptr<TCLCHistograms> Object3D::getTCLCHistograms()
 {
+    cout << "getTCLCHistograms" << endl;
     return tclcHistograms;
 }
 

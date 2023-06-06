@@ -80,6 +80,10 @@ int main(int argc, char **argv)
         int oid = modelManagerPtr->GetObject()->getModelID();
         int fid = 0;
         int key = cv::waitKey(1);
+
+        // // Initialize the tracker with the curent object
+        // objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), cameraPtr->GetK());
+
         // 2b UI pose input
         std::cout << "Please input the pose of the object" << std::endl;
         visualizerPtr->UpdateEvent(ttool::EventType::PoseInput);
@@ -98,7 +102,9 @@ int main(int argc, char **argv)
             input.ConsumeKey(key);
         }
         // 3 TSlet
+        std::cout << "visualizerPtr->UpdateEvent" << std::endl;
         visualizerPtr->UpdateEvent(ttool::EventType::Tracking);
+        std::cout << "FeedNewFrame" << std::endl;
         objectTracker.FeedNewFrame(oid, cameraPtr->image());
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
@@ -112,7 +118,7 @@ int main(int argc, char **argv)
             {
                 break;
             }
-
+            std::cout << "Estimating pose for object " << oid << std::endl;
             objectTracker.EstimatePose(oid, cameraPtr->image());
             visualizerPtr->UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
