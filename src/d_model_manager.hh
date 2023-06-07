@@ -13,19 +13,14 @@ namespace ttool
         public:
         DModelManager(std::vector<cv::String> modelFile, std::vector<cv::Matx44f> &gtPoses, std::shared_ptr<Config> configPtr)
         {
+            assert(("There should be at least one model file", modelFile.size() >= 1));
+            m_ModelID2ModelFiles = convertVectorToMapID(modelFile);
+            m_ModelID2GroundTruthPoses = convertVectorToMapID(gtPoses);
+            m_ModelID2ModelPoses = convertVectorToMapID(gtPoses);
+
             // Initialize object(s) to with model file, starting pose, ...
             std::vector<float> distances = { 200.0f, 400.0f, 600.0f };
-            for (int i = 0; i < modelFile.size(); ++i)
-            {
-                std::cout << modelFile[i] << std::endl;
-                std::cout << gtPoses[i] << std::endl;
-                std::shared_ptr<Object3D> objPtr = std::make_shared<Object3D>(modelFile[i],
-                                                                            gtPoses[i],
-                                                                            1.0,
-                                                                            0.55f,
-                                                                            distances);
-                m_Objects.push_back(objPtr);
-            }
+            m_CurrentObjectPtr = std::make_shared<Object3D>(m_ModelID2ModelFiles[m_CurrentObjectID], m_ModelID2GroundTruthPoses[m_CurrentObjectID], 1.0, 0.55f, distances);
 
             m_ConfigPtr = configPtr;
         }
@@ -39,16 +34,17 @@ namespace ttool
          */
         void InitModels()
         {
-            for (int i = 0; i < m_Objects.size(); ++i)
+            if (m_CurrentObjectPtr->isInitialized())
             {
-                m_Objects[i]->initBuffers();
-                m_Objects[i]->initialize();
-
-                // In case of multiple objects, each object should have a unique model ID for the viewer to render the contour correctly
-                // Originally in the SLET, the model ID is set in the Tracker class, but here we set it here
-                m_Objects[i]->setModelID(i + 1);
-                m_GroundTruthPoses[i + 1] = m_Objects[i]->getPose();
+                return;
             }
+            m_CurrentObjectPtr->initBuffers();
+            m_CurrentObjectPtr->initialize(); // mark Model as initialized
+
+            // In case of multiple objects, each object should have a unique model ID for the viewer to render the contour correctly
+            // Originally in the SLET, the model ID is set in the Tracker class, but here we set it here
+            m_CurrentObjectPtr->setModelID(m_CurrentObjectID);
+            m_ModelID2GroundTruthPoses[m_CurrentObjectID] = m_CurrentObjectPtr->getPose(); //TODO: still need this? when?
         }
 
         /**
@@ -57,7 +53,8 @@ namespace ttool
          */
         void ResetObjectToGroundTruth()
         {
-            m_Objects[m_ObjectID]->setPose(m_GroundTruthPoses[m_ObjectID + 1]);
+            m_CurrentObjectPtr->setPose(m_ModelID2GroundTruthPoses[m_CurrentObjectID]);
+            SnapshotObjectPose();
         }
 
         /**
@@ -67,7 +64,7 @@ namespace ttool
          */
         std::shared_ptr<Object3D> GetObject()
         {
-            return m_Objects[m_ObjectID];
+            return m_CurrentObjectPtr;
         }
 
         /**
@@ -77,7 +74,9 @@ namespace ttool
          */
         void SetObjectID(int objectID)
         {
-            m_ObjectID = objectID;
+            SnapshotObjectPose();
+            m_CurrentObjectID = objectID;
+            setCurrentObjectPtr();
         }
 
         /**
@@ -86,7 +85,12 @@ namespace ttool
          */
         void IncreaseObjectID()
         {
-            m_ObjectID = (m_ObjectID + 1) % m_Objects.size();
+            std::cout << "Current object ID: " << m_CurrentObjectID << std::endl;
+            SnapshotObjectPose();
+            m_CurrentObjectID = m_CurrentObjectID % GetNumObjects() + 1;
+            std::cout << "Changed current object ID: " << m_CurrentObjectID << std::endl;
+            setCurrentObjectPtr();
+            std::cout << "Set current object ID" << std::endl;
         }
 
         /**
@@ -95,7 +99,16 @@ namespace ttool
          */
         int GetNumObjects()
         {
-            return m_Objects.size();
+            return m_ModelID2ModelFiles.size();
+        }
+
+        /**
+         * @brief Snapshot the current pose of the current object
+         * 
+         */
+        void SnapshotObjectPose()
+        {
+            m_ModelID2ModelPoses[m_CurrentObjectID] = m_CurrentObjectPtr->getPose();
         }
 
         /**
@@ -104,10 +117,12 @@ namespace ttool
          */
         void SavePosesToConfig()
         {
+            SnapshotObjectPose();
+
             std::vector<std::vector<float>> poses;
-            for (int i = 0; i < m_Objects.size(); ++i)
+            for (int id = 1; id <= GetNumObjects(); ++id)
             {
-                cv::Matx44f pose = m_Objects[i]->getPose();
+                cv::Matx44f pose = m_ModelID2ModelPoses[id];
                 float m00 = pose(0, 0);
                 float m01 = pose(0, 1);
                 float m02 = pose(0, 2);
@@ -129,16 +144,38 @@ namespace ttool
                                        m03, m13, m23});
             }
             
-            std::cout << m_PoseOutput << std::endl;
-            
             m_ConfigPtr->write("groundTruthPoses", poses);
         }
 
         private:
-        std::string m_PoseOutput;
-        std::vector<std::shared_ptr<Object3D>> m_Objects;
-        std::map<int, cv::Matx44f> m_GroundTruthPoses;
-        int m_ObjectID = 0;
+        template <typename T>
+        std::map<int, T> convertVectorToMapID(std::vector<T> someVector)
+        {
+            std::map<int, T> mapID2Value;
+            for (int i = 0; i < someVector.size(); ++i)
+            {
+                mapID2Value[i + 1] = someVector[i];
+            }
+            return mapID2Value;
+        }
+
+        void setCurrentObjectPtr()
+        {
+            // Initialize object(s) to with model file, starting pose, ...
+            std::vector<float> distances = { 200.0f, 400.0f, 600.0f };
+            m_CurrentObjectPtr = std::make_shared<Object3D>(m_ModelID2ModelFiles[m_CurrentObjectID], m_ModelID2GroundTruthPoses[m_CurrentObjectID], 1.0, 0.55f, distances);
+
+            InitModels();
+        }
+
+        private:
+        std::map<int, std::string> m_ModelID2ModelFiles;
+        std::map<int, cv::Matx44f> m_ModelID2GroundTruthPoses;
+        std::map<int, cv::Matx44f> m_ModelID2ModelPoses;
+
         std::shared_ptr<Config> m_ConfigPtr;
+
+        int m_CurrentObjectID = 1; // 1 based indexing
+        std::shared_ptr<Object3D> m_CurrentObjectPtr;
     };
 }
