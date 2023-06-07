@@ -75,4 +75,4 @@ model_*/**/*
 !saw_*/**/*.obj
 !circular_*/**/*.obj
 
-assets/**/*
+assets/toolheads/**/*
