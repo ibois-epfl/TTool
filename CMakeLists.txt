@@ -1,44 +1,19 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(ttool VERSION "0.1.0" LANGUAGES CXX)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.cmake.in config.cmake @ONLY)
 
 set(CMAKE_CXX_STANDARD 17)
 
 set(BUILD_TSEGMENT_AS_API ON CACHE BOOL "Do not build tsegment exe")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/TSegment)
 
-set(MODEL_NAMES 
-    "circular_blade_scaled"
-    "saw_blade_scaled"
-    "ck30"
-    "drillBit_14_105"
-    "drillBit_20_110"
-    "flachbohrer_25"
-    "forstnerbohrer_40"
-    "holzkombihorer_20"
-    "holzspiralbohrer_sp_20"
-    "selfFeedBits_40_90"
-    "selfFeedBits_50"
-)
-
-foreach(MODEL_NAME IN LISTS MODEL_NAMES)
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}")
-        message(STATUS "Downloading tool head files from https://zenodo.org/record/8006652/files/${MODEL_NAME}.zip")
-        file(DOWNLOAD "https://zenodo.org/record/8006652/files/${MODEL_NAME}.zip" "${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}.zip")
-        file(ARCHIVE_EXTRACT INPUT "${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}.zip" DESTINATION "${PROJECT_SOURCE_DIR}/assets/toolheads/")
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} -E rm ${PROJECT_SOURCE_DIR}/assets/toolheads/${MODEL_NAME}.zip
-        )
-    endif()
-endforeach()
-
-
+include(cmake/dataset.cmake)
 
 FILE(GLOB glsl_SOURCES src/shader/*.glsl)
 source_group("shader" FILES ${glsl_SOURCES})
 
 FILE(GLOB ttool_SOURCES src/*.cc src/*.hh)
-# target_include_directories(ttool PUBLIC deps/TSegment)
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
