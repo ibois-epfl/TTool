@@ -87,6 +87,25 @@ void ContourViewer::UpdateViewer(int fid)
 			contour_img);
 }
 
+void ContourViewer::UpdateViewer(int fid, int fps)
+{
+	auto frame = camera_ptr_->image();
+	auto contour_img = DrawContourOverlay(renderer_, objects_, frame);
+	PrintID(fid, contour_img);
+	PrintFPS(fps, contour_img);
+
+	if (display_images_)
+	{
+		DrawInterface(contour_img);
+		ShowImage(contour_img);
+	}
+
+	if (save_images_)
+		cv::imwrite(
+			save_path_.string() + name_ + "_" + std::to_string(fid) + ".png",
+			contour_img);
+}
+
 cv::Mat ContourViewer::DrawContourOverlay(View *view, const std::vector<std::shared_ptr<Model>> &objects, const cv::Mat &frame)
 {
 	view->setLevel(0);
@@ -143,6 +162,25 @@ void FragmentViewer::UpdateViewer(int fid)
 	const cv::Mat &frame = camera_ptr_->image();
 	auto res_img = DrawFragmentOverlay(renderer_, objects_, frame);
 	PrintID(fid, res_img);
+
+	if (display_images_)
+	{
+		DrawInterface(res_img);
+		ShowImage(res_img);
+	}
+
+	if (save_images_)
+		cv::imwrite(
+			save_path_.string() + name_ + "_" + std::to_string(fid) + ".png",
+			res_img);
+}
+
+void FragmentViewer::UpdateViewer(int fid, int fps)
+{
+	const cv::Mat &frame = camera_ptr_->image();
+	auto res_img = DrawFragmentOverlay(renderer_, objects_, frame);
+	PrintID(fid, res_img);
+	PrintFPS(fps, res_img);
 
 	if (display_images_)
 	{

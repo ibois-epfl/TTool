@@ -78,6 +78,13 @@ public:
 		m_ShowKeymaps = !m_ShowKeymaps;
 	}
 
+	void PrintFPS(int fps, cv::Mat &frame)
+	{
+		std::stringstream sstr;
+		sstr << "FPS" << std::setw(3) << std::setfill('0') << fps;
+		cv::putText(frame, sstr.str(), cv::Point(frame.size[1] - 150, 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(0, 255, 0), 1);
+	}
+
 protected:
 	void PrintID(int fid, cv::Mat &frame);
 	void ShowImage(const cv::Mat &frame);
@@ -111,6 +118,7 @@ public:
 	ContourViewer() = default;
 
 	void UpdateViewer(int save_index) override;
+	void UpdateViewer(int fps, int save_index);
 	cv::Mat DrawContourOverlay(View *view, const std::vector<std::shared_ptr<Model>> &objects, const cv::Mat &frame);
 
 protected:
@@ -125,6 +133,7 @@ public:
 	FragmentViewer() = default;
 
 	void UpdateViewer(int save_index) override;
+	void UpdateViewer(int fps, int save_index);
 	cv::Mat DrawFragmentOverlay(View *view, const std::vector<std::shared_ptr<Model>> &objects, const cv::Mat &frame);
 
 protected:
