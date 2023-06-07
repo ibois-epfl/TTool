@@ -59,7 +59,7 @@ namespace tslet
             }
 
             cv::Matx44f init_pose = modelID2pose[modelID];
-            cv::imshow("What Tracker Sees", frame);
+            // cv::imshow("What Tracker Sees", frame);
             trackerPtr->EstimatePoses(init_pose, frame);
         }
 

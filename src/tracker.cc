@@ -30,11 +30,9 @@ Tracker::Tracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& o
 
 Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<std::shared_ptr<Object3D>>& objects) {
 	Tracker* poseEstimator = NULL;
-	std::cout << "Gettomg tracker " << id << std::endl;
 	poseEstimator = new SLETracker(K, objects);
 
 	CHECK(poseEstimator) << "Check |tracker_mode| in yml file";
-	std::cout << "CHECK(poseEstimator)" << id << std::endl;
 	return poseEstimator;
 }
 
@@ -70,10 +68,6 @@ bool Tracker::UpdateViewers(int iteration) {
 void Tracker::ToggleTracking(int objectIndex, bool undistortedFrame) {
 	if (objectIndex >= objects.size())
 		return;
-
-	//if (undistortedFrame) {
-	//	cv::remap(frame, frame, map1, map2, cv::INTER_LINEAR);
-	//}
 
 	if (!objects[objectIndex]->isInitialized()) {
 		std::cout << "Initializing object " << objects[objectIndex]->getModelID() << std::endl;
