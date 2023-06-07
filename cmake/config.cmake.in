@@ -1,0 +1,17 @@
+# ===================================================================================
+# TTOOL is developed at IBOIS, EPFL @ 2023
+# It is distributed under the GNU GPL license (https://www.gnu.org/licenses/gpl-3.0.en.html)
+# ===================================================================================
+
+set(@PROJECT_NAME@_FOUND YES)
+set(@PROJECT_NAME@_FOUND "YES")
+set(@PROJECT_NAME@_VERSION        @PROJECT_VERSION@)
+set(@PROJECT_NAME@_VERSION_MAJOR  @PROJECT_VERSION_MAJOR@)
+set(@PROJECT_NAME@_VERSION_MINOR  @PROJECT_VERSION_MINOR@)
+set(@PROJECT_NAME@_VERSION_PATCH  @PROJECT_VERSION_PATCH@)
+
+# zenodo direct doi link (to change if dataset us updated)
+set(DSET_DOI "https://doi.org/10.5281/zenodo.8006652")
+
+
+

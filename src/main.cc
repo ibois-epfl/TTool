@@ -20,8 +20,11 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 
     std::string config_file = argv[1];
+
+    // Initialize the camera
+    // TODO: this part shpuld be refactored to read directly frames from a camera cv::VideoCapture
     std::shared_ptr<ttool::Config> config = std::make_shared<ttool::Config>(config_file);
-	std::shared_ptr<Camera> cameraPtr;
+    std::shared_ptr<Camera> cameraPtr;
     if (config->GetConfigData().Frames == "")
     {
         std::cout << "Using camera: " << config->GetConfigData().CameraID << std::endl;
@@ -35,9 +38,10 @@ int main(int argc, char **argv)
 
     cameraPtr->ReadFromFile(config->GetConfigData().CameraConfigFile);
 
- 	// Set the pose reader
-	std::vector<cv::Matx44f> gtPoses;
-	for (std::vector<float> gtPose : config->GetConfigData().GroundTruthPoses)
+    // Set the pose reader 
+    // TODO: this should also happen under the hood
+    std::vector<cv::Matx44f> gtPoses;
+    for (std::vector<float> gtPose : config->GetConfigData().GroundTruthPoses)
     {
         float m00 = gtPose[0];
         float m01 = gtPose[1];
@@ -70,6 +74,7 @@ int main(int argc, char **argv)
     // Initialize the tracker
     tslet::ObjectTracker objectTracker;
 
+    // main thread
     while (true)
     {
         int oid = modelManagerPtr->GetObject()->getModelID();
