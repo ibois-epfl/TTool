@@ -45,10 +45,10 @@ namespace ttool
          * 
          * @param frameId 
          */
-        void UpdateVisualizer(int frameId)
+        void UpdateVisualizer(int frameId, int fps = 69)
         {
-            m_fragmentViewerPtr->UpdateViewer(frameId);
-            m_contourViewerPtr->UpdateViewer(frameId);
+            m_fragmentViewerPtr->UpdateViewer(frameId, fps);
+            m_contourViewerPtr->UpdateViewer(frameId, fps);
         }
 
         void ToggleShowKeymaps()

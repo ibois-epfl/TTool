@@ -156,6 +156,25 @@ void FragmentViewer::UpdateViewer(int fid)
 			res_img);
 }
 
+void FragmentViewer::UpdateViewer(int fid, int fps)
+{
+	const cv::Mat &frame = camera_ptr_->image();
+	auto res_img = DrawFragmentOverlay(renderer_, objects_, frame);
+	PrintID(fid, res_img);
+	PrintFPS(fps, res_img);
+
+	if (display_images_)
+	{
+		DrawInterface(res_img);
+		ShowImage(res_img);
+	}
+
+	if (save_images_)
+		cv::imwrite(
+			save_path_.string() + name_ + "_" + std::to_string(fid) + ".png",
+			res_img);
+}
+
 cv::Mat FragmentViewer::DrawFragmentOverlay(View *view, const std::vector<std::shared_ptr<Model>>&objects, const cv::Mat &frame)
 {
 	// render the models with phong shading
