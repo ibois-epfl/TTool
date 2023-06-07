@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(ttool VERSION "0.1.0" LANGUAGES CXX)
+include(${PROJECT_SOURCE_DIR}/cmake/config.cmake.in)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.cmake.in config.cmake @ONLY)
 
 set(CMAKE_CXX_STANDARD 17)

@@ -31,7 +31,7 @@ if [ ! -d "$__dataset_dir__" ]; then
   mkdir -p $__dataset_dir__
 fi
 if [ "$(ls -A $__dataset_dir__)" ]; then
-  print_error "Directory $__dataset_dir__ is not empty, exiting.."
+  print_warning "Directory $__dataset_dir__ is not empty, exiting.."
   exit 1
 fi
 

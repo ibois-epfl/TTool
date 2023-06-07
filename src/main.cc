@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    std::string config_file = argv[1];
+    std::string config_file = __TTOOL_CONFIG_PATH__;
 
     // Initialize the camera
     // TODO: this part shpuld be refactored to read directly frames from a camera cv::VideoCapture
