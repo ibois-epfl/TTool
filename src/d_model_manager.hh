@@ -18,9 +18,7 @@ namespace ttool
             m_ModelID2GroundTruthPoses = convertVectorToMapID(gtPoses);
             m_ModelID2ModelPoses = convertVectorToMapID(gtPoses);
 
-            // Initialize object(s) to with model file, starting pose, ...
-            std::vector<float> distances = { 200.0f, 400.0f, 600.0f };
-            m_CurrentObjectPtr = std::make_shared<Object3D>(m_ModelID2ModelFiles[m_CurrentObjectID], m_ModelID2GroundTruthPoses[m_CurrentObjectID], 1.0, 0.55f, distances);
+            setCurrentObjectPtr();
 
             m_ConfigPtr = configPtr;
         }
@@ -44,7 +42,6 @@ namespace ttool
             // In case of multiple objects, each object should have a unique model ID for the viewer to render the contour correctly
             // Originally in the SLET, the model ID is set in the Tracker class, but here we set it here
             m_CurrentObjectPtr->setModelID(m_CurrentObjectID);
-            m_ModelID2GroundTruthPoses[m_CurrentObjectID] = m_CurrentObjectPtr->getPose(); //TODO: still need this? when?
         }
 
         /**
@@ -85,12 +82,9 @@ namespace ttool
          */
         void IncreaseObjectID()
         {
-            std::cout << "Current object ID: " << m_CurrentObjectID << std::endl;
             SnapshotObjectPose();
             m_CurrentObjectID = m_CurrentObjectID % GetNumObjects() + 1;
-            std::cout << "Changed current object ID: " << m_CurrentObjectID << std::endl;
             setCurrentObjectPtr();
-            std::cout << "Set current object ID" << std::endl;
         }
 
         /**
@@ -163,7 +157,7 @@ namespace ttool
         {
             // Initialize object(s) to with model file, starting pose, ...
             std::vector<float> distances = { 200.0f, 400.0f, 600.0f };
-            m_CurrentObjectPtr = std::make_shared<Object3D>(m_ModelID2ModelFiles[m_CurrentObjectID], m_ModelID2GroundTruthPoses[m_CurrentObjectID], 1.0, 0.55f, distances);
+            m_CurrentObjectPtr = std::make_shared<Object3D>(m_ModelID2ModelFiles[m_CurrentObjectID], m_ModelID2ModelPoses[m_CurrentObjectID], 1.0, 0.55f, distances);
 
             InitModels();
         }
