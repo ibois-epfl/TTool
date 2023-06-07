@@ -12,15 +12,12 @@ Histogram::~Histogram() {}
 
 RBOTHist::RBOTHist(const std::vector<std::shared_ptr<Object3D>>& objects) {
 	objs = objects;
-	std::cout << "RBOTHist::RBOTHist" << std::endl;
 	for (int i = 0; i < objects.size(); ++i) {
-		std::cout << "RBOTHist::RBOTHist: " << i << std::endl;
 		if (objects[i]->getTCLCHistograms() == nullptr)
 			objects[i]->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(objects[i], 32, 40, 10.0f)));
 		else
 			std::cout << "RBOTHist::RBOTHist: TCLCHistograms already exists!" << std::endl;
 	}
-	std::cout << "RBOTHist::RBOTHist done!" << std::endl;
 }
 
 void RBOTHist::Update(const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, int oid, float afg, float abg){
@@ -28,12 +25,10 @@ void RBOTHist::Update(const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_ma
 	float zFar = view->getZFar();
 	cv::Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
 
-	std::cout << "RBOTHist::Update" << std::endl;
 	objs[oid]->getTCLCHistograms()->update(frame, mask_map, depth_map, K, zNear, zFar, afg, abg);
 }
 
 void RBOTHist::GetPixelProb(uchar rc, uchar gc, uchar bc, int x, int y, int oid, float& ppf, float& ppb) {
-	std::cout << "GetPixelProb" << std::endl;
 	std::shared_ptr<TCLCHistograms> tclcHistograms = objs[oid]->getTCLCHistograms();
 
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
@@ -105,7 +100,6 @@ void RBOTHist::GetRegionProb(const cv::Mat& frame, int oid, cv::Mat& prob_map) {
 	int level = view->getLevel();
 	int upscale = pow(2, level);
 	
-	std::cout << "GetRegionProb" << std::endl;
 	std::shared_ptr<TCLCHistograms> tclcHistograms = objs[oid]->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();

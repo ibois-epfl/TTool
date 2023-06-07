@@ -102,9 +102,7 @@ int main(int argc, char **argv)
             input.ConsumeKey(key);
         }
         // 3 TSlet
-        std::cout << "visualizerPtr->UpdateEvent" << std::endl;
         visualizerPtr->UpdateEvent(ttool::EventType::Tracking);
-        std::cout << "FeedNewFrame" << std::endl;
         objectTracker.FeedNewFrame(oid, cameraPtr->image());
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
@@ -118,7 +116,6 @@ int main(int argc, char **argv)
             {
                 break;
             }
-            std::cout << "Estimating pose for object " << oid << std::endl;
             objectTracker.EstimatePose(oid, cameraPtr->image());
             visualizerPtr->UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
@@ -127,7 +124,6 @@ int main(int argc, char **argv)
 
             input.ConsumeKey(key);
         }
-        std::cout << "Restarting Object " << oid << " changed to >> ";
         oid = modelManagerPtr->GetObject()->getModelID();
         std::cout << oid << std::endl;
     }

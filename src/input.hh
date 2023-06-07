@@ -37,8 +37,6 @@ namespace ttool
          */
         void ConsumeKey(char key)
         {
-            // if (-1 != int(key))
-            //     std::cout << "Key: " << std::isprint(key) << " " << int(key) << std::endl;
             switch (key)
             {
             // Change the model
