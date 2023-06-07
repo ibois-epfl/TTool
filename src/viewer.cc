@@ -87,6 +87,25 @@ void ContourViewer::UpdateViewer(int fid)
 			contour_img);
 }
 
+void ContourViewer::UpdateViewer(int fid, int fps)
+{
+	auto frame = camera_ptr_->image();
+	auto contour_img = DrawContourOverlay(renderer_, objects_, frame);
+	PrintID(fid, contour_img);
+	PrintFPS(fps, contour_img);
+
+	if (display_images_)
+	{
+		DrawInterface(contour_img);
+		ShowImage(contour_img);
+	}
+
+	if (save_images_)
+		cv::imwrite(
+			save_path_.string() + name_ + "_" + std::to_string(fid) + ".png",
+			contour_img);
+}
+
 cv::Mat ContourViewer::DrawContourOverlay(View *view, const std::vector<std::shared_ptr<Model>> &objects, const cv::Mat &frame)
 {
 	view->setLevel(0);
