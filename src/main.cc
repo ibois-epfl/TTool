@@ -86,6 +86,7 @@ int main(int argc, char **argv)
 
         // 2b UI pose input
         std::cout << "Please input the pose of the object" << std::endl;
+        visualizerPtr->SetModels();
         visualizerPtr->UpdateEvent(ttool::EventType::PoseInput);
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
