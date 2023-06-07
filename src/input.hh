@@ -46,7 +46,7 @@ namespace ttool
                 m_ModelManagerPtr->IncreaseObjectID();
                 break;
             case 'r':
-                m_ModelManagerPtr->ResetObjectToGroundTruth();
+                m_ModelManagerPtr->ResetObjectToInitialPose();
                 break;
             // Translate the model
             case 'w':

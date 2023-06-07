@@ -15,7 +15,7 @@ namespace ttool
         {
             assert(("There should be at least one model file", modelFile.size() >= 1));
             m_ModelID2ModelFiles = convertVectorToMapID(modelFile);
-            m_ModelID2GroundTruthPoses = convertVectorToMapID(gtPoses);
+            m_ModelID2InitialPoses = convertVectorToMapID(gtPoses);
             m_ModelID2ModelPoses = convertVectorToMapID(gtPoses);
 
             setCurrentObjectPtr();
@@ -48,9 +48,9 @@ namespace ttool
          * @brief Reset the object to ground truth (from a text file)
          * 
          */
-        void ResetObjectToGroundTruth()
+        void ResetObjectToInitialPose()
         {
-            m_CurrentObjectPtr->setPose(m_ModelID2GroundTruthPoses[m_CurrentObjectID]);
+            m_CurrentObjectPtr->setPose(m_ModelID2InitialPoses[m_CurrentObjectID]);
             SnapshotObjectPose();
         }
 
@@ -164,7 +164,7 @@ namespace ttool
 
         private:
         std::map<int, std::string> m_ModelID2ModelFiles;
-        std::map<int, cv::Matx44f> m_ModelID2GroundTruthPoses;
+        std::map<int, cv::Matx44f> m_ModelID2InitialPoses;
         std::map<int, cv::Matx44f> m_ModelID2ModelPoses;
 
         std::shared_ptr<Config> m_ConfigPtr;
