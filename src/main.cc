@@ -108,6 +108,9 @@ int main(int argc, char **argv)
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
             int key = cv::waitKey(1);
+
+            auto ti = cv::getTickCount();
+
             if ('q' == key)
             {
                 break;
@@ -119,7 +122,11 @@ int main(int argc, char **argv)
             }
 
             objectTracker.EstimatePose(oid, cameraPtr->image());
-            visualizerPtr->UpdateVisualizer(fid);
+            auto tf = cv::getTickCount();
+            auto t = (tf - ti) / cv::getTickFrequency();
+            int fps = 1 / t;
+
+            visualizerPtr->UpdateVisualizer(fid, fps);
             cameraPtr->UpdateCamera();
             objectTracker.FeedNewFrame(oid, cameraPtr->image());
             ++fid;
