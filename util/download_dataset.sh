@@ -55,3 +55,4 @@ for link in $download_links; do
     print_process "----------------------------------------"
 done
 print_success "Dataset downloaded successfully"
+exit 0
