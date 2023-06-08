@@ -9,54 +9,50 @@ histRad: 40
 searchRad: 25
 cameraConfigFile: "./live_camera/calibration_orange_A_1280_720_r.yml"
 groundTruthPoses:
-   - [ 4.18836743e-01, -3.68688226e-01, 8.29848886e-01, -5.16453326e-01,
-       6.54956579e-01, 5.51646948e-01, -7.46899962e-01, -6.59628093e-01,
-       8.39086547e-02, 1.41097794e+01, -5.40889883e+00, 1.65185211e+02 ]
-   - [ 7.52709329e-01, -4.69818085e-01, -4.61201519e-01, 6.56516969e-01,
-       5.87971985e-01, 4.72531378e-01, 4.91689444e-02, -6.58461034e-01,
-       7.51010895e-01, 3.58369598e+01, -1.39099693e+01, 1.90539810e+02 ]
-   - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-       6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-       -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
-   - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-       6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-       -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
-   - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-       6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-       -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
-   - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-       6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-       -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
-#    - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-#        6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-#        -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
-#    - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-#        6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-#        -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
-#    - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-#        6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-#        -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]    
-#    - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-#        6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-#        -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
-#    - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-#        6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-#        -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
-   - [ -8.19670618e-01, 4.34276074e-01, 3.73575330e-01, -2.55266726e-02,
-       6.23800933e-01, -7.81163394e-01, -5.72274745e-01, -6.49839401e-01,
-       -5.00227630e-01, -8.51761246e+01, -9.16908798e+01, 1.68067810e+02 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
 modelFiles:
-   - "./assets/toolheads/model_drill_scaled/drill_scaled_1000.obj"
-   - "./assets/toolheads/saw_blade_scaled/saw_blade_thin_verythin.obj"
-   - "./assets/toolheads/circular_blade_scaled/circular_blade_scaled.obj"
-#    - "./assets/toolheads/ck30/model.obj"
-#    - "./assets/toolheads/drillBit_14_105/model.obj"
-#    - "./assets/toolheads/drillBit_20_110/model.obj"
-#    - "./assets/toolheads/flachbohrer_25/flachbohrer_25.obj"
-#    - "./assets/toolheads/forstnerbohrer_40/forstnerbohrer_40.obj"
-#    - "./assets/toolheads/holzkombihorer_20/model.obj"
-#    - "./assets/toolheads/holzspiralbohrer_sp_20/obj_model/5kmodel.obj"
-#    - "./assets/toolheads/selfFeedBits_40_90/model.obj"
-#    - "./assets/toolheads/selfFeedBits_50/model.obj"
+   - "/home/as/TTool/assets/toolheads/holzkombihorer_20/model.obj"
+   - "/home/as/TTool/assets/toolheads/ck30/model.obj"
+   - "/home/as/TTool/assets/toolheads/drillBit_20_110/model.obj"
+   - "/home/as/TTool/assets/toolheads/drillBit_14_105/model.obj"
+   - "/home/as/TTool/assets/toolheads/holzspiralbohrer_sp_20/5kmodel.obj"
+   - "/home/as/TTool/assets/toolheads/circular_blade_scaled/circular_blade_scaled.obj"
+   - "/home/as/TTool/assets/toolheads/flachbohrer_25/flachbohrer_25.obj"
+   - "/home/as/TTool/assets/toolheads/selfFeedBits_50/model.obj"
+   - "/home/as/TTool/assets/toolheads/saw_blade_scaled/saw_blade_thin_verythin.obj"
+   - "/home/as/TTool/assets/toolheads/forstnerbohrer_40/forstnerbohrer_40.obj"
+   - "/home/as/TTool/assets/toolheads/selfFeedBits_40_90/model.obj"
 frames: ""
 cameraID: 0
