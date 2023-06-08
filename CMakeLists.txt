@@ -18,7 +18,7 @@ FILE(GLOB ttool_SOURCES src/*.cc src/*.hh)
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
-if (BUILD_TTOOL_EXE)
+if (OPT_BUILD_TTOOL_EXE)
     add_executable(ttool
                 ${ttool_SOURCES}
                 ${glsl_SOURCES})

@@ -274,7 +274,7 @@ if( NOT CGAL_MACROS_FILE_INCLUDED )
 
     message (STATUS "Requested component: ${component}")
 
-    if(WITH_CGAL_${component})
+    if(OPT_WITH_CGAL_${component})
       if(TARGET CGAL::CGAL_${component})
         add_to_list( CGAL_LIBRARIES CGAL::CGAL_${component} )
       elseif(TARGET CGAL_${component})
@@ -295,7 +295,7 @@ if( NOT CGAL_MACROS_FILE_INCLUDED )
         find_package(Qt5 COMPONENTS OpenGL Gui Core Script ScriptTools QUIET)
       endif()
 
-    else(WITH_CGAL_${component})
+    else(OPT_WITH_CGAL_${component})
 
       # now we are talking about 3rd party libs
       list( FIND CGAL_CONFIGURED_LIBRARIES "CGAL_${component}" POSITION )
@@ -322,13 +322,13 @@ if( NOT CGAL_MACROS_FILE_INCLUDED )
         endif()
       else()
 
-        if (NOT WITH_CGAL_${component})
+        if (NOT OPT_WITH_CGAL_${component})
           message(STATUS "NOTICE: The CGAL_${component} library seems to be required but is not build. Thus, it is expected that some executables will not be compiled.")
         endif()
 
       endif()
 
-    endif(WITH_CGAL_${component})
+    endif(OPT_WITH_CGAL_${component})
 
   endmacro()
 

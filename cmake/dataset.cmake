@@ -1,5 +1,14 @@
 include(${PROJECT_SOURCE_DIR}/cmake/config.cmake.in)
 
+# if option OPT_REFRESH_DATASET is enabled, then check if the dataset folder exists and erase
+if(OPT_REFRESH_DATASET)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/assets/toolheads)
+        message(STATUS "Removing dataset folder")
+        file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/assets/toolheads)
+    endif()
+endif()
+
+
 if(UNIX AND NOT APPLE)
     # A. download dataset
     set(DOWNLOAD_CMD "${PROJECT_SOURCE_DIR}/util/download_dataset.sh")

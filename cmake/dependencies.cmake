@@ -8,7 +8,7 @@ if(NOT Threads_FOUND)
     message(FATAL_ERROR "Threads not found")
 endif()
 
-if (WITH_CGAL)
+if (OPT_WITH_CGAL)
     # use local eigen
     find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
@@ -22,7 +22,7 @@ if (WITH_CGAL)
     )
 endif()
 
-if (BUILD_TTOOL_EXE)
+if (OPT_BUILD_TTOOL_EXE)
     find_package(assimp REQUIRED)
     if(NOT assimp_FOUND)
         message(FATAL_ERROR "assimp not found")

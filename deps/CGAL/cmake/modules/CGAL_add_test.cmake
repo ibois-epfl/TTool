@@ -120,8 +120,8 @@ function(cgal_add_compilation_test exe_name)
   if(TARGET CGAL_Qt5_moc_and_resources) # if CGAL_Qt5 was searched, and is header-only
     get_property(linked_libraries TARGET "${exe_name}" PROPERTY LINK_LIBRARIES)
     #  message(STATUS "${exe_name} depends on ${linked_libraries}")
-    string(FIND "${linked_libraries}" "CGAL::CGAL_Qt5" link_with_CGAL_Qt5)
-    if(link_with_CGAL_Qt5 STRGREATER "-1" AND
+    string(FIND "${linked_libraries}" "CGAL::CGAL_Qt5" link_OPT_WITH_CGAL_Qt5)
+    if(link_OPT_WITH_CGAL_Qt5 STRGREATER "-1" AND
         NOT TARGET compilation_of__CGAL_Qt5_moc_and_resources)
       # This custom target is useless. It is used only as a flag to
       # detect that the test has already been created.
