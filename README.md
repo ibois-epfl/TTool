@@ -13,7 +13,7 @@ gantt
     title       NC package planning
     axisFormat %Y-%m
 
-    Start                                                     :milestone, strt, 2023-06-01, 0d
+    Start                                                     :milestone, done, strt, 2023-06-01, 0d
 
     section Vocation
     french course half-day                                    :crit, 2023-06-12, 2023-06-23
@@ -29,6 +29,7 @@ gantt
     (5)Fabrication testing + unit testing                        :ftref, after ttollay, 5d
 
     section ML 2D dev
+    (*)classifier prototype with real data                       :classrdata, 2023-06-12, 2023-06-24
     (6)2d detection - state of the art                           :2ddetsota, after apirefct, 4d
     (7)2d detection - refactoring synth generator                :2ddetref, after 2ddetsota, 10d
     (8)2d detection - training                                   :2ddettra, after 2ddetref, 5d
