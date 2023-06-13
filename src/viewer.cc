@@ -117,7 +117,7 @@ cv::Mat UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<Model> object, co
 		}
 
 	view->setLevel(0);
-	view->RenderSilhouette({object}, GL_FILL);
+	view->RenderSilhouette(object, GL_FILL);
 
 	cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 	cv::Mat masks_map;

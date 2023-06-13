@@ -55,7 +55,7 @@ public:
 	int GetHeight() { return fullHeight; }
 	cv::Matx44f GetCalibrationMatrix();
 
-	void RenderSilhouette(std::shared_ptr<Model> model, GLenum polyonMode, bool invertDepth = false, float r = 1.0f, float g = 1.0f, float b = 1.0f, bool drawAll = false);
+	void RenderSilhouette(std::shared_ptr<Model> model, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
 	void RenderSilhouette(std::vector<std::shared_ptr<Model>> models, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
 	void RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, const cv::Point3f color = cv::Point3f(1.0, 0.5, 0.0), bool drawAll = false);
 

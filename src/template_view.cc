@@ -12,7 +12,7 @@ TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float 
     view = View::Instance();
     
     view->setLevel(0);
-    view->RenderSilhouette(object, GL_FILL, false, 1.0f, 1.0f, 1.0f, true);
+    view->RenderSilhouette(object, GL_FILL, false, {cv::Point3f(1.0f, 1.0f, 1.0f)}, true);
     
     Mat mask0 = view->DownloadFrame(View::MASK);
     Mat depth0 = view->DownloadFrame(View::DEPTH);
@@ -64,7 +64,7 @@ TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float 
         roiPyramid[level] = roi;
     
         view->setLevel(level);
-        view->RenderSilhouette(object, GL_FILL, false, 1.0f, 1.0f, 1.0f, true);
+        view->RenderSilhouette(object, GL_FILL, false, {cv::Point3f(1.0f, 1.0f, 1.0f)}, true);
         
         Mat mask = view->DownloadFrame(View::MASK);
         mask = mask(roi).clone();

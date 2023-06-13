@@ -220,7 +220,7 @@ void TrackerBase::UpdateHist(cv::Mat frame) {
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
 		view->setLevel(0);
-		view->RenderSilhouette(std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()), GL_FILL);
+		view->RenderSilhouette(objects[0], GL_FILL);
 		cv::Mat masks_map = view->DownloadFrame(View::MASK);
 		cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 
