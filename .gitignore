@@ -1,4 +1,8 @@
+## >>>>>>>>> ttool >>>>>>>>>
+
 /debug/*
+dataset/
+
 ## >>>>>>>>> cmake >>>>>>>>>
 # Compiled Object files
 **/.DS_Store
