@@ -30,7 +30,6 @@ Tracker::Tracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& o
 
 Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<std::shared_ptr<Object3D>>& objects) {
 	Tracker* poseEstimator = NULL;
-
 	poseEstimator = new SLETracker(K, objects);
 
 	CHECK(poseEstimator) << "Check |tracker_mode| in yml file";
@@ -45,34 +44,10 @@ void Tracker::reset() {
 	initialized = false;
 }
 
-void Tracker::AddViewer(std::shared_ptr<Viewer> viewer_ptr) {
-	viewer_ptrs_.push_back(std::move(viewer_ptr));
-}
-
-bool Tracker::UpdateViewers(int iteration) {
-	if (!viewer_ptrs_.empty()) {
-		for (auto& viewer_ptr : viewer_ptrs_) {
-			viewer_ptr->UpdateViewer(iteration);
-		}
-	}
-	return true;
-}
-
-//std::vector<std::vector<cv::Point> > contours;
-//cv::findContours(mask_map, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-//std::vector<cv::Point3f> pts3d;
-//cv::Matx44f pose = objects[objectIndex]->getPoseMatrix();
-//cv::Matx44f normalization = objects[objectIndex]->getNormalization();
-//view->BackProjectPoints(contours[0], depth_map, pose* normalization, pts3d);
-//OutputPly(pts3d, "pts3d.ply");
 
 void Tracker::ToggleTracking(int objectIndex, bool undistortedFrame) {
 	if (objectIndex >= objects.size())
 		return;
-
-	//if (undistortedFrame) {
-	//	cv::remap(frame, frame, map1, map2, cv::INTER_LINEAR);
-	//}
 
 	if (!objects[objectIndex]->isInitialized()) {
 		std::cout << "Initializing object " << objects[objectIndex]->getModelID() << std::endl;
@@ -222,9 +197,6 @@ TrackerBase::TrackerBase(const cv::Matx33f& K, std::vector<std::shared_ptr<Objec
 : Tracker(K, objects) 
 {
 	hists = new RBOTHist(objects);
-	//hists = new TestHist(objects);
-	//hists = new GlobalHist(objects);
-	//hists = new WTCLCHist(objects);
 }
 
 void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
@@ -248,7 +220,7 @@ void TrackerBase::UpdateHist(cv::Mat frame) {
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
 		view->setLevel(0);
-		view->RenderSilhouette(std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()), GL_FILL);
+		view->RenderSilhouette(objects[0], GL_FILL);
 		cv::Mat masks_map = view->DownloadFrame(View::MASK);
 		cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 
@@ -272,7 +244,6 @@ void SLTracker::GetBundleProb(const cv::Mat& frame, int oid) {
 
 	int level = view->getLevel();
 	int upscale = pow(2, level);
-
 	std::shared_ptr<TCLCHistograms> tclcHistograms = objects[oid]->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();

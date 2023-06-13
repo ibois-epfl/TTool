@@ -37,8 +37,6 @@ namespace ttool
          */
         void ConsumeKey(char key)
         {
-            // if (-1 != int(key))
-            //     std::cout << "Key: " << std::isprint(key) << " " << int(key) << std::endl;
             switch (key)
             {
             // Change the model
@@ -46,7 +44,7 @@ namespace ttool
                 m_ModelManagerPtr->IncreaseObjectID();
                 break;
             case 'r':
-                m_ModelManagerPtr->ResetObjectToGroundTruth();
+                m_ModelManagerPtr->ResetObjectToInitialPose();
                 break;
             // Translate the model
             case 'w':

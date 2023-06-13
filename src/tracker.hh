@@ -18,14 +18,11 @@ public:
 	virtual void ToggleTracking(int objectIndex, bool undistortedFrame);
 	virtual void EstimatePoses();
     virtual void EstimatePoses(cv::Matx44f& init_pose) = 0;
-	virtual void EstimatePoses(cv::Matx44f& init_pose, cv::Mat frame) = 0;
+	virtual void EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) = 0;
     virtual void PreProcess(cv::Mat frame) {}
 	virtual void PostProcess(cv::Mat frame) {}
 
 	void reset();
-
-	void AddViewer(std::shared_ptr<Viewer> viewer_ptr);
-	bool UpdateViewers(int save_idx);
 
 protected:
 	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shared_ptr<Object3D>>& objects, int runs = 1) = 0;

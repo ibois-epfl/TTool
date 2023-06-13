@@ -15,9 +15,15 @@ namespace tslet
             cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
             if (!hasTracker(modelID))
             {
+                if (hasPreviousTracker())
+                {
+                    trackerPtr->ToggleTracking(0, false);
+                    trackerPtr->reset(); // Go through the objects in the tracker and reset its histogram
+                    trackerPtr.reset();
+                }
                 std::vector<std::shared_ptr<Object3D>>objects = {object};
-                std::shared_ptr<Tracker> trackerPtr(Tracker::GetTracker(1, K, distCoeffs, objects));
-                modelID2tracker[modelID] = trackerPtr;
+                trackerPtr = std::shared_ptr<Tracker>(Tracker::GetTracker(1, K, distCoeffs, objects));
+                currentModelID = modelID;
                 trackerPtr->ToggleTracking(0, true);
             }
         }
@@ -30,7 +36,6 @@ namespace tslet
                 return;
             }
 
-            std::shared_ptr<Tracker> trackerPtr = modelID2tracker[modelID];
             trackerPtr->PostProcess(frame);
         }
 
@@ -45,7 +50,7 @@ namespace tslet
             modelID2pose[modelID] = pose;
         }
 
-        void EstimatePose(int modelID, cv::Mat frame)
+        void CallEstimatePose(int modelID, cv::Mat frame)
         {
             if (!hasTracker(modelID) || !hasPose(modelID))
             {
@@ -53,16 +58,20 @@ namespace tslet
                 return;
             }
 
-            std::shared_ptr<Tracker> trackerPtr = modelID2tracker[modelID];
             cv::Matx44f init_pose = modelID2pose[modelID];
-            cv::imshow("What Tracker Sees", frame);
+            // cv::imshow("What Tracker Sees", frame);
             trackerPtr->EstimatePoses(init_pose, frame);
         }
 
         private:
         bool hasTracker(int modelID)
         {
-            return modelID2tracker.find(modelID) != modelID2tracker.end();
+            return currentModelID == modelID;
+        }
+
+        bool hasPreviousTracker()
+        {
+            return currentModelID != -1;
         }
 
         bool hasPose(int modelID)
@@ -71,7 +80,8 @@ namespace tslet
         }
 
         private:
-        std::map<int, std::shared_ptr<Tracker>> modelID2tracker;
+        std::shared_ptr<Tracker> trackerPtr;
+        int currentModelID = -1;
         std::map<int, cv::Matx44f> modelID2pose;
     };
 }

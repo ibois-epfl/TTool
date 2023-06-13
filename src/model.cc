@@ -48,7 +48,7 @@ void Model::Init(const std::string modelFilename, const cv::Matx44f& Ti, float s
 	normalBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
 	indexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
     
-	loadModel(modelFilename);
+  loadModel(modelFilename);
   
   //if (tk::IsFileExist(modelFilename + 's')) {
   //  loadSimpleModel(modelFilename + 's');

@@ -225,29 +225,11 @@ static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 	return (pt(0) < width && pt(1) < height && pt(0) >= 0 && pt(1) >= 0);
 }
 
-void View::RenderSilhouette(std::shared_ptr<Model> model, GLenum polyonMode, bool invertDepth, float r, float g, float b, bool drawAll)
-{
-	vector<std::shared_ptr<Model>> models;
-	models.push_back(model);
-
-	vector<Point3f> colors;
-	colors.push_back(Point3f(r, g, b));
-
-	RenderSilhouette(models, polyonMode, invertDepth, colors, drawAll);
-}
-
-void View::RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, float r, float g, float b, bool drawAll)
-{
-	vector<std::shared_ptr<Model>> models;
-	models.push_back(model);
-
-	vector<Point3f> colors;
-	colors.push_back(Point3f(r, g, b));
-
-	RenderShaded(models, polyonMode, colors, drawAll);
-}
-
 void View::RenderSilhouette(vector<shared_ptr<Model>> models, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
+{
+	return;
+}
+void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
 {
 	glViewport(0, 0, width, height);
 
@@ -259,38 +241,29 @@ void View::RenderSilhouette(vector<shared_ptr<Model>> models, GLenum polyonMode,
 
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	for (int i = 0; i < models.size(); i++)
+	// for (int i = 0; i < models.size(); i++)
+	// {
+		// shared_ptr<Model> model = models[i];
+
+	if (model->isInitialized() || drawAll)
 	{
-		shared_ptr<Model> model = models[i];
+		Matx44f pose = model->getPose();
+		Matx44f normalization = model->getNormalization();
 
-		if (model->isInitialized() || drawAll)
-		{
-			Matx44f pose = model->getPose();
-			Matx44f normalization = model->getNormalization();
+		Matx44f modelViewMatrix = lookAtMatrix * (pose * normalization);
 
-			Matx44f modelViewMatrix = lookAtMatrix * (pose * normalization);
+		Matx44f modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
 
-			Matx44f modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
+		silhouetteShaderProgram->bind();
+		silhouetteShaderProgram->setUniformValue("uMVPMatrix", QMatrix4x4(modelViewProjectionMatrix.val));
+		silhouetteShaderProgram->setUniformValue("uAlpha", 1.0f);
 
-			silhouetteShaderProgram->bind();
-			silhouetteShaderProgram->setUniformValue("uMVPMatrix", QMatrix4x4(modelViewProjectionMatrix.val));
-			silhouetteShaderProgram->setUniformValue("uAlpha", 1.0f);
+		Point3f color = Point3f((float)(model->getModelID()) / 255.0f, 0.0f, 0.0f);
+		silhouetteShaderProgram->setUniformValue("uColor", QVector3D(color.x, color.y, color.z));
 
-			Point3f color;
-			if (i < colors.size())
-			{
-				color = colors[i];
-			}
-			else
-			{
-				color = Point3f((float)(model->getModelID()) / 255.0f, 0.0f, 0.0f);
-			}
-			silhouetteShaderProgram->setUniformValue("uColor", QVector3D(color.x, color.y, color.z));
+		glPolygonMode(GL_FRONT_AND_BACK, polyonMode);
 
-			glPolygonMode(GL_FRONT_AND_BACK, polyonMode);
-
-			model->draw(silhouetteShaderProgram);
-		}
+		model->draw(silhouetteShaderProgram);
 	}
 
 	glClearDepth(0.0f);
@@ -328,52 +301,38 @@ void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 	}
 }
 
-void View::RenderShaded(vector<std::shared_ptr<Model>> models, GLenum polyonMode, const std::vector<cv::Point3f> &colors, bool drawAll)
+void View::RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, const cv::Point3f color, bool drawAll)
 {
 	glViewport(0, 0, width, height);
 
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	for (int i = 0; i < models.size(); i++)
+	if (model->isInitialized() || drawAll)
 	{
-		std::shared_ptr<Model> model = models[i];
+		Matx44f pose = model->getPose();
+		Matx44f normalization = model->getNormalization();
 
-		if (model->isInitialized() || drawAll)
-		{
-			Matx44f pose = model->getPose();
-			Matx44f normalization = model->getNormalization();
+		Matx44f modelViewMatrix = lookAtMatrix * (pose * normalization);
 
-			Matx44f modelViewMatrix = lookAtMatrix * (pose * normalization);
+		Matx33f normalMatrix = modelViewMatrix.get_minor<3, 3>(0, 0).inv().t();
 
-			Matx33f normalMatrix = modelViewMatrix.get_minor<3, 3>(0, 0).inv().t();
+		Matx44f modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
 
-			Matx44f modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
+		phongblinnShaderProgram->bind();
+		phongblinnShaderProgram->setUniformValue("uMVMatrix", QMatrix4x4(modelViewMatrix.val));
+		phongblinnShaderProgram->setUniformValue("uMVPMatrix", QMatrix4x4(modelViewProjectionMatrix.val));
+		phongblinnShaderProgram->setUniformValue("uNormalMatrix", QMatrix3x3(normalMatrix.val));
+		phongblinnShaderProgram->setUniformValue("uLightPosition1", QVector3D(0.1, 0.1, -0.02));
+		phongblinnShaderProgram->setUniformValue("uLightPosition2", QVector3D(-0.1, 0.1, -0.02));
+		phongblinnShaderProgram->setUniformValue("uLightPosition3", QVector3D(0.0, 0.0, 0.1));
+		phongblinnShaderProgram->setUniformValue("uShininess", 100.0f);
+		phongblinnShaderProgram->setUniformValue("uAlpha", 1.0f);
 
-			phongblinnShaderProgram->bind();
-			phongblinnShaderProgram->setUniformValue("uMVMatrix", QMatrix4x4(modelViewMatrix.val));
-			phongblinnShaderProgram->setUniformValue("uMVPMatrix", QMatrix4x4(modelViewProjectionMatrix.val));
-			phongblinnShaderProgram->setUniformValue("uNormalMatrix", QMatrix3x3(normalMatrix.val));
-			phongblinnShaderProgram->setUniformValue("uLightPosition1", QVector3D(0.1, 0.1, -0.02));
-			phongblinnShaderProgram->setUniformValue("uLightPosition2", QVector3D(-0.1, 0.1, -0.02));
-			phongblinnShaderProgram->setUniformValue("uLightPosition3", QVector3D(0.0, 0.0, 0.1));
-			phongblinnShaderProgram->setUniformValue("uShininess", 100.0f);
-			phongblinnShaderProgram->setUniformValue("uAlpha", 1.0f);
+		phongblinnShaderProgram->setUniformValue("uColor", QVector3D(color.x, color.y, color.z));
 
-			Point3f color;
-			if (i < colors.size())
-			{
-				color = colors[i];
-			}
-			else
-			{
-				color = Point3f(1.0, 0.5, 0.0);
-			}
-			phongblinnShaderProgram->setUniformValue("uColor", QVector3D(color.x, color.y, color.z));
+		glPolygonMode(GL_FRONT_AND_BACK, polyonMode);
 
-			glPolygonMode(GL_FRONT_AND_BACK, polyonMode);
-
-			model->draw(phongblinnShaderProgram);
-		}
+		model->draw(phongblinnShaderProgram);
 	}
 
 	glFinish();

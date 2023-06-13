@@ -12,7 +12,7 @@ class Model;
 class Viewer
 {
 public:
-	virtual void UpdateViewer(int save_index) = 0;
+	virtual void UpdateViewer(int save_index, int fps) = 0;
 	void StartSavingImages(const std::filesystem::path &path);
 	void StopSavingImages();
 
@@ -106,37 +106,20 @@ public:
 	void Init(const std::string &name, std::shared_ptr<Camera> camera_ptr);
 	ImageViewer() = default;
 
-	void UpdateViewer(int save_index) override;
+	void UpdateViewer(int save_index, int fps);
 };
 
 class View;
 
-class ContourViewer : public Viewer
+class UnifiedViewer : public Viewer
 {
 public:
-	void Init(const std::string &name, View *view, const std::vector<std::shared_ptr<Model>> &objects, std::shared_ptr<Camera> camera);
-	ContourViewer() = default;
+	void Init(const std::string &name, View *view, std::shared_ptr<Model> object, std::shared_ptr<Camera> camera);
+	UnifiedViewer() = default;
 
-	void UpdateViewer(int save_index) override;
 	void UpdateViewer(int fps, int save_index);
-	cv::Mat DrawContourOverlay(View *view, const std::vector<std::shared_ptr<Model>> &objects, const cv::Mat &frame);
-
+	cv::Mat DrawOverlay(View *view, std::shared_ptr<Model> object, const cv::Mat &frame);
 protected:
 	View *renderer_;
-	std::vector<std::shared_ptr<Model>> objects_;
-};
-
-class FragmentViewer : public Viewer
-{
-public:
-	void Init(const std::string &name, View *view, const std::vector<std::shared_ptr<Model>> &objects, std::shared_ptr<Camera> camera);
-	FragmentViewer() = default;
-
-	void UpdateViewer(int save_index) override;
-	void UpdateViewer(int fps, int save_index);
-	cv::Mat DrawFragmentOverlay(View *view, const std::vector<std::shared_ptr<Model>> &objects, const cv::Mat &frame);
-
-protected:
-	View *renderer_;
-	std::vector<std::shared_ptr<Model>> objects_;
+	std::shared_ptr<Model> objects_;
 };
