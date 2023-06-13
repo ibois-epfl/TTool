@@ -27,13 +27,13 @@ namespace ttool
 
             // Initialize the viewer
 
-            m_fragmentViewerPtr = std::make_shared<UnifiedViewer>();
+            m_viewerPtr = std::make_shared<UnifiedViewer>();
         }
 
         void SetModels()
         {
             View* view = View::Instance();
-            m_fragmentViewerPtr->Init("Viewer", view, m_ModelManagerPtr->GetObject(), m_CameraPtr);
+            m_viewerPtr->Init("Viewer", view, m_ModelManagerPtr->GetObject(), m_CameraPtr);
         }
 
         /**
@@ -43,21 +43,21 @@ namespace ttool
          */
         void UpdateVisualizer(int frameId, int fps = -1)
         {
-            m_fragmentViewerPtr->UpdateViewer(frameId, fps);
+            m_viewerPtr->UpdateViewer(frameId, fps);
         }
 
         void ToggleShowKeymaps()
         {
-            m_fragmentViewerPtr->ToggleShowKeymaps();
+            m_viewerPtr->ToggleShowKeymaps();
         }
 
         void UpdateEvent(ttool::EventType event)
         {
-            m_fragmentViewerPtr->UpdateEvent(event);
+            m_viewerPtr->UpdateEvent(event);
         }
 
     private:
-        std::shared_ptr<UnifiedViewer> m_fragmentViewerPtr;
+        std::shared_ptr<UnifiedViewer> m_viewerPtr;
         std::shared_ptr<Camera> m_CameraPtr;
         std::shared_ptr<DModelManager> m_ModelManagerPtr;
     };
