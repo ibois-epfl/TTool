@@ -210,6 +210,7 @@ cv::Mat FragmentViewer::DrawFragmentOverlay(View *view, const std::vector<std::s
 	cv::Mat depth = view->DownloadFrame(View::DEPTH);
 
 	// compose the rendering with the current camera image for demo purposes (can be done more efficiently directly in OpenGL)
+	float alpha = 0.5f;
 	cv::Mat result = frame.clone();
 	for (int y = 0; y < frame.rows; y++)
 		for (int x = 0; x < frame.cols; x++)
@@ -217,9 +218,9 @@ cv::Mat FragmentViewer::DrawFragmentOverlay(View *view, const std::vector<std::s
 			cv::Vec3b color = rendering.at<cv::Vec3b>(y, x);
 			if (depth.at<float>(y, x) != 0.0f)
 			{
-				result.at<cv::Vec3b>(y, x)[0] = color[2];
-				result.at<cv::Vec3b>(y, x)[1] = color[1];
-				result.at<cv::Vec3b>(y, x)[2] = color[0];
+				result.at<cv::Vec3b>(y, x)[0] = alpha * color[2] + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x)[2];
+				result.at<cv::Vec3b>(y, x)[1] = alpha * color[1] + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x)[1];
+				result.at<cv::Vec3b>(y, x)[2] = alpha * color[0] + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x)[0];
 			}
 		}
 	return result;
