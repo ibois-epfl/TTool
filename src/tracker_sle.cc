@@ -235,7 +235,7 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 	}
 
 	view->setLevel(level);
-	view->RenderSilhouette(std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()), GL_FILL);
+	view->RenderSilhouette(objects[0], GL_FILL);
 	cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 
 	cv::Mat masks_map;
@@ -303,7 +303,7 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 
 void SLETracker::EstimatePoses(cv::Matx44f& init_pose) {}
 
-void SLETracker::EstimatePoses(cv::Matx44f& init_pose, cv::Mat frame) {
+void SLETracker::EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) {
     std::vector<cv::Mat> imagePyramid;
     imagePyramid.push_back(frame);
 
@@ -347,7 +347,7 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
     }
 
     view->setLevel(level);
-    view->RenderSilhouette(std::vector<std::shared_ptr<Model>>(objects.begin(), objects.end()), GL_FILL);
+    view->RenderSilhouette(objects[0], GL_FILL);
     cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 
     cv::Mat masks_map;
