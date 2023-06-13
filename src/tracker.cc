@@ -44,26 +44,6 @@ void Tracker::reset() {
 	initialized = false;
 }
 
-void Tracker::AddViewer(std::shared_ptr<Viewer> viewer_ptr) {
-	viewer_ptrs_.push_back(std::move(viewer_ptr));
-}
-
-bool Tracker::UpdateViewers(int iteration) {
-	if (!viewer_ptrs_.empty()) {
-		for (auto& viewer_ptr : viewer_ptrs_) {
-			viewer_ptr->UpdateViewer(iteration);
-		}
-	}
-	return true;
-}
-
-//std::vector<std::vector<cv::Point> > contours;
-//cv::findContours(mask_map, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-//std::vector<cv::Point3f> pts3d;
-//cv::Matx44f pose = objects[objectIndex]->getPoseMatrix();
-//cv::Matx44f normalization = objects[objectIndex]->getNormalization();
-//view->BackProjectPoints(contours[0], depth_map, pose* normalization, pts3d);
-//OutputPly(pts3d, "pts3d.ply");
 
 void Tracker::ToggleTracking(int objectIndex, bool undistortedFrame) {
 	if (objectIndex >= objects.size())

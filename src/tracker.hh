@@ -24,9 +24,6 @@ public:
 
 	void reset();
 
-	void AddViewer(std::shared_ptr<Viewer> viewer_ptr);
-	bool UpdateViewers(int save_idx);
-
 protected:
 	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shared_ptr<Object3D>>& objects, int runs = 1) = 0;
 
