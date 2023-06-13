@@ -223,7 +223,6 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 
 		cv::Rect roi = Compute2DROI(objects[o], cv::Size(width / pow(2, level), height / pow(2, level)), 8);
 		if (roi.area() == 0) {
-            std::cout << "Level ROI 0\n";
             continue;
         }
 

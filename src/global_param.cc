@@ -57,81 +57,107 @@ namespace tk {
     /**
      * Parse YML to GlobalParam
      * Note: member of GlobalParam should correspond to the indices in config YML
-     * @param config_file an absolute path to config file
+     * @param filePath an absolute path to config file
      */
-    void GlobalParam::ParseConfig(const std::string &config_file) {
-        std::cout << "Parsing config file: " << config_file << std::endl;
+    void GlobalParam::ParseConfig(const std::string &filePath)
+    {
+        cv::FileStorage fs(filePath, cv::FileStorage::READ);
+        if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__) + " could not open file:" + filePath);
 
-        cv::FileStorage fs(config_file, cv::FileStorage::READ);
-        CHECK(fs.isOpened()) << "failed to read config: " << config_file;
+        fs["camera_config_file"] >> camera_config_file;
 
-        cv::FileNode node;
+        fs["model_file"] >> model_file;
+        fs["gt_poses"] >> gt_poses;
 
-        /////////////////////////////////////
-        // camera
-        /////////////////////////////////////
-        ReadValue(fs, "camera_config_file", camera_config_file);
-        ReadArray(fs, "K", K);
-        ReadArray(fs, "dist_coeff", dist_coeff);
-        ReadValue(fs, "preprocess_width", preprocess_width);
-        ReadValue(fs, "preprocess_height", preprocess_height);
+        fs["frames"] >> frames;
+        fs["camera_id"] >> camera_id;
 
-        /////////////////////////////////////
-        // input
-        /////////////////////////////////////
-        ReadArray(fs, "model_file", model_file);
-        ReadValue(fs, "unit_model", unit_model);
+        fs["hist_offset"] >> hist_offset;
+        fs["hist_rad"] >> hist_rad;
+        fs["search_rad"] >> search_rad;
+        fs["alpha_fg"] >> alpha_fg;
+        fs["alpha_bg"] >> alpha_bg;
 
-        ReadValue(fs, "frames", frames);
-        ReadValue(fs, "camera_id", camera_id);
+        // Visualizer
+        fs["zn"] >> zn;
+        fs["zf"] >> zf;
 
-        ReadValue(fs, "fx", fx);
-        ReadValue(fs, "fy", fy);
-        ReadValue(fs, "cx", cx);
-        ReadValue(fs, "cy", cy);
-
-        ReadValue(fs, "zn", zn);
-        ReadValue(fs, "zf", zf);
-
-        /////////////////////////////////////
-        // histogram
-        /////////////////////////////////////
-        ReadValue(fs, "hist_offset", hist_offset);
-        ReadValue(fs, "hist_rad", hist_rad);
-        ReadValue(fs, "search_rad", search_rad);
-        ReadValue(fs, "alpha_fg", alpha_fg);
-        ReadValue(fs, "alpha_bg", alpha_bg);
-
-        /////////////////////////////////////
-        // tracker
-        /////////////////////////////////////
-        ReadValue(fs, "line_len", line_len);
-        ReadValue(fs, "sl_seg", sl_seg);
-
-        /////////////////////////////////////
-        // tracker
-        /////////////////////////////////////
-        ReadValue(fs, "tracker_mode", tracker_mode);
-        ReadValue(fs, "timeout", timeout);
-        ReadValue(fs, "target_frame", target_frame);
-        ReadValue(fs, "show_result", show_result);
-
-        /////////////////////////////////////
-        // output
-        /////////////////////////////////////
-        ReadValue(fs, "input_pose_file", input_pose_file);
-        ReadValue(fs, "tk_pose_file", tk_pose_file);
-        ReadValue(fs, "fps_file", fps_file);
-        ReadValue(fs, "result_video_file", result_video_file);
-        ReadValue(fs, "result_img_dir", bench_case);
-
-        /////////////////////////////////////
-        // benchmark
-        /////////////////////////////////////
-        ReadValue(fs, "report_file", report_file);
-        ReadValue(fs, "bench_mode", bench_mode);
-        ReadValue(fs, "gt_pose_file", gt_pose_file);
+        return fs.release();
     }
+    // void GlobalParam::ParseConfig2(const std::string &config_file) {
+    //     std::cout << "Parsing config file: " << config_file << std::endl;
+
+    //     cv::FileStorage fs(config_file, cv::FileStorage::READ);
+    //     CHECK(fs.isOpened()) << "failed to read config: " << config_file;
+
+    //     cv::FileNode node;
+
+    //     /////////////////////////////////////
+    //     // camera
+    //     /////////////////////////////////////
+    //     ReadValue(fs, "camera_config_file", camera_config_file);
+    //     ReadArray(fs, "K", K);
+    //     ReadArray(fs, "dist_coeff", dist_coeff);
+    //     ReadValue(fs, "preprocess_width", preprocess_width);
+    //     ReadValue(fs, "preprocess_height", preprocess_height);
+
+    //     /////////////////////////////////////
+    //     // input
+    //     /////////////////////////////////////
+    //     ReadArray(fs, "model_file", model_file);
+    //     ReadArray(fs, "gt_poses", gt_poses);
+    //     ReadValue(fs, "unit_model", unit_model);
+
+    //     ReadValue(fs, "frames", frames);
+    //     ReadValue(fs, "camera_id", camera_id);
+
+    //     ReadValue(fs, "fx", fx);
+    //     ReadValue(fs, "fy", fy);
+    //     ReadValue(fs, "cx", cx);
+    //     ReadValue(fs, "cy", cy);
+
+    //     ReadValue(fs, "zn", zn);
+    //     ReadValue(fs, "zf", zf);
+
+    //     /////////////////////////////////////
+    //     // histogram
+    //     /////////////////////////////////////
+    //     ReadValue(fs, "hist_offset", hist_offset);
+    //     ReadValue(fs, "hist_rad", hist_rad);
+    //     ReadValue(fs, "search_rad", search_rad);
+    //     ReadValue(fs, "alpha_fg", alpha_fg);
+    //     ReadValue(fs, "alpha_bg", alpha_bg);
+
+    //     /////////////////////////////////////
+    //     // tracker
+    //     /////////////////////////////////////
+    //     ReadValue(fs, "line_len", line_len);
+    //     ReadValue(fs, "sl_seg", sl_seg);
+
+    //     /////////////////////////////////////
+    //     // tracker
+    //     /////////////////////////////////////
+    //     ReadValue(fs, "tracker_mode", tracker_mode);
+    //     ReadValue(fs, "timeout", timeout);
+    //     ReadValue(fs, "target_frame", target_frame);
+    //     ReadValue(fs, "show_result", show_result);
+
+    //     /////////////////////////////////////
+    //     // output
+    //     /////////////////////////////////////
+    //     ReadValue(fs, "input_pose_file", input_pose_file);
+    //     ReadValue(fs, "tk_pose_file", tk_pose_file);
+    //     ReadValue(fs, "fps_file", fps_file);
+    //     ReadValue(fs, "result_video_file", result_video_file);
+    //     ReadValue(fs, "result_img_dir", bench_case);
+
+    //     /////////////////////////////////////
+    //     // benchmark
+    //     /////////////////////////////////////
+    //     ReadValue(fs, "report_file", report_file);
+    //     ReadValue(fs, "bench_mode", bench_mode);
+    //     ReadValue(fs, "gt_pose_file", gt_pose_file);
+    // }
 
     /**
      * Dump a value of a given index to a YML line

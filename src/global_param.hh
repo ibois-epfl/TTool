@@ -18,6 +18,7 @@ namespace tk {
 
         // input
         std::vector<std::string> model_file;
+        std::vector<std::vector<float>> gt_poses;
         bool unit_model{};
 
         //std::string init_pose;

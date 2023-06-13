@@ -73,11 +73,6 @@ int main(int argc, char **argv)
 
     // Initialize the tracker
     tslet::ObjectTracker objectTracker;
-    for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
-    {
-        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), cameraPtr->GetK());
-        modelManagerPtr->IncreaseObjectID();
-    }
 
     // main thread
     while (true)
@@ -85,8 +80,13 @@ int main(int argc, char **argv)
         int oid = modelManagerPtr->GetObject()->getModelID();
         int fid = 0;
         int key = cv::waitKey(1);
+
+        // Initialize the tracker with the curent object
+        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), cameraPtr->GetK());
+
         // 2b UI pose input
         std::cout << "Please input the pose of the object" << std::endl;
+        visualizerPtr->SetModels();
         visualizerPtr->UpdateEvent(ttool::EventType::PoseInput);
         while (oid == modelManagerPtr->GetObject()->getModelID())
         {
@@ -120,7 +120,6 @@ int main(int argc, char **argv)
             {
                 break;
             }
-
             objectTracker.EstimatePose(oid, cameraPtr->image());
             auto tf = cv::getTickCount();
             auto t = (tf - ti) / cv::getTickFrequency();
@@ -133,7 +132,6 @@ int main(int argc, char **argv)
 
             input.ConsumeKey(key);
         }
-        std::cout << "Restarting Object " << oid << " changed to >> ";
         oid = modelManagerPtr->GetObject()->getModelID();
         std::cout << oid << std::endl;
     }

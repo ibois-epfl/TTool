@@ -30,7 +30,6 @@ Tracker::Tracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& o
 
 Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<std::shared_ptr<Object3D>>& objects) {
 	Tracker* poseEstimator = NULL;
-
 	poseEstimator = new SLETracker(K, objects);
 
 	CHECK(poseEstimator) << "Check |tracker_mode| in yml file";
@@ -69,10 +68,6 @@ bool Tracker::UpdateViewers(int iteration) {
 void Tracker::ToggleTracking(int objectIndex, bool undistortedFrame) {
 	if (objectIndex >= objects.size())
 		return;
-
-	//if (undistortedFrame) {
-	//	cv::remap(frame, frame, map1, map2, cv::INTER_LINEAR);
-	//}
 
 	if (!objects[objectIndex]->isInitialized()) {
 		std::cout << "Initializing object " << objects[objectIndex]->getModelID() << std::endl;
@@ -222,9 +217,6 @@ TrackerBase::TrackerBase(const cv::Matx33f& K, std::vector<std::shared_ptr<Objec
 : Tracker(K, objects) 
 {
 	hists = new RBOTHist(objects);
-	//hists = new TestHist(objects);
-	//hists = new GlobalHist(objects);
-	//hists = new WTCLCHist(objects);
 }
 
 void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
@@ -272,7 +264,6 @@ void SLTracker::GetBundleProb(const cv::Mat& frame, int oid) {
 
 	int level = view->getLevel();
 	int upscale = pow(2, level);
-
 	std::shared_ptr<TCLCHistograms> tclcHistograms = objects[oid]->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();
