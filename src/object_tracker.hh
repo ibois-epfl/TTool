@@ -50,7 +50,7 @@ namespace tslet
             modelID2pose[modelID] = pose;
         }
 
-        void EstimatePose(int modelID, cv::Mat frame)
+        void CallEstimatePose(int modelID, cv::Mat frame)
         {
             if (!hasTracker(modelID) || !hasPose(modelID))
             {

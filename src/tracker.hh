@@ -18,7 +18,7 @@ public:
 	virtual void ToggleTracking(int objectIndex, bool undistortedFrame);
 	virtual void EstimatePoses();
     virtual void EstimatePoses(cv::Matx44f& init_pose) = 0;
-	virtual void EstimatePoses(cv::Matx44f& init_pose, cv::Mat frame) = 0;
+	virtual void EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) = 0;
     virtual void PreProcess(cv::Mat frame) {}
 	virtual void PostProcess(cv::Mat frame) {}
 

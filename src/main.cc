@@ -120,7 +120,7 @@ int main(int argc, char **argv)
             {
                 break;
             }
-            objectTracker.EstimatePose(oid, cameraPtr->image());
+            objectTracker.CallEstimatePose(oid, cameraPtr->image());
             auto tf = cv::getTickCount();
             auto t = (tf - ti) / cv::getTickFrequency();
             int fps = 1 / t;
