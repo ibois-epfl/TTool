@@ -7,7 +7,7 @@ zf: 4000.
 histOffset: 100
 histRad: 40
 searchRad: 25
-cameraConfigFile: "./live_camera/calibration_orange_A_1280_720_r.yml"
+cameraConfigFile: "./assets/calibration_orange_A_1280_720_r.yml"
 groundTruthPoses:
    - [ 1, 0, 0, 0,
        0, 1, 0, 0,
@@ -42,17 +42,21 @@ groundTruthPoses:
    - [ 1, 0, 0, 0,
        0, 1, 0, 0,
        0, 0, 1 ,0 ]
+   - [ 1, 0, 0, 0,
+       0, 1, 0, 0,
+       0, 0, 1 ,0 ]
 modelFiles:
-   - "/home/as/TTool/assets/toolheads/holzkombihorer_20/model.obj"
-   - "/home/as/TTool/assets/toolheads/ck30/model.obj"
-   - "/home/as/TTool/assets/toolheads/drillBit_20_110/model.obj"
-   - "/home/as/TTool/assets/toolheads/drillBit_14_105/model.obj"
-   - "/home/as/TTool/assets/toolheads/holzspiralbohrer_sp_20/5kmodel.obj"
-   - "/home/as/TTool/assets/toolheads/circular_blade_scaled/circular_blade_scaled.obj"
-   - "/home/as/TTool/assets/toolheads/flachbohrer_25/flachbohrer_25.obj"
+   - "/home/as/TTool/assets/toolheads/twist_drill_bit_32_165/model.obj"
+   - "/home/as/TTool/assets/toolheads/brad_point_drill_bit_20_150/model.obj"
+   - "/home/as/TTool/assets/toolheads/self_feeding_bit_40_90/model.obj"
+   - "/home/as/TTool/assets/toolheads/spade_drill_bit_25_150/model.obj"
+   - "/home/as/TTool/assets/toolheads/saber_saw_blade_makita_t/model.obj"
+   - "/home/as/TTool/assets/toolheads/auger_drill_bit_20_235/model.obj"
    - "/home/as/TTool/assets/toolheads/selfFeedBits_50/model.obj"
    - "/home/as/TTool/assets/toolheads/saw_blade_scaled/saw_blade_thin_verythin.obj"
-   - "/home/as/TTool/assets/toolheads/forstnerbohrer_40/forstnerbohrer_40.obj"
+   - "/home/as/TTool/assets/toolheads/self_feeding_bit_50_90/model.obj"
    - "/home/as/TTool/assets/toolheads/selfFeedBits_40_90/model.obj"
+   - "/home/as/TTool/assets/toolheads/chain_saw_blade_f_250/model.obj"
+   - "/home/as/TTool/assets/toolheads/circular_saw_blade_makita_190/model.obj"
 frames: ""
 cameraID: 0
