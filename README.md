@@ -37,6 +37,9 @@ gantt
     (10)2d detection - integration API                           :2ddetinteg, after 2ddetrefin, 10d
     (11) 3d pose detector                                        :crit, 3dposde, after 2ddetinteg, 12d
 
+    section optimisation
+    (**)tSLET optimisation                                        :crit, optim, after 2ddetinteg, 12d
+
     code refinement                                           :ref, after 3dposde, 4d
     documentation/cleaning                                    :docclean, 2023-08-10, 2023-08-14
 
@@ -73,6 +76,10 @@ gantt
   - [ ] format output based on the chosen training format
 
 - [ ] **(11) (optional) 3d pose detector**: if we are on time, 2 weeks will be reserved to the integration of a initial 6DOF pose detector to avoid the manual placing of the object.
+
+- [ ] **optimisation**:
+  - [ ] [Track's RunIteration](./src/tracker_sle.cc#L185) has fixed number of run
+  - [ ] Search line depends on the size of the Object3D. This leads to slower [EstimatePose](./src/tracker_sle.cc#L306) on some models
 
 ---
 
