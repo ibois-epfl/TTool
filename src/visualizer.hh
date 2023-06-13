@@ -26,18 +26,14 @@ namespace ttool
             m_CameraPtr = cameraPtr;
 
             // Initialize the viewer
-            m_fragmentViewerPtr = std::make_shared<FragmentViewer>();
-            m_fragmentViewerPtr->Init("Fragment Viewer", view, std::vector<std::shared_ptr<Model>>(), m_CameraPtr);
 
-            m_contourViewerPtr = std::make_shared<ContourViewer>();
-            m_contourViewerPtr->Init("Contour Viewer", view, std::vector<std::shared_ptr<Model>>(), m_CameraPtr);
+            m_fragmentViewerPtr = std::make_shared<UnifiedViewer>();
         }
 
         void SetModels()
         {
             View* view = View::Instance();
-            m_fragmentViewerPtr->Init("Fragment Viewer", view, std::vector<std::shared_ptr<Model>>{m_ModelManagerPtr->GetObject()}, m_CameraPtr);
-            m_contourViewerPtr->Init("Contour Viewer", view, std::vector<std::shared_ptr<Model>>{m_ModelManagerPtr->GetObject()}, m_CameraPtr);
+            m_fragmentViewerPtr->Init("Viewer", view, m_ModelManagerPtr->GetObject(), m_CameraPtr);
         }
 
         /**
@@ -45,27 +41,23 @@ namespace ttool
          * 
          * @param frameId 
          */
-        void UpdateVisualizer(int frameId, int fps = 69)
+        void UpdateVisualizer(int frameId, int fps = -1)
         {
             m_fragmentViewerPtr->UpdateViewer(frameId, fps);
-            m_contourViewerPtr->UpdateViewer(frameId, fps);
         }
 
         void ToggleShowKeymaps()
         {
             m_fragmentViewerPtr->ToggleShowKeymaps();
-            m_contourViewerPtr->ToggleShowKeymaps();
         }
 
         void UpdateEvent(ttool::EventType event)
         {
             m_fragmentViewerPtr->UpdateEvent(event);
-            m_contourViewerPtr->UpdateEvent(event);
         }
 
     private:
-        std::shared_ptr<FragmentViewer> m_fragmentViewerPtr;
-        std::shared_ptr<ContourViewer> m_contourViewerPtr;
+        std::shared_ptr<UnifiedViewer> m_fragmentViewerPtr;
         std::shared_ptr<Camera> m_CameraPtr;
         std::shared_ptr<DModelManager> m_ModelManagerPtr;
     };
