@@ -89,6 +89,7 @@ namespace ttool
 
                 // Create the folder
                 std::filesystem::create_directory(path);
+                std::filesystem::create_directory(path + "/no_gui/");
 
                 m_viewerPtr->StartSavingImages(path);
             }
