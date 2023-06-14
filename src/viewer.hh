@@ -122,4 +122,5 @@ public:
 protected:
 	View *renderer_;
 	std::shared_ptr<Model> objects_;
+	int m_SaveIndex = 0;
 };

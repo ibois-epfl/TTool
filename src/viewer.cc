@@ -83,9 +83,10 @@ void UnifiedViewer::UpdateViewer(int fid, int fps)
 	}
 
 	if (save_images_)
-		cv::imwrite(
-			save_path_.string() + name_ + "_" + std::to_string(fid) + ".png",
-			res_img);
+	{
+		cv::imwrite(save_path_.string() + name_ + "_" + std::to_string(m_SaveIndex) + ".png", res_img);
+		++m_SaveIndex;
+	}
 }
 
 cv::Mat UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<Model> object, const cv::Mat &frame)
