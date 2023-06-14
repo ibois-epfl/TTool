@@ -12,7 +12,7 @@ namespace ttool
     struct Visualizer
     {
     public:
-        Visualizer(std::shared_ptr<Camera> cameraPtr, std::shared_ptr<DModelManager> modelManagerPtr, int zn, int zf)
+        Visualizer(std::shared_ptr<Camera> cameraPtr, std::shared_ptr<DModelManager> modelManagerPtr, float zn, float zf)
         {
             cv::Matx33f K = cameraPtr->GetK();
 
