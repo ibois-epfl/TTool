@@ -11,7 +11,7 @@ set(@PROJECT_NAME@_VERSION_MINOR  @PROJECT_VERSION_MINOR@)
 set(@PROJECT_NAME@_VERSION_PATCH  @PROJECT_VERSION_PATCH@)
 
 # zenodo direct doi link (to change if dataset us updated)
-set(__DSET_DOI__ "https://doi.org/10.5281/zenodo.8015022")
+set(__DSET_DOI__ "https://doi.org/10.5281/zenodo.8039125")
 
 # ttol config loader/unloader
 set(__TTOOL_CONFIG_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.yml")
