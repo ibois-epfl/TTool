@@ -102,7 +102,7 @@ def main(dataset_path : str, config_path : str) -> None:
     for i in range(len(model_obj_paths)):
         new_model_path : str = ""
         new_lines_modelFiles.append("   - \"{}\"\n".format(model_obj_paths[i]))
-        identity_matrix : str = "   - [ 1, 0, 0, 0,\n       0, 1, 0, 0,\n       0, 0, 1 ,0 ]\n"
+        identity_matrix : str = "   - [ 1, 0, 0,\n       0, 1, 0,\n       0, 0, 1,\n       0, 0, 0 ]\n"
         new_lines_gtPoses.append(identity_matrix)
 
     with open(config_path, "r+") as f:
