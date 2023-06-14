@@ -116,6 +116,7 @@ class UnifiedViewer : public Viewer
 public:
 	void Init(const std::string &name, View *view, std::shared_ptr<Model> object, std::shared_ptr<Camera> camera);
 	UnifiedViewer() = default;
+	void StopSavingImages();
 
 	void UpdateViewer(int fps, int save_index);
 	cv::Mat DrawOverlay(View *view, std::shared_ptr<Model> object, const cv::Mat &frame);

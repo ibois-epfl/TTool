@@ -69,6 +69,13 @@ void UnifiedViewer::Init(const std::string &name, View *view, std::shared_ptr<Mo
 	initialized_ = true;
 }
 
+void UnifiedViewer::StopSavingImages()
+{
+	save_images_ = false;
+	m_SaveIndex = 0;
+}
+
+
 void UnifiedViewer::UpdateViewer(int fid, int fps)
 {
 	const cv::Mat &frame = camera_ptr_->image();

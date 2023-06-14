@@ -84,7 +84,7 @@ namespace ttool
                 std::time_t t = std::time(nullptr);
                 std::tm tm = *std::localtime(&t);
                 std::stringstream ss;
-                ss << m_ImageSavePath << "/" << std::put_time(&tm, "%Y-%m-%d-%H-%M-%S");
+                ss << m_ImageSavePath << "/" << std::put_time(&tm, "%Y-%m-%d-%H-%M-%S") << "/";
                 std::string path = ss.str();
 
                 // Create the folder
