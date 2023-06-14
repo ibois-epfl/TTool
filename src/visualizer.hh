@@ -56,10 +56,23 @@ namespace ttool
             m_viewerPtr->UpdateEvent(event);
         }
 
+        void ToggleSavingImages(std::string path)
+        {
+            if (m_IsSavingImages)
+            {
+                m_viewerPtr->StopSavingImages();
+            }
+            else
+            {
+                m_viewerPtr->StartSavingImages(path);
+            }
+        }
+
     private:
         std::shared_ptr<UnifiedViewer> m_viewerPtr;
         std::shared_ptr<Camera> m_CameraPtr;
         std::shared_ptr<DModelManager> m_ModelManagerPtr;
+        bool m_IsSavingImages = false;
     };
     
 }

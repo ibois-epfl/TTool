@@ -112,9 +112,16 @@ namespace ttool
                 m_ModelManagerPtr->GetObject()->setInitialPose(pose);
                 break;
             }
+
+            // Visualizer options
             case 'h':
             {
                 m_VisualizerPtr->ToggleShowKeymaps();
+            }
+            case 'n':
+            {
+                m_VisualizerPtr->ToggleSavingImages("./debug/tracking/");
+                break;
             }
             default:
                 break;
