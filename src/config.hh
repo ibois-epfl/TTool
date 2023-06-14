@@ -37,6 +37,9 @@ namespace ttool
             // Visualizer
             float Zn;
             float Zf;
+
+            // Debugging
+            std::string SaveImagePath;
             
             // Unordered maps are used to help Setters more dynamic typed
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::string>>> stringVectorMembers = {
@@ -63,7 +66,8 @@ namespace ttool
 
             std::unordered_map<std::string, std::reference_wrapper<std::string>> stringMembers = {
                 {"frames", std::ref(Frames)},
-                {"cameraConfigFile", std::ref(CameraConfigFile)}
+                {"cameraConfigFile", std::ref(CameraConfigFile)},
+                {"saveImagePath", std::ref(SaveImagePath)}
             };
 
             /**
@@ -188,6 +192,9 @@ namespace ttool
                 m_ConfigData.setValue("zn", (float)fs["zn"]);
                 m_ConfigData.setValue("zf", (float)fs["zf"]);           
 
+                // Debugging Configs
+                m_ConfigData.setValue("saveImagePath", (std::string)fs["saveImagePath"]);
+
                 return fs.release();
             }
 
@@ -223,6 +230,8 @@ namespace ttool
                 std::cout << "Alpha background: " << m_ConfigData.AlphaBackground << std::endl;
                 std::cout << "Zn: " << m_ConfigData.Zn << std::endl;
                 std::cout << "Zf: " << m_ConfigData.Zf << std::endl;
+
+                std::cout << "Save image path: " << m_ConfigData.SaveImagePath << std::endl;
             }
 
             /**

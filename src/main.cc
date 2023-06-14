@@ -67,6 +67,7 @@ int main(int argc, char **argv)
 
     // Initialize the visualizer
     std::shared_ptr<ttool::Visualizer> visualizerPtr = std::make_shared<ttool::Visualizer>(cameraPtr, modelManagerPtr, config->GetConfigData().Zn, config->GetConfigData().Zf);
+    visualizerPtr->SetSaveImagePath(config->GetConfigData().SaveImagePath);
     cameraPtr->UpdateCamera();
 
     ttool::Input input(modelManagerPtr, visualizerPtr);

@@ -117,10 +117,11 @@ namespace ttool
             case 'h':
             {
                 m_VisualizerPtr->ToggleShowKeymaps();
+                break;
             }
             case 'n':
             {
-                m_VisualizerPtr->ToggleSavingImages("./debug/tracking/");
+                m_VisualizerPtr->ToggleSavingImages();
                 break;
             }
             default:

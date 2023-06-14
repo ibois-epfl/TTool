@@ -30,6 +30,20 @@ namespace ttool
             m_viewerPtr = std::make_shared<UnifiedViewer>();
         }
 
+        /**
+         * @brief Set the Image Save Path object
+         * 
+         * @param path 
+         */
+        void SetSaveImagePath(std::string path)
+        {
+            m_ImageSavePath = path;
+        }
+        
+        /**
+         * @brief Set the models with the current model manager
+         * 
+         */
         void SetModels()
         {
             View* view = View::Instance();
@@ -56,14 +70,26 @@ namespace ttool
             m_viewerPtr->UpdateEvent(event);
         }
 
-        void ToggleSavingImages(std::string path)
+        void ToggleSavingImages()
         {
             if (m_IsSavingImages)
             {
                 m_viewerPtr->StopSavingImages();
+                m_IsSavingImages = false;
             }
             else
             {
+                m_IsSavingImages = true;
+                // Generate a folder name based on the current time
+                std::time_t t = std::time(nullptr);
+                std::tm tm = *std::localtime(&t);
+                std::stringstream ss;
+                ss << m_ImageSavePath << "/" << std::put_time(&tm, "%Y-%m-%d-%H-%M-%S");
+                std::string path = ss.str();
+
+                // Create the folder
+                std::filesystem::create_directory(path);
+
                 m_viewerPtr->StartSavingImages(path);
             }
         }
@@ -72,7 +98,9 @@ namespace ttool
         std::shared_ptr<UnifiedViewer> m_viewerPtr;
         std::shared_ptr<Camera> m_CameraPtr;
         std::shared_ptr<DModelManager> m_ModelManagerPtr;
+
         bool m_IsSavingImages = false;
+        std::string m_ImageSavePath = "./debug/";
     };
     
 }
