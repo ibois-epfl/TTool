@@ -20,6 +20,8 @@ namespace ttool
         {
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
             
+            InitializeView();
+
             std::vector<cv::Matx44f> preprocessedGroundTruthPoses = PreprocessGroundTruthPoses(m_ConfigPtr->GetConfigData().GroundTruthPoses);
 
 
@@ -29,7 +31,6 @@ namespace ttool
                 m_ConfigPtr);
             
             m_Input = ttool::InputModelManager(m_ModelManagerPtr);
-            InitializeView();
             InitializeObjectTracker();
         };
         ~TTool(){};
@@ -100,6 +101,7 @@ namespace ttool
 
     public:
         std::shared_ptr<ttool::Config> GetConfig() { return m_ConfigPtr; };
+        std::shared_ptr<ttool::DModelManager> GetModelManager() { return m_ModelManagerPtr; };
 
 
     private:
