@@ -253,6 +253,8 @@ namespace ttool
                 fs << "histRad" << m_ConfigData.HistRad;
                 fs << "searchRad" << m_ConfigData.SearchRad;
                 
+                fs << "saveImagePath" << m_ConfigData.SaveImagePath;
+
                 fs << "cameraConfigFile" << m_ConfigData.CameraConfigFile;
                 
                 fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;

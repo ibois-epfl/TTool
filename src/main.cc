@@ -35,6 +35,8 @@ int main(int argc, char **argv)
     visualizerPtr->SetSaveImagePath(configPtr->GetConfigData().SaveImagePath);
     cameraPtr->UpdateCamera();
 
+    ttool::InputVisualizer inputVisualizer(visualizerPtr);
+
     // TODO:
     // the ttool needs:
     // - a) it needs index of the model -> TTool::ManipulateModel
@@ -67,6 +69,7 @@ int main(int argc, char **argv)
                 break;
             }
             ttool->ManipulateModel(key);
+            inputVisualizer.ConsumeKey(key);
             visualizerPtr->SetModels();
         }
         // 3 TSlet
@@ -96,6 +99,7 @@ int main(int argc, char **argv)
 
             visualizerPtr->UpdateVisualizer(fid, fps);
             cameraPtr->UpdateCamera();
+            inputVisualizer.ConsumeKey(key);
             ++fid;
         }
     }
