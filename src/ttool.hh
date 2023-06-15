@@ -46,8 +46,10 @@ namespace ttool
         {
             m_Input.ConsumeKey(key);
 
+            // When m_Input changes the object ID, we need to update the object tracker
             CheckObjectChange();
 
+            // When m_Input changes the object pose, we need to update the object tracker
             m_ObjectTracker.SetPose(m_CurrentObjectID, m_Input.GetPose());
         }
 

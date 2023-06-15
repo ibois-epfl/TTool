@@ -67,6 +67,7 @@ int main(int argc, char **argv)
                 break;
             }
             ttool->ManipulateModel(key);
+            visualizerPtr->SetModels();
         }
         // 3 TSlet
         visualizerPtr->UpdateEvent(ttool::EventType::Tracking);
