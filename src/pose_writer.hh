@@ -5,42 +5,49 @@
 #include <opencv2/core.hpp>
 
 
-class PoseWriter
+namespace ttool::standaloneUtils
 {
-    public:
-        PoseWriter(const std::string& filename, const std::string &configFile, const std::vector<std::string> &modelFiles)
-        {
-            outputFile.open(filename);
-            if (!outputFile.is_open())
+    class PoseWriter
+    {
+        public:
+            PoseWriter(){};
+            PoseWriter(const std::string& filename, const std::string &configFile, const std::vector<std::string> &modelFiles)
+            : m_ModelFiles(modelFiles)
             {
-                std::cerr << "Cannot open the pose file";
-                exit(1);
+                m_OutputFile.open(filename);
+                if (!m_OutputFile.is_open())
+                {
+                    std::cerr << "Cannot open the pose file";
+                    exit(1);
+                }
+                // print time stamp and commit hash
+                m_OutputFile << "timestamp: " << __DATE__ << " " << __TIME__ << std::endl;
+                m_OutputFile << "config_file: " << configFile << std::endl;
+                m_OutputFile << "model_files: " << std::endl;
+                int objectID = 1;
+                for (const auto& modelFile : m_ModelFiles)
+                {
+                    m_OutputFile << "\tmodelID (" << objectID++ << ")" << modelFile << std::endl;
+                }
+
             }
-            outputFile << "config_file: " << configFile << std::endl;
-            outputFile << "model_files: " << std::endl;
-            int objectID = 1;
-            for (const auto& modelFile : modelFiles)
+            ~PoseWriter()
             {
-                outputFile << "\tmodelID (" << objectID++ << ")" << modelFile << std::endl;
+                m_OutputFile.close();
             }
 
-        }
-        ~PoseWriter()
-        {
-            outputFile.close();
-        }
+            void write(cv::Matx44f& pose, int objectID)
+            {
+                m_OutputFile << "objectID: " << objectID << std::endl;
+                m_OutputFile << "pose: " << std::endl;
+                m_OutputFile << '\t' << pose(0, 0) << ' ' << pose(0, 1) << ' ' << pose(0, 2) << ' ' << pose(0, 3) << std::endl;
+                m_OutputFile << '\t' << pose(1, 0) << ' ' << pose(1, 1) << ' ' << pose(1, 2) << ' ' << pose(1, 3) << std::endl;
+                m_OutputFile << '\t' << pose(2, 0) << ' ' << pose(2, 1) << ' ' << pose(2, 2) << ' ' << pose(2, 3) << std::endl;
+                m_OutputFile << '\t' << pose(3, 0) << ' ' << pose(3, 1) << ' ' << pose(3, 2) << ' ' << pose(3, 3) << std::endl;
+            }
 
-        void write(cv::Matx44f& pose, int objectID)
-        {
-            outputFile << "objectID: " << objectID << std::endl;
-            outputFile << "pose: " << std::endl;
-            outputFile << '\t' << pose(0, 0) << ' ' << pose(0, 1) << ' ' << pose(0, 2) << ' ' << pose(0, 3) << std::endl;
-            outputFile << '\t' << pose(1, 0) << ' ' << pose(1, 1) << ' ' << pose(1, 2) << ' ' << pose(1, 3) << std::endl;
-            outputFile << '\t' << pose(2, 0) << ' ' << pose(2, 1) << ' ' << pose(2, 2) << ' ' << pose(2, 3) << std::endl;
-            outputFile << '\t' << pose(3, 0) << ' ' << pose(3, 1) << ' ' << pose(3, 2) << ' ' << pose(3, 3) << std::endl;
-        }
-
-    private:
-        std::ofstream outputFile;
-        std::vector<std::string> modelFiles;
-};
+        private:
+            std::ofstream m_OutputFile;
+            std::vector<std::string> m_ModelFiles;
+    };
+}

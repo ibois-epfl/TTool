@@ -16,14 +16,15 @@ namespace ttool
     class TTOOL_API TTool
     {
     public:
-        TTool(std::string configFile)
+        TTool(std::string configFile, std::string cameraCalibFile)
         {
+            std::cout << "ttool constructor cmd calib file: " << cameraCalibFile << std::endl;
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            m_CameraCalibFile = cameraCalibFile;
             
             InitializeView();
 
             std::vector<cv::Matx44f> preprocessedGroundTruthPoses = PreprocessGroundTruthPoses(m_ConfigPtr->GetConfigData().GroundTruthPoses);
-
 
             m_ModelManagerPtr = std::make_shared<ttool::DModelManager>(
                 m_ConfigPtr->GetConfigData().ModelFiles,
@@ -125,10 +126,8 @@ namespace ttool
     
         cv::Mat ReadCameraMatrix()
         {
-            std::string cameraFile = m_ConfigPtr->GetConfigData().CameraConfigFile;
-
-            cv::FileStorage fs(cameraFile, cv::FileStorage::READ);
-            if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file: " + cameraFile);
+            cv::FileStorage fs(m_CameraCalibFile, cv::FileStorage::READ);
+            if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file: " + m_CameraCalibFile);
 
             cv::Mat MCamera;
             fs["camera_matrix"] >> MCamera;
@@ -139,9 +138,8 @@ namespace ttool
 
         void InitializeView()
         {
-            std::string cameraFile = m_ConfigPtr->GetConfigData().CameraConfigFile;
-            cv::FileStorage fs(cameraFile, cv::FileStorage::READ);
-            if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file:"+cameraFile);
+            cv::FileStorage fs(m_CameraCalibFile, cv::FileStorage::READ);
+            if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file:"+m_CameraCalibFile);
 
             int w = -1, h = -1;
             cv::Mat MCamera;
@@ -152,14 +150,14 @@ namespace ttool
             if (MCamera.cols == 0 || MCamera.rows == 0){
                 fs["Camera_Matrix"] >> MCamera;
                 if (MCamera.cols == 0 || MCamera.rows == 0)
-                    throw std::runtime_error(std::string(__FILE__)+" File :" + cameraFile + " does not contains valid camera matrix");
+                    throw std::runtime_error(std::string(__FILE__)+" File :" + m_CameraCalibFile + " does not contains valid camera matrix");
             }
 
             if (w == -1 || h == 0){
                 fs["image_Width"] >> w;
                 fs["image_Height"] >> h;
                 if (w == -1 || h == 0)
-                throw std::runtime_error(std::string(__FILE__)+  "File :" + cameraFile + " does not contains valid camera dimensions");
+                throw std::runtime_error(std::string(__FILE__)+  "File :" + m_CameraCalibFile + " does not contains valid camera dimensions");
             }
             if (MCamera.type() != CV_32FC1)
                 MCamera.convertTo(MCamera, CV_32FC1);
@@ -203,6 +201,8 @@ namespace ttool
 
     private:
         std::shared_ptr<ttool::Config> m_ConfigPtr;
+        std::string m_CameraCalibFile;
+
         std::shared_ptr<ttool::DModelManager> m_ModelManagerPtr;
 
         tslet::ObjectTracker m_ObjectTracker;

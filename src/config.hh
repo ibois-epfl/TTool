@@ -22,11 +22,6 @@ namespace ttool
             std::vector<std::string> ModelFiles;
             std::vector<std::vector<float>> GroundTruthPoses;
 
-            // Camera
-            std::string Frames;
-            int CameraID;
-            std::string CameraConfigFile;
-
             // Histogram
             int HistOffset;
             int HistRad;
@@ -51,7 +46,6 @@ namespace ttool
             };
 
             std::unordered_map<std::string, std::reference_wrapper<int>> intMembers = {
-                {"cameraID", std::ref(CameraID)},
                 {"histOffset", std::ref(HistOffset)},
                 {"histRad", std::ref(HistRad)},
                 {"searchRad", std::ref(SearchRad)}
@@ -65,8 +59,6 @@ namespace ttool
             };
 
             std::unordered_map<std::string, std::reference_wrapper<std::string>> stringMembers = {
-                {"frames", std::ref(Frames)},
-                {"cameraConfigFile", std::ref(CameraConfigFile)},
                 {"saveImagePath", std::ref(SaveImagePath)}
             };
 
@@ -179,10 +171,6 @@ namespace ttool
                 fs["groundTruthPoses"] >> groundTruthPoses;
                 m_ConfigData.setValue("groundTruthPoses", groundTruthPoses);
 
-                m_ConfigData.setValue("frames", (std::string)fs["frames"]);
-                m_ConfigData.setValue("cameraID", (int)fs["cameraID"]);
-                m_ConfigData.setValue("cameraConfigFile", (std::string)fs["cameraConfigFile"]);
-
                 m_ConfigData.setValue("histOffset", (int)fs["histOffset"]);
                 m_ConfigData.setValue("histRad", (int)fs["histRad"]);
                 m_ConfigData.setValue("searchRad", (int)fs["searchRad"]);
@@ -220,9 +208,6 @@ namespace ttool
                     }
                     std::cout << std::endl;
                 }
-                std::cout << "Frames: " << m_ConfigData.Frames << std::endl;
-                std::cout << "Camera ID: " << m_ConfigData.CameraID << std::endl;
-                std::cout << "Camera config file: " << m_ConfigData.CameraConfigFile << std::endl;
                 std::cout << "Hist offset: " << m_ConfigData.HistOffset << std::endl;
                 std::cout << "Hist rad: " << m_ConfigData.HistRad << std::endl;
                 std::cout << "Search rad: " << m_ConfigData.SearchRad << std::endl;
@@ -255,12 +240,8 @@ namespace ttool
                 
                 fs << "saveImagePath" << m_ConfigData.SaveImagePath;
 
-                fs << "cameraConfigFile" << m_ConfigData.CameraConfigFile;
-                
                 fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;
                 fs << "modelFiles" << m_ConfigData.ModelFiles;
-                fs << "frames" << m_ConfigData.Frames;
-                fs << "cameraID" << m_ConfigData.CameraID;
 
                 fs.release();
             }

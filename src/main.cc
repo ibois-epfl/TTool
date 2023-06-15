@@ -9,44 +9,97 @@
 
 #include "pose_writer.hh"
 
+using namespace ttool::standaloneUtils;
+
 int main(int argc, char **argv)
 {
+    // parse args
+    std::string helpMsg = "Usage: ./ttool \n" \
+                               "[options]:\n" \
+                               "[-h,--help]: print this message\n" \
+                               "[-c,--camera]: camera index\n" \
+                               "[-l,--calib]: calibration file for the camera\n" \
+                               "[-t,--trackPose]: it saves all poses and objects in a log file\n";
+    int cameraID = 0;
+    std::string calibFilePath;
+    bool trackPose = false;
+    if (argc == 1)
+    {
+        std::cout << helpMsg << std::endl;
+        return 0;
+    }
+    for (int i = 1; i < argc; ++i)
+    {
+        std::string arg = argv[i];
+        if (arg == "-h" || arg == "--help")
+        {
+            std::cout << helpMsg << std::endl;
+            return 0;
+        }
+        else if (arg == "-c" || arg == "--camera")
+        {
+            if (i + 1 < argc)
+            {
+                cameraID = std::stoi(argv[++i]);
+                std::cout << "\033[1;35m[Info]: Camera index: " << cameraID << "\033[0m" << std::endl;
+            }
+            else
+            {
+                std::cout << "\033[1;31m[Error]: camera index is not specified\033[0m" << std::endl;
+                std::cout << helpMsg << std::endl;
+                return 1;
+            }
+        }
+        else if (arg == "-l" || arg == "--calib")
+        {
+            if (i + 1 < argc)
+            {
+                calibFilePath = argv[++i];
+                std::cout << "\033[1;35m[Info]: Calibration file: " << calibFilePath << "\033[0m" << std::endl;
+            }
+            else
+            {
+                std::cout << "\033[1;31m[Error]: calibration file is not specified\033[0m" << std::endl;
+                std::cout << helpMsg << std::endl;
+                return 1;
+            }
+        }
+        else if (arg == "-t" || arg == "--trackPose")
+        {
+            trackPose = true;
+            std::cout << "\033[1;35m[Info]: output pose recording to log\033[0m" << std::endl;
+        }
+        else
+        {
+            std::cout << "\033[1;31m[Error]: unkown argument\033[0m" << arg << std::endl;
+            std::cout << helpMsg << std::endl;
+            return 1;
+        }
+    }
+
+    // Qt
     QApplication a(argc, argv);
 
-    std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(__TTOOL_CONFIG_PATH__);
+    // ttool setup
+    std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(__TTOOL_CONFIG_PATH__, calibFilePath);
 
     std::shared_ptr<ttool::Config> configPtr = ttool->GetConfig();
 
-    // Initialize the camera
-    std::shared_ptr<ttool::standaloneUtils::Camera> cameraPtr;
-    if (configPtr->GetConfigData().Frames == "")
-    {
-        std::cout << "Using camera: " << configPtr->GetConfigData().CameraID << std::endl;
-        cameraPtr.reset(ttool::standaloneUtils::Camera::BuildCamera(configPtr->GetConfigData().CameraID));
-    }
-    else
-    {
-        std::cout << "Using frames: " << configPtr->GetConfigData().Frames << std::endl;
-        cameraPtr.reset(ttool::standaloneUtils::Camera::BuildCamera(configPtr->GetConfigData().Frames));
-    }
-    cameraPtr->ReadFromFile(configPtr->GetConfigData().CameraConfigFile);
+    // Set standalone console components
+    std::shared_ptr<Camera> cameraPtr;
+    cameraPtr.reset(Camera::BuildCamera(cameraID));
+    cameraPtr->ReadFromFile(calibFilePath);
 
-    // Initialize the visualizer as standalone utility
-    std::shared_ptr<ttool::standaloneUtils::Visualizer> visualizerPtr = std::make_shared<ttool::standaloneUtils::Visualizer>(cameraPtr, ttool->GetModelManager(), configPtr->GetConfigData().Zn, configPtr->GetConfigData().Zf);
+    std::shared_ptr<Visualizer> visualizerPtr = std::make_shared<Visualizer>(cameraPtr,
+                                                                            ttool->GetModelManager(),
+                                                                            configPtr->GetConfigData().Zn,
+                                                                            configPtr->GetConfigData().Zf);
     visualizerPtr->SetSaveImagePath(configPtr->GetConfigData().SaveImagePath);
     cameraPtr->UpdateCamera();
-
     ttool::InputVisualizer inputVisualizer(visualizerPtr);
 
-    // PoseWriter
-    PoseWriter poseWriter("trackingPose.txt", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
+    PoseWriter poseWriter = PoseWriter("trackingPose.log", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
 
-    // TODO:
-    // the ttool needs:
-    // - a) it needs index of the model -> TTool::ManipulateModel
-    // - b) it needs the frame -> TTool::RunOnAFrame
-    // - c) it needs the initial/modified pose -> TTool::ManipulateModel
-    // after we can start tracking
     // main thread
     bool exit = false;
     while (!exit)
@@ -107,7 +160,8 @@ int main(int argc, char **argv)
             ++fid;
 
             cv::Matx44f pose = ttool->GetPose();
-            poseWriter.write(pose, ttool->GetCurrentObjectID());
+
+            if (trackPose) { poseWriter.write(pose, ttool->GetCurrentObjectID()); }
         }
     }
 
