@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 
 
 class PoseWriter
@@ -30,14 +30,14 @@ class PoseWriter
             outputFile.close();
         }
 
-        void write(const cv::Mat44f& pose, int objectID)
+        void write(cv::Matx44f& pose, int objectID)
         {
             outputFile << "objectID: " << objectID << std::endl;
             outputFile << "pose: " << std::endl;
-            outputFile << "\t" << pose(0, 0) << " " << pose(0, 1) << " " << pose(0, 2) << " " << pose(0, 3) << std::endl;
-            outputFile << "\t" << pose(1, 0) << " " << pose(1, 1) << " " << pose(1, 2) << " " << pose(1, 3) << std::endl;
-            outputFile << "\t" << pose(2, 0) << " " << pose(2, 1) << " " << pose(2, 2) << " " << pose(2, 3) << std::endl;
-            outputFile << "\t" << pose(3, 0) << " " << pose(3, 1) << " " << pose(3, 2) << " " << pose(3, 3) << std::endl;
+            outputFile << '\t' << pose(0, 0) << ' ' << pose(0, 1) << ' ' << pose(0, 2) << ' ' << pose(0, 3) << std::endl;
+            outputFile << '\t' << pose(1, 0) << ' ' << pose(1, 1) << ' ' << pose(1, 2) << ' ' << pose(1, 3) << std::endl;
+            outputFile << '\t' << pose(2, 0) << ' ' << pose(2, 1) << ' ' << pose(2, 2) << ' ' << pose(2, 3) << std::endl;
+            outputFile << '\t' << pose(3, 0) << ' ' << pose(3, 1) << ' ' << pose(3, 2) << ' ' << pose(3, 3) << std::endl;
         }
 
     private:

@@ -7,6 +7,7 @@
 #include "ttool.hh"
 #include "util.hh"
 
+#include "pose_writer.hh"
 
 int main(int argc, char **argv)
 {
@@ -36,6 +37,9 @@ int main(int argc, char **argv)
     cameraPtr->UpdateCamera();
 
     ttool::InputVisualizer inputVisualizer(visualizerPtr);
+
+    // PoseWriter
+    PoseWriter poseWriter("trackingPose.txt", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
 
     // TODO:
     // the ttool needs:
@@ -101,6 +105,9 @@ int main(int argc, char **argv)
             cameraPtr->UpdateCamera();
             inputVisualizer.ConsumeKey(key);
             ++fid;
+
+            cv::Matx44f pose = ttool->GetPose();
+            poseWriter.write(pose, ttool->GetCurrentObjectID());
         }
     }
 
