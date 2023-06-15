@@ -37,20 +37,28 @@ def get_keys_yml(path : str) -> dict:
 
 def main(dataset_path : str, config_path : str) -> None:
     _log_process("Loading the dataset paths...")
-    num_folders : int = 0
+
     # count the number of subfolders in the dataset path
+    num_folders : int = 0
     for root, dirs, files in os.walk(dataset_path):
         num_folders += len(dirs)
     _log_info("Found {} folders.".format(num_folders))
     model_obj_paths : list[str] = []
+    model_init_pose_paths : list[str] = []
     for root, dirs, files in os.walk(dataset_path):
         for file in files:
             if file.endswith(".obj"):
                 model_obj_paths.append(os.path.join(root, file))
+            if file.endswith(".initpose"):
+                model_init_pose_paths.append(os.path.join(root, file))
+    _log_info("Found {} .initpose files.".format(len(model_init_pose_paths)))
     _log_info("Found {} .obj files.".format(len(model_obj_paths)))
     print(f"model_obj_paths: {model_obj_paths}")
     print(f"num_folders: {num_folders}")
-    assert len(model_obj_paths) == num_folders, "The number of .obj files is not equal to the number of folders."
+    assert len(model_obj_paths) == num_folders, "The number of .obj files is not equal to the number of folders.\
+        \nPlease make sure that each folder has a .obj file."
+    assert len(model_init_pose_paths) == num_folders, "The number of .initpose files is not equal to the number of folders.\
+        \nPlease make sure that each folder has a .initpose file."
     _log_success("Obj paths found.")
 
     _log_process("Parsing/Modifying the config file with dataset paths and reset poses...")
@@ -102,6 +110,14 @@ def main(dataset_path : str, config_path : str) -> None:
     for i in range(len(model_obj_paths)):
         new_model_path : str = ""
         new_lines_modelFiles.append("   - \"{}\"\n".format(model_obj_paths[i]))
+
+        # load the pose from the file
+        with open(model_init_pose_paths[i], "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                new_model_path += line
+        new_lines_gtPoses.append("{}\n".format(new_model_path))
+
         identity_matrix : str = "   - [ 1, 0, 0,\n       0, 1, 0,\n       0, 0, 1,\n       0, 0, 0 ]\n"
         new_lines_gtPoses.append(identity_matrix)
 
