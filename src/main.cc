@@ -18,21 +18,21 @@ int main(int argc, char **argv)
     std::shared_ptr<ttool::Config> configPtr = ttool->GetConfig();
 
     // Initialize the camera
-    std::shared_ptr<Camera> cameraPtr;
+    std::shared_ptr<ttool::standaloneUtils::Camera> cameraPtr;
     if (configPtr->GetConfigData().Frames == "")
     {
         std::cout << "Using camera: " << configPtr->GetConfigData().CameraID << std::endl;
-        cameraPtr.reset(Camera::BuildCamera(configPtr->GetConfigData().CameraID));
+        cameraPtr.reset(ttool::standaloneUtils::Camera::BuildCamera(configPtr->GetConfigData().CameraID));
     }
     else
     {
         std::cout << "Using frames: " << configPtr->GetConfigData().Frames << std::endl;
-        cameraPtr.reset(Camera::BuildCamera(configPtr->GetConfigData().Frames));
+        cameraPtr.reset(ttool::standaloneUtils::Camera::BuildCamera(configPtr->GetConfigData().Frames));
     }
     cameraPtr->ReadFromFile(configPtr->GetConfigData().CameraConfigFile);
 
     // Initialize the visualizer as standalone utility
-    std::shared_ptr<ttool::Visualizer> visualizerPtr = std::make_shared<ttool::Visualizer>(cameraPtr, ttool->GetModelManager(), configPtr->GetConfigData().Zn, configPtr->GetConfigData().Zf);
+    std::shared_ptr<ttool::standaloneUtils::Visualizer> visualizerPtr = std::make_shared<ttool::standaloneUtils::Visualizer>(cameraPtr, ttool->GetModelManager(), configPtr->GetConfigData().Zn, configPtr->GetConfigData().Zf);
     visualizerPtr->SetSaveImagePath(configPtr->GetConfigData().SaveImagePath);
     cameraPtr->UpdateCamera();
 
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
             inputVisualizer.ConsumeKey(key);
             visualizerPtr->SetModels();
         }
-        // 3 TSlet
+        // 3 Pose refiner
         visualizerPtr->UpdateEvent(ttool::EventType::Tracking);
         while (!exit)
         {

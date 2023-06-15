@@ -7,6 +7,8 @@
 #include "camera.hh"
 #include "event.hh"
 
+using namespace ttool::standaloneUtils;
+
 class Model;
 
 class Viewer
@@ -89,7 +91,7 @@ protected:
 	void PrintID(int fid, cv::Mat &frame);
 	void ShowImage(const cv::Mat &frame);
 
-	std::shared_ptr<Camera> camera_ptr_ = nullptr;
+	std::shared_ptr<ttool::standaloneUtils::Camera> camera_ptr_ = nullptr;
 	std::string name_{};
 	std::filesystem::path save_path_{};
 	bool display_images_ = true;
@@ -103,7 +105,7 @@ protected:
 class ImageViewer : public Viewer
 {
 public:
-	void Init(const std::string &name, std::shared_ptr<Camera> camera_ptr);
+	void Init(const std::string &name, std::shared_ptr<ttool::standaloneUtils::Camera> camera_ptr);
 	ImageViewer() = default;
 
 	void UpdateViewer(int save_index, int fps);

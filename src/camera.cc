@@ -2,6 +2,8 @@
 #include "opencv2/calib3d.hpp"
 #include "opencv2/opencv.hpp"
 
+using namespace ttool::standaloneUtils;
+
 Camera* Camera::BuildCamera(const std::string& frames)
 {
 	struct stat buf;

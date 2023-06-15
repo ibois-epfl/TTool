@@ -3,6 +3,9 @@
 #include "viewer.hh"
 #include "view.hh"
 
+
+using namespace ttool::standaloneUtils;
+
 void Viewer::StartSavingImages(const std::filesystem::path &path)
 {
 	save_images_ = true;
