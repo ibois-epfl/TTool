@@ -7,7 +7,8 @@ zf: 4000.
 histOffset: 100
 histRad: 40
 searchRad: 25
-cameraConfigFile: "./assets/calibration_orange_A_1280_720_r.yml"
+saveImagePath: "./debug/"
+cameraConfigFile: "./assets/calibration_orange_B_1280_720_r.yml"
 groundTruthPoses:
    - [ 1, 0, 0,
        0, 1, 0,
@@ -45,20 +46,25 @@ groundTruthPoses:
        0, 1, 0,
        0, 0, 1,
        0, 0, 0 ]
-   - [ 1, 0, 0,
-       0, 1, 0,
-       0, 0, 1,
-       0, 0, 0 ]
 modelFiles:
-   - "/home/as/TTool/assets/toolheads/twist_drill_bit_32_165/model.obj"
-   - "/home/as/TTool/assets/toolheads/brad_point_drill_bit_20_150/model.obj"
-   - "/home/as/TTool/assets/toolheads/self_feeding_bit_40_90/model.obj"
-   - "/home/as/TTool/assets/toolheads/spade_drill_bit_25_150/model.obj"
-   - "/home/as/TTool/assets/toolheads/saber_saw_blade_makita_t/model.obj"
-   - "/home/as/TTool/assets/toolheads/auger_drill_bit_20_235/model.obj"
-   - "/home/as/TTool/assets/toolheads/self_feeding_bit_50_90/model.obj"
-   - "/home/as/TTool/assets/toolheads/selfFeedBits_40_90/model.obj"
-   - "/home/as/TTool/assets/toolheads/chain_saw_blade_f_250/model.obj"
-   - "/home/as/TTool/assets/toolheads/circular_saw_blade_makita_190/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/circular_saw_blade_makita_190/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/chain_saw_blade_f_250/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/auger_drill_bit_20_235/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/twist_drill_bit_32_165/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_40_90/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_50_90/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/saber_saw_blade_makita_t/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/brad_point_drill_bit_20_150/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/spade_drill_bit_25_150/model.obj"
+#    - "/home/as/TTool/assets/toolheads/twist_drill_bit_32_165/model.obj"
+#    - "/home/as/TTool/assets/toolheads/brad_point_drill_bit_20_150/model.obj"
+#    - "/home/as/TTool/assets/toolheads/self_feeding_bit_40_90/model.obj"
+#    - "/home/as/TTool/assets/toolheads/spade_drill_bit_25_150/model.obj"
+#    - "/home/as/TTool/assets/toolheads/saber_saw_blade_makita_t/model.obj"
+#    - "/home/as/TTool/assets/toolheads/auger_drill_bit_20_235/model.obj"
+#    - "/home/as/TTool/assets/toolheads/self_feeding_bit_50_90/model.obj"
+#    - "/home/as/TTool/assets/toolheads/selfFeedBits_40_90/model.obj"
+#    - "/home/as/TTool/assets/toolheads/chain_saw_blade_f_250/model.obj"
+#    - "/home/as/TTool/assets/toolheads/circular_saw_blade_makita_190/model.obj"
 frames: ""
-cameraID: 0
+cameraID: 2

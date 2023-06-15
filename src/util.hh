@@ -37,7 +37,7 @@ namespace ttool
 
     inline void deleteImages(const std::filesystem::path& path)
     {
-        std::string command = "rm -rf" + path.string();
+        std::string command = "rm -rf " + path.string();
         std::cout << command << std::endl;
         system(command.c_str());
     }

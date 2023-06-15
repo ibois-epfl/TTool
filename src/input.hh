@@ -12,13 +12,14 @@
 
 namespace ttool
 {
-    struct Input
+    class InputModelManager
     {
-        public:
-        Input(std::shared_ptr<DModelManager> modelManagerPtr, std::shared_ptr<Visualizer> visualizerPtr)
+    public:
+        InputModelManager(){};
+
+        InputModelManager(std::shared_ptr<DModelManager> modelManagerPtr)
         {
             m_ModelManagerPtr = modelManagerPtr;
-            m_VisualizerPtr = visualizerPtr;
         }
 
         /**
@@ -31,7 +32,7 @@ namespace ttool
         }
 
         /**
-         * @brief Consume a key press and perform the corresponding action
+         * @brief Consume a key press and perform the corresponding action related to the model manager
          * 
          * @param key translate (w, s, a, d, q, e) or rotate (i, k, j, l, u, o
          */
@@ -112,24 +113,12 @@ namespace ttool
                 m_ModelManagerPtr->GetObject()->setInitialPose(pose);
                 break;
             }
-
-            // Visualizer options
-            case 'h':
-            {
-                m_VisualizerPtr->ToggleShowKeymaps();
-                break;
-            }
-            case 'n':
-            {
-                m_VisualizerPtr->ToggleSavingImages();
-                break;
-            }
             default:
                 break;
             }
         }
 
-        private:
+    private:
         /**
          * @brief Translate a model
          * 
@@ -165,18 +154,86 @@ namespace ttool
             cv::Vec4f worldCenter = (pose * normalization) * cv::Vec4f(center(0), center(1), center(2), 1.0f);
             worldCenter = worldCenter / worldCenter(3);
             pose = Transformations::translationMatrix(-worldCenter(0), -worldCenter(1), -worldCenter(2)) * pose;
-            // pose = Transformations::rotationMatrix(angle, axis) * pose;
             pose = Transformations::rotationMatrix(angle, cv::Vec3f(localAxis(0), localAxis(1), localAxis(2))) * pose;
             pose = Transformations::translationMatrix(worldCenter(0), worldCenter(1), worldCenter(2)) * pose;
             model->setPose(pose);
         }
 
-        private:
         std::shared_ptr<DModelManager> m_ModelManagerPtr;
-        std::shared_ptr<Visualizer> m_VisualizerPtr;
         float translateScale = 0.01f;
         float rotateScale = 0.5f;
     };
-    
 
+    class InputVisualizer
+    {
+    public:
+        InputVisualizer() {}
+
+        InputVisualizer(std::shared_ptr<Visualizer> visualizerPtr)
+        {
+            m_VisualizerPtr = visualizerPtr;
+        }
+
+        /**
+         * @brief Consume a key press and perform the corresponding action related to the visualizer
+         * 
+         * @param key the key that was pressed
+         */
+        void ConsumeKey(char key)
+        {
+            switch (key)
+            {
+            // Visualizer options
+            case 'h':
+            {
+                m_VisualizerPtr->ToggleShowKeymaps();
+                break;
+            }
+            case 'n':
+            {
+                m_VisualizerPtr->ToggleSavingImages();
+                break;
+            }
+            default:
+                break;
+            }
+        }
+
+    private:
+        std::shared_ptr<Visualizer> m_VisualizerPtr;
+    };
+
+    class Input
+    {
+    public:
+        Input(std::shared_ptr<DModelManager> modelManagerPtr, std::shared_ptr<Visualizer> visualizerPtr)
+        {
+            m_InputModelManager = InputModelManager(modelManagerPtr);
+            m_InputVisualizer = InputVisualizer(visualizerPtr);
+        }
+
+        /**
+         * @brief Get the pose
+         * 
+         */
+        cv::Matx44f GetPose()
+        {
+            return m_InputModelManager.GetPose();
+        }
+
+        /**
+         * @brief Consume a key press and perform the corresponding action related to the model manager
+         * 
+         * @param key translate (w, s, a, d, q, e) or rotate (i, k, j, l, u, o
+         */
+        void ConsumeKey(char key)
+        {
+            m_InputModelManager.ConsumeKey(key);
+            m_InputVisualizer.ConsumeKey(key);
+        }
+
+    private:
+        InputModelManager m_InputModelManager;
+        InputVisualizer m_InputVisualizer;
+    };
 }
