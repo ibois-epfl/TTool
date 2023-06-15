@@ -91,8 +91,8 @@ void UnifiedViewer::UpdateViewer(int fid, int fps)
 
 	if (save_images_)
 	{	
-		cv::imwrite(save_path_.string() + "/no_gui/" + name_ + "_" + std::to_string(m_SaveIndex) + ".png", camera_ptr_->image());
-		cv::imwrite(save_path_.string() + name_ + "_" + std::to_string(m_SaveIndex) + ".png", res_img);
+		cv::imwrite(save_path_.string() + "/raw/" + std::to_string(m_SaveIndex) + ".png", camera_ptr_->image());
+		cv::imwrite(save_path_.string() + std::to_string(m_SaveIndex) + ".png", res_img);
 		++m_SaveIndex;
 	}
 }

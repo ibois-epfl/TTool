@@ -56,7 +56,7 @@ gantt
   - [ ] integrate downloading procedures in AC and TTool
 
 - [ ] **(2) utilities**: all utilities for the documentation of the developement needs to be implemented:
-  - [ ] video recorder (with and without gui images)
+  - [x] video recorder (with and without gui images)
   - [ ] camera pose output
   - [ ] log output with fabrication info
 

@@ -8,6 +8,7 @@
 #include "object_tracker.hh"
 #include "config.hh"
 #include "event.hh"
+#include "util.hh"
 
 #include <algorithm>
 #include <iostream>
@@ -76,7 +77,8 @@ int main(int argc, char **argv)
     tslet::ObjectTracker objectTracker;
 
     // main thread
-    while (true)
+    bool exit = false;
+    while (!exit)
     {
         int oid = modelManagerPtr->GetObject()->getModelID();
         int fid = 0;
@@ -89,7 +91,7 @@ int main(int argc, char **argv)
         std::cout << "Please input the pose of the object" << std::endl;
         visualizerPtr->SetModels();
         visualizerPtr->UpdateEvent(ttool::EventType::PoseInput);
-        while (oid == modelManagerPtr->GetObject()->getModelID())
+        while (oid == modelManagerPtr->GetObject()->getModelID() && !exit)
         {
             visualizerPtr->UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
@@ -99,6 +101,11 @@ int main(int argc, char **argv)
             {
                 break;
             }
+            if (27 == key)
+            {
+                exit = true;
+                break;
+            }
             objectTracker.SetPose(modelManagerPtr->GetObject()->getModelID(), input.GetPose());
 
             input.ConsumeKey(key);
@@ -106,7 +113,7 @@ int main(int argc, char **argv)
         // 3 TSlet
         visualizerPtr->UpdateEvent(ttool::EventType::Tracking);
         objectTracker.FeedNewFrame(oid, cameraPtr->image());
-        while (oid == modelManagerPtr->GetObject()->getModelID())
+        while (oid == modelManagerPtr->GetObject()->getModelID() && !exit)
         {
             int key = cv::waitKey(1);
 
@@ -114,6 +121,11 @@ int main(int argc, char **argv)
 
             if ('q' == key)
             {
+                break;
+            }
+            if (27 == key)
+            {
+                exit = true;
                 break;
             }
             // Break before the new object's gtID is used to estimate the pose of the previous object (snapshotted by the tracker)
@@ -136,6 +148,9 @@ int main(int argc, char **argv)
         oid = modelManagerPtr->GetObject()->getModelID();
         std::cout << oid << std::endl;
     }
+
+    cv::destroyAllWindows();
+    ttool::makeVideoFromAllSavedImages(config->GetConfigData().SaveImagePath);
 
     return 0;
 }
