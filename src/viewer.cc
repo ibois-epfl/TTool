@@ -3,6 +3,9 @@
 #include "viewer.hh"
 #include "view.hh"
 
+
+using namespace ttool::standaloneUtils;
+
 void Viewer::StartSavingImages(const std::filesystem::path &path)
 {
 	save_images_ = true;
@@ -69,6 +72,13 @@ void UnifiedViewer::Init(const std::string &name, View *view, std::shared_ptr<Mo
 	initialized_ = true;
 }
 
+void UnifiedViewer::StopSavingImages()
+{
+	save_images_ = false;
+	m_SaveIndex = 0;
+}
+
+
 void UnifiedViewer::UpdateViewer(int fid, int fps)
 {
 	const cv::Mat &frame = camera_ptr_->image();
@@ -83,9 +93,11 @@ void UnifiedViewer::UpdateViewer(int fid, int fps)
 	}
 
 	if (save_images_)
-		cv::imwrite(
-			save_path_.string() + name_ + "_" + std::to_string(fid) + ".png",
-			res_img);
+	{	
+		cv::imwrite(save_path_.string() + "/raw/" + std::to_string(m_SaveIndex) + ".png", camera_ptr_->image());
+		cv::imwrite(save_path_.string() + std::to_string(m_SaveIndex) + ".png", res_img);
+		++m_SaveIndex;
+	}
 }
 
 cv::Mat UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<Model> object, const cv::Mat &frame)

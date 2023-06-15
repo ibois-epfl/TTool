@@ -79,6 +79,12 @@ Matx44f View::GetCalibrationMatrix()
 
 void View::init(const Matx33f &K, int width, int height, float zNear, float zFar, int numLevels)
 {
+	if (m_IsInitialized)
+	{
+		LOG(WARNING) << "View already initialized";
+		return;
+	}
+
 	this->width = width;
 	this->height = height;
 
@@ -143,6 +149,7 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 	lightPosition = cv::Vec3f(0, 0, 0);
 
 	// doneCurrent();
+	m_IsInitialized = true;
 }
 
 float View::getZNear() {

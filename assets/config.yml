@@ -7,7 +7,8 @@ zf: 4000.
 histOffset: 100
 histRad: 40
 searchRad: 25
-cameraConfigFile: "./assets/calibration_orange_A_1280_720_r.yml"
+saveImagePath: "./debug/"
+cameraConfigFile: "./assets/calibration_orange_B_1280_720_r.yml"
 groundTruthPoses:
    - [ 1, 0, 0,
        0, 1, 0,
