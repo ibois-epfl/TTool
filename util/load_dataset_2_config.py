@@ -117,8 +117,6 @@ def main(dataset_path : str, config_path : str) -> None:
             for line in lines:
                 new_model_path += line
         new_lines_gtPoses.append("{}\n".format(new_model_path))
-
-        identity_matrix : str = "   - [ 1, 0, 0,\n       0, 1, 0,\n       0, 0, 1,\n       0, 0, 0 ]\n"
         new_lines_gtPoses.append(identity_matrix)
 
     with open(config_path, "r+") as f:
