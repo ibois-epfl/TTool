@@ -21,9 +21,9 @@
 
 //     // TODO:
 //     // the ttool needs:
-//     // - a) it needs index of the model
-//     // - b) it needs the frame
-//     // - c) it needs the initial/modified pose
+//     // - a) it needs index of the model -> TTool::ManipulateModel
+//     // - b) it needs the frame -> TTool::RunOnAFrame
+//     // - c) it needs the initial/modified pose -> TTool::ManipulateModel
 //     // after we can start tracking
 
 

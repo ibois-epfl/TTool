@@ -3,5 +3,5 @@
 
 namespace ttool
 {
-    void TTool::Run() {}
+    // void TTool::Run() {}
 }

@@ -4,6 +4,10 @@
 #include <string>
 
 #include "ttool_exports.hh"
+#include "d_model_manager.hh"
+#include "input.hh"
+#include "object_tracker.hh"
+#include "view.hh"
 #include "config.hh"
 
 namespace ttool
@@ -11,19 +15,168 @@ namespace ttool
     class TTOOL_API TTool
     {
     public:
-        TTool(std::string config_file)
-            : m_Config(config_file)
-        {};
-        ~TTool(){};
+        TTool(std::string configFile)
+        {
+            m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            
+            std::vector<cv::Matx44f> preprocessedGroundTruthPoses = PreprocessGroundTruthPoses(m_ConfigPtr->GetConfigData().GroundTruthPoses);
+            m_ModelManagerPtr = std::make_shared<ttool::DModelManager>(
+                m_ConfigPtr->GetConfigData().ModelFiles,
+                preprocessedGroundTruthPoses,
+                m_ConfigPtr);
+            
+            m_Input = ttool::InputModelManager(m_ModelManagerPtr);
+            InitializeView();
+            InitializeObjectTracker();
+        };
 
-        void Run();
+        /**
+         * @brief Manipulate the model based on the key press
+         * This include changing the model index and adjusting the initial pose
+         * of the model
+         * 
+         * @param key fefer to src/input.hh for the key mapping
+         */
+        void ManipulateModel(char key)
+        {
+            m_Input.ConsumeKey(key);
+
+            CheckObjectChange();
+
+            objectTracker.SetPose(m_CurrentObjectID, m_Input.GetPose());
+        }
+
+        /**
+         * @brief Run the object tracker on a frame
+         * 
+         * @param frame 
+         */
+        void RunOnAFrame(cv::Mat frame)
+        {
+            CheckObjectChange();
+            objectTracker.CallEstimatePose(m_CurrentObjectID, frame);
+            objectTracker.FeedNewFrame(m_CurrentObjectID, frame);
+        }
+
+        /**
+         * @brief Get the Pose object
+         * 
+         * @return cv::Matx44f 
+         */
+        cv::Matx44f GetPose()
+        {
+            CheckObjectChange();
+            return m_ModelManagerPtr->GetObject()->getPose();
+        }
+
+        ~TTool(){};
 
 
     public:
-        ttool::Config& GetConfig() { return m_Config; };
+        std::shared_ptr<ttool::Config> GetConfig() { return m_ConfigPtr; };
+
 
     private:
-        ttool::Config m_Config;
+        void InitializeObjectTracker()
+        {
+            cv::Mat cameraMatrix = ReadCameraMatrix();
+            objectTracker.Consume(m_ModelManagerPtr->GetObject()->getModelID(), m_ModelManagerPtr->GetObject(), cameraMatrix);
+        }
+
+        void CheckObjectChange()
+        {
+            if (m_ModelManagerPtr->GetObject()->getModelID() != m_CurrentObjectID)
+            {
+                m_CurrentObjectID = m_ModelManagerPtr->GetObject()->getModelID();
+                InitializeObjectTracker();
+            }
+        }
+    
+        cv::Mat ReadCameraMatrix()
+        {
+            std::string cameraFile = m_ConfigPtr->GetConfigData().CameraConfigFile;
+
+            cv::FileStorage fs(cameraFile, cv::FileStorage::READ);
+            if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file: " + cameraFile);
+
+            cv::Mat MCamera;
+            fs["camera_matrix"] >> MCamera;
+            
+            fs.release();
+            return MCamera;
+        }
+
+        void InitializeView()
+        {
+            std::string cameraFile = m_ConfigPtr->GetConfigData().CameraConfigFile;
+            cv::FileStorage fs(cameraFile, cv::FileStorage::READ);
+            if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file:"+cameraFile);
+
+            int w = -1, h = -1;
+            cv::Mat MCamera;
+            fs["image_width"] >> w;
+            fs["image_height"] >> h;
+            fs["camera_matrix"] >> MCamera;
+
+            if (MCamera.cols == 0 || MCamera.rows == 0){
+                fs["Camera_Matrix"] >> MCamera;
+                if (MCamera.cols == 0 || MCamera.rows == 0)
+                    throw std::runtime_error(std::string(__FILE__)+" File :" + cameraFile + " does not contains valid camera matrix");
+            }
+
+            if (w == -1 || h == 0){
+                fs["image_Width"] >> w;
+                fs["image_Height"] >> h;
+                if (w == -1 || h == 0)
+                throw std::runtime_error(std::string(__FILE__)+  "File :" + cameraFile + " does not contains valid camera dimensions");
+            }
+            if (MCamera.type() != CV_32FC1)
+                MCamera.convertTo(MCamera, CV_32FC1);
+
+            // Initialize the view
+            View* view = View::Instance();
+            float zn = m_ConfigPtr->GetConfigData().Zn;
+            float zf = m_ConfigPtr->GetConfigData().Zf;
+            view->init(MCamera, w, h, zn, zf, 4);
+
+            fs.release();
+        }
+
+        std::vector<cv::Matx44f> PreprocessGroundTruthPoses(std::vector<std::vector<float>> groundTruthPoses)
+        {
+            std::vector<cv::Matx44f> preprocessedGroundTruthPoses;
+            for (std::vector<float> gtPose : m_ConfigPtr->GetConfigData().GroundTruthPoses)
+            {
+                float m00 = gtPose[0];
+                float m01 = gtPose[1];
+                float m02 = gtPose[2];
+                float m10 = gtPose[3];
+                float m11 = gtPose[4];
+                float m12 = gtPose[5];
+                float m20 = gtPose[6];
+                float m21 = gtPose[7];
+                float m22 = gtPose[8];
+                float m03 = gtPose[9];
+                float m13 = gtPose[10];
+                float m23 = gtPose[11];
+
+                preprocessedGroundTruthPoses.push_back(cv::Matx44f(
+                m00, m01, m02, m03,
+                m10, m11, m12, m13,
+                m20, m21, m22, m23,
+                0, 0, 0, 1));
+            }
+
+            return preprocessedGroundTruthPoses;
+        }
+
+    private:
+        std::shared_ptr<ttool::Config> m_ConfigPtr;
+        std::shared_ptr<ttool::DModelManager> m_ModelManagerPtr;
+
+        tslet::ObjectTracker objectTracker;
+        ttool::InputModelManager m_Input;
+        int m_CurrentObjectID = 0;
     };
 }
 
