@@ -112,7 +112,7 @@ int main(int argc, char **argv)
         }
         // 3 TSlet
         visualizerPtr->UpdateEvent(ttool::EventType::Tracking);
-        objectTracker.FeedNewFrame(oid, cameraPtr->image());
+        objectTracker.UpdateHistogram(oid, cameraPtr->image());
         while (oid == modelManagerPtr->GetObject()->getModelID() && !exit)
         {
             int key = cv::waitKey(1);
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
 
             visualizerPtr->UpdateVisualizer(fid, fps);
             cameraPtr->UpdateCamera();
-            objectTracker.FeedNewFrame(oid, cameraPtr->image());
+            objectTracker.UpdateHistogram(oid, cameraPtr->image());
             ++fid;
 
             input.ConsumeKey(key);

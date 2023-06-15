@@ -28,7 +28,7 @@ namespace tslet
             }
         }
 
-        void FeedNewFrame(int modelID, cv::Mat frame)
+        void UpdateHistogram(int modelID, cv::Mat frame)
         {
             if (!hasTracker(modelID))
             {

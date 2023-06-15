@@ -7,6 +7,7 @@
 #include "d_model_manager.hh"
 #include "input.hh"
 #include "object_tracker.hh"
+#include "object3d.hh"
 #include "view.hh"
 #include "config.hh"
 
@@ -20,6 +21,8 @@ namespace ttool
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
             
             std::vector<cv::Matx44f> preprocessedGroundTruthPoses = PreprocessGroundTruthPoses(m_ConfigPtr->GetConfigData().GroundTruthPoses);
+
+
             m_ModelManagerPtr = std::make_shared<ttool::DModelManager>(
                 m_ConfigPtr->GetConfigData().ModelFiles,
                 preprocessedGroundTruthPoses,
@@ -29,13 +32,14 @@ namespace ttool
             InitializeView();
             InitializeObjectTracker();
         };
+        ~TTool(){};
 
         /**
          * @brief Manipulate the model based on the key press
          * This include changing the model index and adjusting the initial pose
          * of the model
          * 
-         * @param key fefer to src/input.hh for the key mapping
+         * @param key translate (w, s, a, d, q, e) or rotate (i, k, j, l, u, o)
          */
         void ManipulateModel(char key)
         {
@@ -43,7 +47,7 @@ namespace ttool
 
             CheckObjectChange();
 
-            objectTracker.SetPose(m_CurrentObjectID, m_Input.GetPose());
+            m_ObjectTracker.SetPose(m_CurrentObjectID, m_Input.GetPose());
         }
 
         /**
@@ -54,8 +58,8 @@ namespace ttool
         void RunOnAFrame(cv::Mat frame)
         {
             CheckObjectChange();
-            objectTracker.CallEstimatePose(m_CurrentObjectID, frame);
-            objectTracker.FeedNewFrame(m_CurrentObjectID, frame);
+            m_ObjectTracker.UpdateHistogram(m_CurrentObjectID, frame);
+            m_ObjectTracker.CallEstimatePose(m_CurrentObjectID, frame);
         }
 
         /**
@@ -69,7 +73,29 @@ namespace ttool
             return m_ModelManagerPtr->GetObject()->getPose();
         }
 
-        ~TTool(){};
+        /**
+         * @brief Get the Model object
+         * 
+         * @return std::shared_ptr<ttool::Model> 
+         */
+        std::shared_ptr<Object3D> GetModel()
+        {
+            CheckObjectChange();
+            return m_ModelManagerPtr->GetObject();
+        }
+
+
+        /**
+         * @brief Set the Object ID
+         * 
+         * @param objectID 
+         */
+        void SetObjectID(int objectID)
+        {
+            m_CurrentObjectID = objectID;
+            m_ModelManagerPtr->SetObjectID(objectID);
+            InitializeObjectTracker();
+        }
 
 
     public:
@@ -80,7 +106,7 @@ namespace ttool
         void InitializeObjectTracker()
         {
             cv::Mat cameraMatrix = ReadCameraMatrix();
-            objectTracker.Consume(m_ModelManagerPtr->GetObject()->getModelID(), m_ModelManagerPtr->GetObject(), cameraMatrix);
+            m_ObjectTracker.Consume(m_ModelManagerPtr->GetObject()->getModelID(), m_ModelManagerPtr->GetObject(), cameraMatrix);
         }
 
         void CheckObjectChange()
@@ -174,7 +200,7 @@ namespace ttool
         std::shared_ptr<ttool::Config> m_ConfigPtr;
         std::shared_ptr<ttool::DModelManager> m_ModelManagerPtr;
 
-        tslet::ObjectTracker objectTracker;
+        tslet::ObjectTracker m_ObjectTracker;
         ttool::InputModelManager m_Input;
         int m_CurrentObjectID = 0;
     };
