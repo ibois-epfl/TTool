@@ -73,6 +73,8 @@ protected:
 
 private:
 	static View *instance;
+	
+	bool m_IsInitialized = false;
 
 	int width;
 	int height;
