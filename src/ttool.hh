@@ -104,6 +104,7 @@ namespace ttool
     public:
         std::shared_ptr<ttool::Config> GetConfig() { return m_ConfigPtr; };
         std::shared_ptr<ttool::DModelManager> GetModelManager() { return m_ModelManagerPtr; };
+        int GetCurrentObjectID() { return m_CurrentObjectID; };
 
 
     private:

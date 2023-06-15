@@ -7,7 +7,7 @@
 #include "d_model_manager.hh"
 #include "event.hh"
 
-namespace ttool
+namespace ttool::standaloneUtils
 {
     struct Visualizer
     {
