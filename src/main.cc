@@ -9,6 +9,7 @@
 
 #include "pose_writer.hh"
 
+
 using namespace ttool::standaloneUtils;
 
 int main(int argc, char **argv)
@@ -19,10 +20,12 @@ int main(int argc, char **argv)
                                "[-h,--help]: print this message\n" \
                                "[-c,--camera]: camera index\n" \
                                "[-l,--calib]: calibration file for the camera\n" \
+                               "[-s,--save]: save image path\n" \
                                "[-t,--trackPose]: it saves all poses and objects in a log file\n";
     int cameraID = 0;
     std::string calibFilePath;
     bool trackPose = false;
+    std::string saveImagePath = "./debug/";
     if (argc == 1)
     {
         std::cout << helpMsg << std::endl;
@@ -64,6 +67,20 @@ int main(int argc, char **argv)
                 return 1;
             }
         }
+        else if (arg == "-s" || arg == "--save")
+        {
+            if (i + 1 < argc)
+            {
+                saveImagePath = argv[++i];
+                std::cout << "\033[1;35m[Info]: Save image path: " << saveImagePath << "\033[0m" << std::endl;
+            }
+            else
+            {
+                std::cout << "\033[1;31m[Error]: save image path is not specified\033[0m" << std::endl;
+                std::cout << helpMsg << std::endl;
+                return 1;
+            }
+        }
         else if (arg == "-t" || arg == "--trackPose")
         {
             trackPose = true;
@@ -94,7 +111,7 @@ int main(int argc, char **argv)
                                                                             ttool->GetModelManager(),
                                                                             configPtr->GetConfigData().Zn,
                                                                             configPtr->GetConfigData().Zf);
-    visualizerPtr->SetSaveImagePath(configPtr->GetConfigData().SaveImagePath);
+    visualizerPtr->SetSaveImagePath(saveImagePath);
     cameraPtr->UpdateCamera();
     ttool::InputVisualizer inputVisualizer(visualizerPtr);
 
@@ -129,6 +146,7 @@ int main(int argc, char **argv)
             inputVisualizer.ConsumeKey(key);
             visualizerPtr->SetModels();
         }
+
         // 3 Pose refiner
         visualizerPtr->UpdateEvent(ttool::EventType::Tracking);
         while (!exit)
@@ -166,6 +184,6 @@ int main(int argc, char **argv)
     }
 
     cv::destroyAllWindows();
-    ttool::makeVideoFromAllSavedImages(configPtr->GetConfigData().SaveImagePath);
+    ttool::makeVideoFromAllSavedImages(saveImagePath);
 
 }

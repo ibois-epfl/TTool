@@ -30,7 +30,7 @@ namespace ttool
                 m_ConfigPtr->GetConfigData().ModelFiles,
                 preprocessedGroundTruthPoses,
                 m_ConfigPtr);
-            
+
             m_Input = ttool::InputModelManager(m_ModelManagerPtr);
             InitializeObjectTracker();
         };

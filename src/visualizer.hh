@@ -16,7 +16,6 @@ namespace ttool::standaloneUtils
         {
             cv::Matx33f K = cameraPtr->GetK();
 
-            // Initialize the view
             View* view = View::Instance();
             view->init(K, cameraPtr->GetPreprocessWidth(), cameraPtr->GetPreprocessHeight(), zn, zf, 4);
 
@@ -25,9 +24,8 @@ namespace ttool::standaloneUtils
 
             m_CameraPtr = cameraPtr;
 
-            // Initialize the viewer
-
             m_viewerPtr = std::make_shared<UnifiedViewer>();
+
         }
 
         /**

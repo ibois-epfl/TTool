@@ -7,7 +7,6 @@ zf: 4000.
 histOffset: 100
 histRad: 40
 searchRad: 25
-saveImagePath: "./debug/"
 groundTruthPoses:
    - [ 9.50834990e-01, 2.37247661e-01, -1.99040413e-01, 2.44926587e-02,
        -6.98316872e-01, -7.15365469e-01, -3.08712870e-01, 6.75321281e-01,

@@ -33,9 +33,6 @@ namespace ttool
             float Zn;
             float Zf;
 
-            // Debugging
-            std::string SaveImagePath;
-            
             // Unordered maps are used to help Setters more dynamic typed
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::string>>> stringVectorMembers = {
                 {"modelFiles", std::ref(ModelFiles)}
@@ -56,10 +53,6 @@ namespace ttool
                 {"alphaBackground", std::ref(AlphaBackground)},
                 {"zn", std::ref(Zn)},
                 {"zf", std::ref(Zf)}
-            };
-
-            std::unordered_map<std::string, std::reference_wrapper<std::string>> stringMembers = {
-                {"saveImagePath", std::ref(SaveImagePath)}
             };
 
             /**
@@ -127,22 +120,6 @@ namespace ttool
                     it->second.get() = value;
                 }
             }
-
-            /**
-             * @brief Set the Value object
-             * 
-             * @param key key of the value to set
-             * @param value value to set
-             */
-            void setValue(std::string key, std::string value)
-            {
-                SET_UNORDERED_MAP_VALUE(stringMembers, key, value);
-                return;
-                if (auto it = stringMembers.find(key); it != stringMembers.end())
-                {
-                    it->second.get() = value;
-                }
-            }
     };
 
     class Config
@@ -180,9 +157,6 @@ namespace ttool
                 m_ConfigData.setValue("zn", (float)fs["zn"]);
                 m_ConfigData.setValue("zf", (float)fs["zf"]);           
 
-                // Debugging Configs
-                m_ConfigData.setValue("saveImagePath", (std::string)fs["saveImagePath"]);
-
                 return fs.release();
             }
 
@@ -215,8 +189,6 @@ namespace ttool
                 std::cout << "Alpha background: " << m_ConfigData.AlphaBackground << std::endl;
                 std::cout << "Zn: " << m_ConfigData.Zn << std::endl;
                 std::cout << "Zf: " << m_ConfigData.Zf << std::endl;
-
-                std::cout << "Save image path: " << m_ConfigData.SaveImagePath << std::endl;
             }
 
             /**
@@ -238,8 +210,6 @@ namespace ttool
                 fs << "histRad" << m_ConfigData.HistRad;
                 fs << "searchRad" << m_ConfigData.SearchRad;
                 
-                fs << "saveImagePath" << m_ConfigData.SaveImagePath;
-
                 fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;
                 fs << "modelFiles" << m_ConfigData.ModelFiles;
 
