@@ -6,6 +6,9 @@ debug/**/*
 dataset/
 *.log
 
+# ignore all files in the root directory
+/*.mp4
+
 ## >>>>>>>>> cmake >>>>>>>>>
 # Compiled Object files
 **/.DS_Store
