@@ -4,6 +4,7 @@
 debug/
 debug/**/*
 dataset/
+*.log
 
 ## >>>>>>>>> cmake >>>>>>>>>
 # Compiled Object files
