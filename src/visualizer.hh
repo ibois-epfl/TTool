@@ -35,6 +35,11 @@ namespace ttool::standaloneUtils
          */
         void SetSaveImagePath(std::string path)
         {
+            // if it doesn't exists create a folder
+            if (!std::filesystem::exists(path))
+            {
+                std::filesystem::create_directory(path);
+            }
             m_ImageSavePath = path;
         }
         
@@ -78,14 +83,13 @@ namespace ttool::standaloneUtils
             else
             {
                 m_IsSavingImages = true;
-                // Generate a folder name based on the current time
+
                 std::time_t t = std::time(nullptr);
                 std::tm tm = *std::localtime(&t);
                 std::stringstream ss;
                 ss << m_ImageSavePath << "/" << std::put_time(&tm, "%Y-%m-%d-%H-%M-%S") << "/";
                 std::string path = ss.str();
 
-                // Create the folder
                 std::filesystem::create_directory(path);
                 std::filesystem::create_directory(path + "/raw/");
 

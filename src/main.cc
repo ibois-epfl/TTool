@@ -20,11 +20,12 @@ int main(int argc, char **argv)
                                "[-h,--help]: print this message\n" \
                                "[-c,--camera]: camera index\n" \
                                "[-l,--calib]: calibration file for the camera\n" \
-                               "[-s,--save]: save image path\n" \
+                               "[-s,--save]: record video of session\n" \
                                "[-t,--trackPose]: it saves all poses and objects in a log file\n";
     int cameraID = 0;
     std::string calibFilePath;
     bool trackPose = false;
+    bool isVideoRecording = false;
     std::string saveImagePath = "./debug/";
     if (argc == 1)
     {
@@ -69,17 +70,12 @@ int main(int argc, char **argv)
         }
         else if (arg == "-s" || arg == "--save")
         {
+            isVideoRecording = true;
             if (i + 1 < argc)
             {
                 saveImagePath = argv[++i];
-                std::cout << "\033[1;35m[Info]: Save image path: " << saveImagePath << "\033[0m" << std::endl;
             }
-            else
-            {
-                std::cout << "\033[1;31m[Error]: save image path is not specified\033[0m" << std::endl;
-                std::cout << helpMsg << std::endl;
-                return 1;
-            }
+            std::cout << "\033[1;35m[Info]: Save video path: " << saveImagePath << "\033[0m" << std::endl;
         }
         else if (arg == "-t" || arg == "--trackPose")
         {
@@ -111,7 +107,7 @@ int main(int argc, char **argv)
                                                                             ttool->GetModelManager(),
                                                                             configPtr->GetConfigData().Zn,
                                                                             configPtr->GetConfigData().Zf);
-    visualizerPtr->SetSaveImagePath(saveImagePath);
+    if (isVideoRecording) {visualizerPtr->SetSaveImagePath(saveImagePath);}
     cameraPtr->UpdateCamera();
     ttool::InputVisualizer inputVisualizer(visualizerPtr);
 
@@ -119,6 +115,7 @@ int main(int argc, char **argv)
 
     // main thread
     bool exit = false;
+    if (isVideoRecording) {visualizerPtr->ToggleSavingImages();}
     while (!exit)
     {
         int fid = 0;
@@ -184,6 +181,6 @@ int main(int argc, char **argv)
     }
 
     cv::destroyAllWindows();
-    ttool::makeVideoFromAllSavedImages(saveImagePath);
+    if (isVideoRecording) {ttool::standaloneUtils::makeVideoFromAllSavedImages(saveImagePath);}
 
 }

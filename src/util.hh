@@ -22,7 +22,7 @@ inline bool IsFileExist (const std::string& name) {
 
 } // namespace tk
 
-namespace ttool
+namespace ttool::standaloneUtils
 {
     inline void createVideo(const std::filesystem::path& path)
     {
@@ -60,19 +60,13 @@ namespace ttool
         ss << std::put_time(&tm, "%Y-%m-%d");
         std::string currentDate = ss.str();
 
-        // Check if the directory exists
         if (std::filesystem::exists(directoryPath) && std::filesystem::is_directory(directoryPath)) {
-            // Iterate over the directory entries
             for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
-                // Check if the entry is a directory
                 if (entry.is_directory()) {
-                    // Get the directory name and print it
                     std::string folderName = entry.path().filename().string();
                     if (startsWith(folderName, currentDate))
                     {
                         std::cout << "Folder: " << entry.path().string() << std::endl;
-
-                        // Create the video
                         createVideoAndDeleteImages(entry.path().string());
                     }
                 }

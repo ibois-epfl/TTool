@@ -86,41 +86,19 @@ gantt
 # TTool
 This is the repository hosting the API for TTool. It is a program able to detect the 6dof of a fix toolhead from the feed of a fix camera view.
 
-```mermaid
-flowchart TB
-    A(TTool API)
-    B(TSegment API) --> A
-    C(TSlet API) --> A
-    D(ML API*) --> A
+## How to use
 
-    A --> E(Augmented Carpentry)
+```bash
+cmake -S . -B build && cmake --build build && ./build/ttool -c 0 -l "./assets/calibration_orange_A_1280_720_r.yml" -t -s
 ```
+where,
 
-## TTool Dataflow
+- `[-h,--help]`: print this message
+- `[-c,--camera]`: camera index
+- `[-l,--calib]`: calibration file for the camera
+- `[-s,--save]`: record video of session, give custom path for output (default: ./default)
+- `[-t,--trackPose]`: it saves all poses and objects in a log file
 
-```mermaid
-graph TD;
-cam[TTool::Camera]
-uii["TTool::PoseInput / ML::PoseEstimator"]
-seg[TSegment::Segmentation]
-%% mle[ML::PoseEstimator]
-tkr[TSLET::ObjectTracker]
-
-cam--image-->seg
-cam--image-->uii
-
-seg--segmentationMask-->uii
-seg--segmentationMask-->tkr
-
-
-uii--initialPose-->tkr
-uii--toolheadID-->tkr
-
-%% uii<-->mle 
-
-tkr--refinedPose-->TTool::Visualizer
-tkr--3DObject-->TTool::Visualizer
-```
 
 ## CI/CD
 If you commit and push some code that does not influence the compilation (e.g. readme, docs, etc), add one of these texts to your commit message, it will stop the run of the github action.

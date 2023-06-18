@@ -189,11 +189,6 @@ namespace ttool
                 m_VisualizerPtr->ToggleShowKeymaps();
                 break;
             }
-            case 'n':
-            {
-                m_VisualizerPtr->ToggleSavingImages();
-                break;
-            }
             default:
                 break;
             }
