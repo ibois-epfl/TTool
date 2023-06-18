@@ -1,6 +1,8 @@
 ## >>>>>>>>> ttool >>>>>>>>>
 
 /debug/*
+debug/
+debug/**/*
 dataset/
 
 ## >>>>>>>>> cmake >>>>>>>>>
