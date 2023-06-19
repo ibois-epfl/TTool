@@ -1,4 +1,4 @@
-include(${PROJECT_SOURCE_DIR}/cmake/config.cmake.in)
+# include(${PROJECT_SOURCE_DIR}/cmake/ttoolConfig.cmake.in)
 include(${PROJECT_SOURCE_DIR}/cmake/options.cmake)
 
 if(OPT_REFRESH_DATASET)
