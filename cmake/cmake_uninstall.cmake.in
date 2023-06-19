@@ -5,11 +5,10 @@ endif()
 message(STATUS "Uninstalling MyPackage from @CMAKE_INSTALL_PREFIX@")
 
 # Remove installed files
-file(REMOVE "@CMAKE_INSTALL_PREFIX@/include/ttool/ttool.hh")
-file(REMOVE "@CMAKE_INSTALL_PREFIX@/lib/ttool_lib.so")  # Adjust the library name if needed
+file(REMOVE "@CMAKE_INSTALL_PREFIX@/lib/libttool.so")
+file(REMOVE_RECURSE "@CMAKE_INSTALL_PREFIX@/include/ttool")
 
 # Remove empty directories
-file(REMOVE_RECURSE "@CMAKE_INSTALL_PREFIX@/include/ttool.hh")
 file(REMOVE_RECURSE "@CMAKE_INSTALL_PREFIX@/lib")
 
 message(STATUS "Uninstallation complete")

@@ -86,7 +86,19 @@ gantt
 # TTool
 This is the repository hosting the API for TTool. It is a program able to detect the 6dof of a fix toolhead from the feed of a fix camera view.
 
-## How to use
+## Config & Build
+```bash
+cmake -S . -B build
+cmake --build build
+```
+# Install/uninstall
+```bash
+sudo cmake --install build
+```
+```bash
+sudo cmake --build build --target uninstall
+```
+## Run executable
 
 ```bash
 cmake -S . -B build && cmake --build build && ./build/ttool -c 0 -l "./assets/calibration_orange_A_1280_720_r.yml" -t -s

@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
-
-# include(CPack)
+cmake_minimum_required(VERSION 3.21)
 
 project(ttool VERSION "0.1.0" LANGUAGES CXX)
 include(${PROJECT_SOURCE_DIR}/cmake/ttoolConfig.cmake.in)
@@ -10,7 +8,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(cmake/dataset.cmake)
 
-# create ttool library dynamically
 FILE(GLOB glsl_SOURCES src/shader/*.glsl)
 source_group("shader" FILES ${glsl_SOURCES})
 
@@ -29,29 +26,18 @@ target_link_libraries(ttool PUBLIC
         ${OPENGL_LIBRARIES}
         ${ASSIMP_LIBRARIES})
 target_include_directories(ttool PUBLIC 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${OpenCV_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR})
 
+# FIXME: attach dependecies to install ttool
 install(TARGETS ttool DESTINATION lib)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/ttool.hh DESTINATION include)
-
-
-
-
-# export the package to be used by other projects
-set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
-export(TARGETS ttool FILE ttoolConfig.cmake)
-
-export(PACKAGE ttool)
-
-
-
-
-
-
-# TODO: not working for import outside
-
+file(GLOB_RECURSE ttool_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hh)
+foreach(HEADER_FILE ${ttool_HEADERS})
+    get_filename_component(HEADER_FILE_DIR ${HEADER_FILE} DIRECTORY)
+    file(RELATIVE_PATH HEADER_FILE_DIR_REL ${CMAKE_CURRENT_SOURCE_DIR}/include ${HEADER_FILE_DIR})
+    install(FILES ${HEADER_FILE} DESTINATION include/ttool/${HEADER_FILE_DIR_REL})
+endforeach()
 
 # Add uninstall target
 configure_file(
@@ -60,14 +46,6 @@ configure_file(
     IMMEDIATE @ONLY)
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-
-
-# find_package(ttool REQUIRED)
-# message(STATUS "ttool found: ${ttool_FOUND}")
-# message(STATUS "ttool include dir: ${ttool_INCLUDE_DIRS}")
-# message(STATUS "ttool library dir: ${ttool_LIBRARY_DIRS}")
-
-
 
 # create ttool executable
 if (OPT_BUILD_TTOOL_EXE)
