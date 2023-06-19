@@ -1,10 +1,35 @@
 import pathlib
 
 import lightning.pytorch as pl
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import sklearn.metrics
 import torch.nn as nn
 import torch.optim
 import torchvision.io
+import torchvision.transforms as transforms
+import tqdm
+from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint
 from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms
+
+labels = [
+    "auger_bit_24_400",
+    "auger_drill_bit_20_450",
+    "chain_saw_blade_f_250",
+    "self_feeding_bit_50",
+    "spade_drill_bit_35",
+    "auger_drill_bit_20_235",
+    "auger_drill_bit_30_400",
+    "circular_saw_blade_makita_190",
+    "self_feeding_drill_bit_30_90",
+    "twist_drill_bit_32_90",
+    "auger_drill_bit_20_400",
+    "brad_point_drill_bit_20_150",
+    "saber_saw_blade",
+    "spade_drill_bit_25",
+]
 
 
 class ResNetBlock(nn.Module):
@@ -97,17 +122,47 @@ class LitClassifier(pl.LightningModule):
     def __init__(self, network):
         super().__init__()
         self.net = network
+        self.loss_function = nn.CrossEntropyLoss()
+        self.acc_function = lambda y_hat, y: (y_hat.argmax(dim=-1) == y).float().mean()
+
+    def forward(self, x):
+        return self.net(x)
 
     def training_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self.net(x)
-        loss = nn.functional.cross_entropy(y_hat, y)
+        loss = self.loss_function(y_hat, y)
+        acc = self.acc_function(y_hat, y)
         self.log("train_loss", loss)
+        self.log("train_acc", acc)
         return loss
 
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self.net(x)
+        loss = self.loss_function(y_hat, y)
+        acc = self.acc_function(y_hat, y)
+        self.log("val_loss", loss)
+        self.log("val_acc", acc)
+        # plot_confusion_matrix(y, y_hat)
+        return loss
+
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self.net(x)
+        loss = self.loss_function(y_hat, y)
+        acc = self.acc_function(y_hat, y)
+        self.log("test_loss", loss)
+        self.log("test_acc", acc)
+
     def configure_optimizers(self):
-        optimizer = torch.optim.SGD(self.parameters(), lr=1e-3)
-        return optimizer
+        optimizer = torch.optim.SGD(
+            self.parameters(), lr=0.1, momentum=0.9, weight_decay=1e-4
+        )
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[100, 150], gamma=0.1
+        )
+        return [optimizer], [scheduler]
 
 
 class ToolDataset(Dataset):
@@ -123,6 +178,7 @@ class ToolDataset(Dataset):
     def __getitem__(self, idx):
         img_path = self.img_paths[idx]
         image = torchvision.io.read_image(str(img_path))
+        image = image.float() / 255
         label = img_path.stem.split("__")[0]
         if self.transform:
             image = self.transform(image)
@@ -132,38 +188,81 @@ class ToolDataset(Dataset):
 
 
 def label_transform(label):
-    labels = [
-        "auger_bit_24_400",
-        "auger_drill_bit_20_450",
-        "chain_saw_blade_f_250",
-        "self_feeding_bit_50",
-        "spade_drill_bit_35",
-        "auger_drill_bit_20_235",
-        "auger_drill_bit_30_400",
-        "circular_saw_blade_makita_190",
-        "self_feeding_drill_bit_30_90",
-        "twist_drill_bit_32_90",
-        "auger_drill_bit_20_400",
-        "brad_point_drill_bit_20_150",
-        "saber_saw_blade",
-        "spade_drill_bit_25",
-    ]
     return labels.index(label)
 
 
-def image_transform(img):
-    return img.float()
+def plot_confusion_matrix(y, y_hat):
+    y = y.cpu()
+    y_hat = y_hat.cpu()
+    y_hat = np.argmax(y_hat, axis=1)
+    confusion_matrix = sklearn.metrics.confusion_matrix(y.cpu(), y_hat.cpu())
+    confusion_matrix = confusion_matrix / np.sum(confusion_matrix, axis=1)[:, None]
+    print(np.unique(y))
+    print(np.unique(y_hat))
+    print(len(np.array(labels)[np.unique(y)]))
+    disp = sklearn.metrics.ConfusionMatrixDisplay(
+        confusion_matrix=confusion_matrix, display_labels=np.array(labels)[np.unique(y)]
+    )
+    disp.plot()
+    output_folder = pathlib.Path("confusion_matrices")
+    idx = len(list(output_folder.glob("*.pdf")))
+    plt.savefig(output_folder / f"matrix_{idx}.pdf")
+    plt.close()
 
 
 if __name__ == "__main__":
-    img_dir = pathlib.Path(
-        "/home/aymanns/projects/ENAC_augmented_carpentry/data/images"
+    torch.set_float32_matmul_precision("high")
+
+    img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
+
+    # Determine the mean and std for the training data
+    train_dataset = ToolDataset(
+        img_dir / "train",
+        transform=lambda x: x.float(),
+        target_transform=label_transform,
     )
-    dataset = ToolDataset(
-        img_dir, transform=image_transform, target_transform=label_transform
+    train_imgs = []
+    n_train_imgs = len(train_dataset)
+    print("Loading train images to compute mean and std")
+    for i in tqdm.tqdm(np.arange(n_train_imgs)):
+        train_imgs.append(train_dataset[i][0])
+    train_imgs = torch.stack(train_imgs)
+    train_means = train_imgs.mean(axis=(0, 2, 3))
+    train_stds = train_imgs.std(axis=(0, 2, 3))
+    print(train_means)
+    print(train_stds)
+    quit()
+    df = pd.DataFrame({"Mean": train_means, "STD": train_stds})
+    df.to_csv("train_means_stds.csv")
+
+    # Create train and validation datasets
+    image_transform = transforms.Normalize(train_means, train_stds)
+    train_dataset = ToolDataset(
+        img_dir / "train", transform=image_transform, target_transform=label_transform
     )
-    train_loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=8)
+    val_dataset = ToolDataset(
+        img_dir / "val", transform=image_transform, target_transform=label_transform
+    )
+
+    # Create data loaders
+    train_loader = DataLoader(train_dataset, batch_size=25, shuffle=True, num_workers=8)
+    val_loader = DataLoader(val_dataset, batch_size=25, num_workers=8)
+
+    # Create instance of lightning module
     classifier = LitClassifier(ResNet())
 
-    trainer = pl.Trainer(limit_train_batches=100, max_epochs=10)
-    trainer.fit(model=classifier, train_dataloaders=train_loader)
+    # Train
+    trainer = pl.Trainer(
+        max_epochs=201,
+        callbacks=[
+            ModelCheckpoint(save_weights_only=True, mode="max", monitor="val_acc"),
+            LearningRateMonitor("epoch"),
+        ],
+    )
+    trainer.logger._log_graph = (True,)
+    trainer.fit(
+        model=classifier,
+        train_dataloaders=train_loader,
+        val_dataloaders=val_loader,
+        ckpt_path="lightning_logs/version_4/checkpoints/epoch=199-step=22800.ckpt",
+    )
