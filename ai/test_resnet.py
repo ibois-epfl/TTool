@@ -4,29 +4,47 @@ import lightning.pytorch as pl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import sklearn
+import sklearn.metrics
 import torch
+import torchvision
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from resnet import LitClassifier, ResNet, ToolDataset, label_transform, labels
+from resnet import (
+    LitClassifier,
+    ResNet,
+    ToolDataset,
+    TransferResNet,
+    label_transform,
+    labels,
+)
 
 torch.set_float32_matmul_precision("high")
 
 img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
-train_means_stds = pd.read_csv("train_means_stds.csv")
-train_means = train_means_stds["Mean"].values
-train_stds = train_means_stds["STD"].values
-image_transform = transforms.Normalize(train_means, train_stds)
-image_transform = transforms.Normalize(train_means, train_stds)
+model_type = "TransferResNet"  # "ResNet"
+
+if model_type == "ResNet":
+    train_means_stds = pd.read_csv("train_means_stds.csv")
+    train_means = train_means_stds["Mean"].values
+    train_stds = train_means_stds["STD"].values
+    image_transform = transforms.Normalize(train_means, train_stds)
+    image_transform = transforms.Normalize(train_means, train_stds)
+    ckpt = "./lightning_logs/version_4/checkpoints/bck_epoch=199-step=22800.ckpt"
+    network = ResNet()
+elif model_type == "TransferResNet":
+    image_transform = torchvision.models.ResNet18_Weights.DEFAULT.transforms()
+    ckpt = "./lightning_logs/version_53/checkpoints/epoch=88-step=10146.ckpt"
+    network = TransferResNet()
+
 test_dataset = ToolDataset(
     img_dir / "test", transform=image_transform, target_transform=label_transform
 )
 test_dataloader = DataLoader(test_dataset, batch_size=25, num_workers=8)
 
 model = LitClassifier.load_from_checkpoint(
-    "./lightning_logs/version_4/checkpoints/bck_epoch=199-step=22800.ckpt",
-    network=ResNet(),
+    ckpt,
+    network=network,
 )
 model.eval()
 

@@ -1,10 +1,8 @@
 import pathlib
 
 import lightning.pytorch as pl
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import sklearn.metrics
 import torch.nn as nn
 import torch.optim
 import torchvision.io
@@ -118,6 +116,30 @@ class ResNet(nn.Module):
         return x
 
 
+class TransferResNet(nn.Module):
+    def __init__(
+        self,
+        num_classes=14,
+        **kwargs,
+    ):
+        super().__init__()
+        backbone = torchvision.models.resnet18(weights="DEFAULT")
+        num_filters = backbone.fc.in_features
+        layers = list(backbone.children())[:-2]
+        self.feature_extractor = nn.Sequential(*layers).eval()
+
+        self.classification_head = nn.Sequential(
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(num_filters, num_classes),
+        )
+
+    def forward(self, x):
+        x = self.feature_extractor(x)
+        x = self.classification_head(x)
+        return x
+
+
 class LitClassifier(pl.LightningModule):
     def __init__(self, network):
         super().__init__()
@@ -191,52 +213,38 @@ def label_transform(label):
     return labels.index(label)
 
 
-def plot_confusion_matrix(y, y_hat):
-    y = y.cpu()
-    y_hat = y_hat.cpu()
-    y_hat = np.argmax(y_hat, axis=1)
-    confusion_matrix = sklearn.metrics.confusion_matrix(y.cpu(), y_hat.cpu())
-    confusion_matrix = confusion_matrix / np.sum(confusion_matrix, axis=1)[:, None]
-    print(np.unique(y))
-    print(np.unique(y_hat))
-    print(len(np.array(labels)[np.unique(y)]))
-    disp = sklearn.metrics.ConfusionMatrixDisplay(
-        confusion_matrix=confusion_matrix, display_labels=np.array(labels)[np.unique(y)]
-    )
-    disp.plot()
-    output_folder = pathlib.Path("confusion_matrices")
-    idx = len(list(output_folder.glob("*.pdf")))
-    plt.savefig(output_folder / f"matrix_{idx}.pdf")
-    plt.close()
-
-
 if __name__ == "__main__":
     torch.set_float32_matmul_precision("high")
 
+    model_type = "TransferResNet"  # "ResNet"
+
     img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
 
-    # Determine the mean and std for the training data
-    train_dataset = ToolDataset(
-        img_dir / "train",
-        transform=lambda x: x.float(),
-        target_transform=label_transform,
-    )
-    train_imgs = []
-    n_train_imgs = len(train_dataset)
-    print("Loading train images to compute mean and std")
-    for i in tqdm.tqdm(np.arange(n_train_imgs)):
-        train_imgs.append(train_dataset[i][0])
-    train_imgs = torch.stack(train_imgs)
-    train_means = train_imgs.mean(axis=(0, 2, 3))
-    train_stds = train_imgs.std(axis=(0, 2, 3))
-    print(train_means)
-    print(train_stds)
-    quit()
-    df = pd.DataFrame({"Mean": train_means, "STD": train_stds})
-    df.to_csv("train_means_stds.csv")
+    if model_type == "ResNet":
+        # Determine the mean and std for the training data
+        train_dataset = ToolDataset(
+            img_dir / "train",
+            transform=lambda x: x.float(),
+            target_transform=label_transform,
+        )
+        train_imgs = []
+        n_train_imgs = len(train_dataset)
+        print("Loading train images to compute mean and std")
+        for i in tqdm.tqdm(np.arange(n_train_imgs)):
+            train_imgs.append(train_dataset[i][0])
+        train_imgs = torch.stack(train_imgs)
+        train_means = train_imgs.mean(axis=(0, 2, 3))
+        train_stds = train_imgs.std(axis=(0, 2, 3))
+        df = pd.DataFrame({"Mean": train_means, "STD": train_stds})
+        df.to_csv("train_means_stds.csv")
+
+        image_transform = transforms.Normalize(train_means, train_stds)
+        network = ResNet()
+    elif model_type == "TransferResNet":
+        image_transform = torchvision.models.ResNet18_Weights.DEFAULT.transforms()
+        network = TransferResNet()
 
     # Create train and validation datasets
-    image_transform = transforms.Normalize(train_means, train_stds)
     train_dataset = ToolDataset(
         img_dir / "train", transform=image_transform, target_transform=label_transform
     )
@@ -249,13 +257,13 @@ if __name__ == "__main__":
     val_loader = DataLoader(val_dataset, batch_size=25, num_workers=8)
 
     # Create instance of lightning module
-    classifier = LitClassifier(ResNet())
+    classifier = LitClassifier(network)
 
     # Train
     trainer = pl.Trainer(
         max_epochs=201,
         callbacks=[
-            ModelCheckpoint(save_weights_only=True, mode="max", monitor="val_acc"),
+            ModelCheckpoint(mode="max", monitor="val_acc"),
             LearningRateMonitor("epoch"),
         ],
     )
@@ -264,5 +272,5 @@ if __name__ == "__main__":
         model=classifier,
         train_dataloaders=train_loader,
         val_dataloaders=val_loader,
-        ckpt_path="lightning_logs/version_4/checkpoints/epoch=199-step=22800.ckpt",
+        # ckpt_path="lightning_logs/version_4/checkpoints/epoch=199-step=22800.ckpt",
     )
