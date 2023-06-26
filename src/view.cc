@@ -98,14 +98,20 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 
 	projectionMatrix = Transformations::perspectiveMatrix(K, width, height, zNear, zFar, true);
 
+	std::cout << "makeCurrent" << std::endl;
 	makeCurrent();
 
+	std::cout << "initializeOpenGLFunctions 2" << std::endl;
 	initializeOpenGLFunctions();
+	std::cout << "done initializeOpenGLFunctions" << std::endl;
 
 	// FIX FOR NEW OPENGL
 	uint vao;
+	std::cout << "glGenVertexArrays" << std::endl;
 	glGenVertexArrays(1, &vao);
+	std::cout << "glBindVertexArray" << std::endl;
 	glBindVertexArray(vao);
+	std::cout << "After glBindVertexArray" << std::endl;
 
 	calibrationMatrices.clear();
 
@@ -124,19 +130,27 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 
 	// cout << "GL Version " << glGetString(GL_VERSION) << endl << "GLSL Version " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
+	std::cout << "glEnable" << std::endl;
 	glEnable(GL_DEPTH);
 	glEnable(GL_DEPTH_TEST);
+	std::cout << "glEnable GL_DEPTH_TEST" << std::endl;
 
+	std::cout << "glDepthRange" << std::endl;
 	// INVERT DEPTH BUFFER
 	glDepthRange(1, 0);
 	glClearDepth(0.0f);
 	glDepthFunc(GL_GREATER);
+	std::cout << "glDepthFunc" << std::endl;
 
+	std::cout << "glPolygonMode" << std::endl;
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	std::cout << "done glPolygonMode" << std::endl;
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
+	std::cout << "initRenderingBuffers" << std::endl;
 	initRenderingBuffers();
+	std::cout << "initRenderingBuffers" << std::endl;
 
 	shaderFolder = "src/";
 
