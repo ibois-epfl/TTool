@@ -1,0 +1,92 @@
+import pathlib
+
+import lightning.pytorch as pl
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import sklearn.metrics
+import torch
+import torchvision
+from torch.utils.data import DataLoader
+from torchvision import transforms
+
+from train import (
+    LitClassifier,
+    ResNet,
+    ToolDataset,
+    TransferEfficientNet,
+    TransferResNet,
+    label_transform,
+    labels,
+)
+
+torch.set_float32_matmul_precision("high")
+
+img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
+# model_type = "ResNet"
+# model_type = "ResNet222"
+# model_type = "TransferResNet"
+model_type = "TransferEfficientNet"
+
+if model_type == "ResNet":
+    train_means_stds = pd.read_csv("train_means_stds.csv")
+    train_means = train_means_stds["Mean"].values
+    train_stds = train_means_stds["STD"].values
+    image_transform = transforms.Normalize(train_means, train_stds)
+    image_transform = transforms.Normalize(train_means, train_stds)
+    ckpt = "./lightning_logs/version_0/checkpoints/epoch=199-step=22800.ckpt"
+    network = ResNet()
+if model_type == "ResNet222":
+    train_means_stds = pd.read_csv("train_means_stds.csv")
+    train_means = train_means_stds["Mean"].values
+    train_stds = train_means_stds["STD"].values
+    image_transform = transforms.Normalize(train_means, train_stds)
+    image_transform = transforms.Normalize(train_means, train_stds)
+    ckpt = "./lightning_logs/version_1/checkpoints/epoch=184-step=21090.ckpt"
+    network = ResNet(nun_blocks=[2, 2, 2])
+elif model_type == "TransferResNet":
+    image_transform = torchvision.models.ResNet18_Weights.DEFAULT.transforms()
+    ckpt = "./lightning_logs/version_2/checkpoints/epoch=88-step=10146.ckpt"
+    network = TransferResNet()
+elif model_type == "TransferEfficientNet":
+    image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
+    ckpt = "./lightning_logs/version_3/checkpoints/epoch=176-step=20178.ckpt"
+    network = TransferEfficientNet()
+
+val_dataset = ToolDataset(
+    img_dir / "val", transform=image_transform, target_transform=label_transform
+)
+val_dataloader = DataLoader(val_dataset, batch_size=25, num_workers=8)
+
+model = LitClassifier.load_from_checkpoint(
+    ckpt,
+    network=network,
+)
+model.eval()
+
+trainer = pl.Trainer(accelerator="gpu", logger=None)
+val_result = trainer.test(model, dataloaders=val_dataloader, verbose=True)
+res = trainer.predict(model, dataloaders=val_dataloader)
+y_hats = [i[0] for i in res]
+ys = [i[1] for i in res]
+y_hat = torch.cat(y_hats)
+y = torch.cat(ys)
+
+acc = (y == y_hat).float().mean()
+
+confusion_matrix = sklearn.metrics.confusion_matrix(
+    y, y_hat, labels=np.argsort(labels), normalize="true"
+)
+disp = sklearn.metrics.ConfusionMatrixDisplay(
+    confusion_matrix=confusion_matrix,
+    display_labels=np.sort(np.array(labels)[np.unique(y)]),
+)
+disp.plot(text_kw={"fontsize": 6})
+ax = plt.gca()
+ax.tick_params(axis="both", which="major", labelsize=6)
+ax.tick_params(axis="both", which="minor", labelsize=6)
+plt.xticks(rotation=90)
+plt.tight_layout()
+plt.title(f"{model_type} acc={acc:.2f}")
+plt.savefig(f"confusion_matrix_{model_type}.pdf")
+plt.close()

@@ -140,6 +140,31 @@ class TransferResNet(nn.Module):
         return x
 
 
+class TransferEfficientNet(nn.Module):
+    def __init__(
+        self,
+        num_classes=14,
+        **kwargs,
+    ):
+        super().__init__()
+        backbone = torchvision.models.efficientnet_v2_s(weights="DEFAULT")
+        layers = list(backbone.children())
+        num_filters = layers[-1][1].in_features
+        self.feature_extractor = nn.Sequential(*layers[:-2]).eval()
+
+        self.classification_head = nn.Sequential(
+            nn.AdaptiveAvgPool2d(output_size=1),
+            nn.Dropout(p=0.2, inplace=True),
+            nn.Flatten(),
+            nn.Linear(num_filters, num_classes),
+        )
+
+    def forward(self, x):
+        x = self.feature_extractor(x)
+        x = self.classification_head(x)
+        return x
+
+
 class LitClassifier(pl.LightningModule):
     def __init__(self, network):
         super().__init__()
@@ -176,6 +201,11 @@ class LitClassifier(pl.LightningModule):
         acc = self.acc_function(y_hat, y)
         self.log("test_loss", loss)
         self.log("test_acc", acc)
+
+    def predict_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self.net(x).argmax(dim=-1)
+        return y_hat, y
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(
@@ -216,7 +246,9 @@ def label_transform(label):
 if __name__ == "__main__":
     torch.set_float32_matmul_precision("high")
 
-    model_type = "TransferResNet"  # "ResNet"
+    # model_type = "TransferResNet"
+    # model_type = "ResNet"
+    model_type = "TransferEfficientNet"
 
     img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
 
@@ -239,10 +271,15 @@ if __name__ == "__main__":
         df.to_csv("train_means_stds.csv")
 
         image_transform = transforms.Normalize(train_means, train_stds)
-        network = ResNet()
+        network = ResNet(num_blocks=[2, 2, 2])
     elif model_type == "TransferResNet":
         image_transform = torchvision.models.ResNet18_Weights.DEFAULT.transforms()
         network = TransferResNet()
+    elif model_type == "TransferEfficientNet":
+        image_transform = (
+            torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
+        )
+        network = TransferEfficientNet()
 
     # Create train and validation datasets
     train_dataset = ToolDataset(
