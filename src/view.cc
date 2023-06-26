@@ -152,11 +152,13 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 	m_IsInitialized = true;
 }
 
-float View::getZNear() {
+float View::getZNear()
+{
 	return zn;
 }
 
-float View::getZFar() {
+float View::getZFar()
+{
 	return zf;
 }
 
@@ -171,7 +173,8 @@ void View::setLevel(int level)
 	height += height % 4;
 }
 
-int View::getLevel() {
+int View::getLevel()
+{
 	return currentLevel;
 }
 
@@ -250,7 +253,7 @@ void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool inv
 
 	// for (int i = 0; i < models.size(); i++)
 	// {
-		// shared_ptr<Model> model = models[i];
+	// shared_ptr<Model> model = models[i];
 
 	if (model->isInitialized() || drawAll)
 	{
@@ -345,7 +348,8 @@ void View::RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, const c
 	glFinish();
 }
 
-void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f>& projections, cv::Rect& boundingRect) {
+void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
+{
 	Vec3f lbn = model->getLBN();
 	Vec3f rtf = model->getRTF();
 
@@ -374,7 +378,8 @@ void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Poin
 	Point2f lt(FLT_MAX, FLT_MAX);
 	Point2f rb(-FLT_MAX, -FLT_MAX);
 
-	for (auto & i : points3D) {
+	for (auto &i : points3D)
+	{
 		Vec4f p = calibrationMatrices[currentLevel] * pose * normalization * i;
 
 		if (p[2] == 0)
@@ -383,10 +388,14 @@ void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Poin
 		Point2f p2d = Point2f(p[0] / p[2], p[1] / p[2]);
 		projections.push_back(p2d);
 
-		if (p2d.x < lt.x) lt.x = p2d.x;
-		if (p2d.x > rb.x) rb.x = p2d.x;
-		if (p2d.y < lt.y) lt.y = p2d.y;
-		if (p2d.y > rb.y) rb.y = p2d.y;
+		if (p2d.x < lt.x)
+			lt.x = p2d.x;
+		if (p2d.x > rb.x)
+			rb.x = p2d.x;
+		if (p2d.y < lt.y)
+			lt.y = p2d.y;
+		if (p2d.y > rb.y)
+			rb.y = p2d.y;
 	}
 
 	boundingRect.x = lt.x;
