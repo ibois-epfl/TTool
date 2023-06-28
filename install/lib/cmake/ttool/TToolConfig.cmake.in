@@ -22,16 +22,16 @@ add_compile_definitions(__TTOOL_CONFIG_PATH__="${__TTOOL_CONFIG_PATH__}")
 
 
 # library
-set(ttool_INSTALL_PREFIX "${CMAKE_CURRENT_LIST_DIR}/../install" CACHE PATH "ttool installation prefix")
-set(ttool_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
-set(ttool_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
-set(ttool_LIBRARIES ttool)
+set(TTool_INSTALL_PREFIX "${CMAKE_CURRENT_LIST_DIR}/../install" CACHE PATH "TTool installation prefix")
+set(TTool_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
+set(TTool_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
+set(TTool_LIBRARIES TTool)
 
-# add_library(ttool INTERFACE)
-# target_include_directories(ttool INTERFACE ${ttool_INCLUDE_DIRS})
-# target_link_libraries(ttool INTERFACE ${ttool_LIBRARY_DIRS})
-# target_link_libraries(ttool INTERFACE ${ttool_LIBRARIES})
+# add_library(TTool INTERFACE)
+# target_include_directories(TTool INTERFACE ${TTool_INCLUDE_DIRS})
+# target_link_libraries(TTool INTERFACE ${TTool_LIBRARY_DIRS})
+# target_link_libraries(TTool INTERFACE ${TTool_LIBRARIES})
 
 
-install(FILES ${CMAKE_CURRENT_LIST_DIR}/ttoolConfig.cmake.in DESTINATION ${ttool_INSTALL_PREFIX}/lib/cmake/ttool)
+install(FILES ${CMAKE_CURRENT_LIST_DIR}/TToolConfig.cmake.in DESTINATION ${TTool_INSTALL_PREFIX}/lib/cmake/TTool)
 
