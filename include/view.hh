@@ -67,6 +67,9 @@ public:
 
 	void destroy();
 
+	void MakeCurrent() { makeCurrent(); };
+	void ReleaseCurrent() { doneCurrent(); };
+
 protected:
 	void makeCurrent();
 	void doneCurrent();
