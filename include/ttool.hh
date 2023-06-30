@@ -33,6 +33,12 @@ namespace ttool
 
             m_Input = ttool::InputModelManager(m_ModelManagerPtr);
             InitializeObjectTracker();
+
+            // View *view = View::Instance();
+            // view->RenderSilhouette(m_ModelManagerPtr->GetObject(), GL_FILL, true);
+            // cv::Mat depth_inv_map = view->DownloadFrame(View::DEPTH);
+            // cv::imshow("depth_inv_map", depth_inv_map);
+            // cv::waitKey(0);
         };
         ~TTool(){};
 
@@ -64,6 +70,12 @@ namespace ttool
             CheckObjectChange();
             m_ObjectTracker.UpdateHistogram(m_CurrentObjectID, frame);
             m_ObjectTracker.CallEstimatePose(m_CurrentObjectID, frame);
+
+            // View *view = View::Instance();
+            // view->RenderSilhouette(m_ModelManagerPtr->GetObject(), GL_FILL, true);
+            // cv::Mat depth_inv_map = view->DownloadFrame(View::DEPTH);
+            // cv::imshow("depth_inv_map", depth_inv_map);
+            // cv::waitKey(50);
         }
 
         /**
@@ -107,8 +119,8 @@ namespace ttool
         std::shared_ptr<ttool::DModelManager> GetModelManager() { return m_ModelManagerPtr; };
         int GetCurrentObjectID() { return m_CurrentObjectID; };
 
-        void MakeCurrent() { View::Instance()->MakeCurrent(); };
-        void ReleaseCurrent() { View::Instance()->ReleaseCurrent(); };
+        void MakeCurrent() { return; };
+        void ReleaseCurrent() { return; };
 
     private:
         void InitializeObjectTracker()

@@ -736,8 +736,14 @@ vector<Point3i> TCLCHistograms::computeLocalHistogramCenters(const Mat &mask)
 vector<Point3i> TCLCHistograms::parallelComputeLocalHistogramCenters(const Mat &mask, const Mat &depth, const Matx33f &K, float zNear, float zFar, int level)
 {
     vector<Point3i> res;
-    
-    vector<Vec3f> verticies = _model->getSimpleVertices();
+    // Convert vector<glm::vec3> to vector<cv::Vec3f>
+    vector<Vec3f> verticies;
+    verticies.resize(_model->getSimpleVertices().size());
+    for(int i = 0; i < verticies.size(); i++)
+    {
+        verticies[i] = Vec3f(_model->getSimpleVertices()[i].x, _model->getSimpleVertices()[i].y, _model->getSimpleVertices()[i].z);
+    }
+    // vector<Vec3f> verticies = _model->getSimpleVertices();
     Matx44f T_cm = _model->getPose();
     Matx44f T_n = _model->getNormalization();
     

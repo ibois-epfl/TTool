@@ -2,6 +2,8 @@
 
 #include <glog/logging.h>
 #include "view.hh"
+#include "shader.hh"
+#include "util.hh"
 
 using namespace std;
 using namespace cv;
@@ -10,23 +12,6 @@ View *View::instance;
 
 View::View(void)
 {
-	QSurfaceFormat glFormat;
-	glFormat.setVersion(3, 3);
-	glFormat.setProfile(QSurfaceFormat::CoreProfile);
-	glFormat.setRenderableType(QSurfaceFormat::OpenGL);
-
-	surface = new QOffscreenSurface();
-	surface->setFormat(glFormat);
-	surface->create();
-
-	glContext = new QOpenGLContext();
-	glContext->setFormat(surface->requestedFormat());
-	glContext->create();
-
-	silhouetteShaderProgram = new QOpenGLShaderProgram();
-	phongblinnShaderProgram = new QOpenGLShaderProgram();
-	normalsShaderProgram = new QOpenGLShaderProgram();
-
 	calibrationMatrices.push_back(Matx44f::eye());
 
 	projectionMatrix = Transformations::perspectiveMatrix(40, 4.0f / 3.0f, 0.1, 1000.0);
@@ -38,44 +23,32 @@ View::View(void)
 
 View::~View(void)
 {
-	glDeleteTextures(1, &colorTextureID);
-	glDeleteTextures(1, &depthTextureID);
-	glDeleteFramebuffers(1, &frameBufferID);
+	// glDeleteTextures(1, &colorTextureID);
+	// glDeleteTextures(1, &depthTextureID);
+	// glDeleteFramebuffers(1, &frameBufferID);
 
-	delete phongblinnShaderProgram;
-	delete normalsShaderProgram;
-	delete silhouetteShaderProgram;
-	delete surface;
+	// delete phongblinnShaderProgram;
+	// delete normalsShaderProgram;
+	// delete silhouetteShaderProgram;
+	// delete surface;
 }
 
 void View::destroy()
 {
-	doneCurrent();
+	// doneCurrent();
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// glBindTexture(GL_TEXTURE_2D, 0);
+	// glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	delete instance;
-	instance = NULL;
-}
-
-void View::makeCurrent()
-{
-	glContext->makeCurrent(surface);
-}
-
-void View::doneCurrent()
-{
-	glContext->doneCurrent();
+	// delete instance;
+	// instance = NULL;
 }
 
 Matx44f View::GetCalibrationMatrix()
 {
 	return calibrationMatrices[currentLevel];
 }
-
-#include "shader/shaders.hh"
 
 void View::init(const Matx33f &K, int width, int height, float zNear, float zFar, int numLevels)
 {
@@ -97,22 +70,14 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 	this->numLevels = numLevels;
 
 	projectionMatrix = Transformations::perspectiveMatrix(K, width, height, zNear, zFar, true);
+	LOG(INFO) << "Projection matrix: " << projectionMatrix;
 
-	std::cout << "makeCurrent" << std::endl;
-	makeCurrent();
+	LOG(INFO) << "Initializing View...";
 
-	std::cout << "initializeOpenGLFunctions 2" << std::endl;
-	initializeOpenGLFunctions();
-	std::cout << "done initializeOpenGLFunctions" << std::endl;
-
-	// FIX FOR NEW OPENGL
-	uint vao;
-	std::cout << "glGenVertexArrays" << std::endl;
-	glGenVertexArrays(1, &vao);
-	std::cout << "glBindVertexArray" << std::endl;
-	glBindVertexArray(vao);
-	std::cout << "After glBindVertexArray" << std::endl;
-
+	LOG(INFO) << "Creating window...";
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+	
 	calibrationMatrices.clear();
 
 	for (int i = 0; i < numLevels; i++)
@@ -127,42 +92,36 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 
 		calibrationMatrices.push_back(K_l);
 	}
+	initRenderingBuffers();
 
-	// cout << "GL Version " << glGetString(GL_VERSION) << endl << "GLSL Version " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
-
-	std::cout << "glEnable" << std::endl;
 	glEnable(GL_DEPTH);
 	glEnable(GL_DEPTH_TEST);
-	std::cout << "glEnable GL_DEPTH_TEST" << std::endl;
 
-	std::cout << "glDepthRange" << std::endl;
 	// INVERT DEPTH BUFFER
 	glDepthRange(1, 0);
 	glClearDepth(0.0f);
 	glDepthFunc(GL_GREATER);
-	std::cout << "glDepthFunc" << std::endl;
 
-	std::cout << "glPolygonMode" << std::endl;
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	std::cout << "done glPolygonMode" << std::endl;
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
-	std::cout << "initRenderingBuffers" << std::endl;
-	initRenderingBuffers();
-	std::cout << "initRenderingBuffers" << std::endl;
 
-	shaderFolder = "src/";
+	// Create and compile our GLSL program from the shaders
+	char* vertexFilePath = (char*)"assets/opengl/Silhouette.vs";
+	char* fragmentFilePath = (char*)"assets/opengl/Silhouette.fs";
 
-	initShaderProgramFromCode(silhouetteShaderProgram, silhouette_vertex_shader, silhouette_fragment_shader);
-	initShaderProgramFromCode(phongblinnShaderProgram, phongblinn_vertex_shader, phongblinn_fragment_shader);
-	initShaderProgramFromCode(normalsShaderProgram, normals_vertex_shader, normals_fragment_shader);
+	silhouetteShaderProgram = LoadShaders(vertexFilePath, fragmentFilePath);
+	// Get a handle for our "MVP" uniform
+	m_MatrixId = glGetUniformLocation(silhouetteShaderProgram, "uMVPMatrix");
+	m_AlphaId = glGetUniformLocation(silhouetteShaderProgram, "uAlpha");
+	m_ColorId = glGetUniformLocation(silhouetteShaderProgram, "uColor");
+
 
 	angle = 0;
 
 	lightPosition = cv::Vec3f(0, 0, 0);
 
-	// doneCurrent();
 	m_IsInitialized = true;
 }
 
@@ -194,6 +153,16 @@ int View::getLevel()
 
 bool View::initRenderingBuffers()
 {
+	glGenVertexArrays(1, &m_VAO);
+	glGenVertexArrays(1, &m_VAO);
+	glGenVertexArrays(1, &m_VAO);
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+	std::cout << "VAO ID: " << m_VAO << std::endl;
+
+	glGenFramebuffers(1, &frameBufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+
 	glGenTextures(1, &colorTextureID);
 	glBindTexture(GL_TEXTURE_2D, colorTextureID);
 
@@ -208,9 +177,6 @@ bool View::initRenderingBuffers()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glGenFramebuffers(1, &frameBufferID);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
-
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTextureID, 0);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureID, 0);
@@ -223,26 +189,6 @@ bool View::initRenderingBuffers()
 	return true;
 }
 
-bool View::initShaderProgramFromCode(QOpenGLShaderProgram *program, char *vertex_shader, char *fragment_shader)
-{
-	if (!program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertex_shader))
-	{
-		cout << "error adding vertex shader from source file" << endl;
-		return false;
-	}
-	if (!program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragment_shader))
-	{
-		cout << "error adding fragment shader from source file" << endl;
-		return false;
-	}
-
-	if (!program->link())
-	{
-		cout << "error linking shaders" << endl;
-		return false;
-	}
-	return true;
-}
 
 static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 {
@@ -265,12 +211,10 @@ void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool inv
 
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	// for (int i = 0; i < models.size(); i++)
-	// {
-	// shared_ptr<Model> model = models[i];
-
 	if (model->isInitialized() || drawAll)
 	{
+		cout << "rendering model " << model->getModelID() << endl;
+
 		Matx44f pose = model->getPose();
 		Matx44f normalization = model->getNormalization();
 
@@ -278,12 +222,15 @@ void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool inv
 
 		Matx44f modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
 
-		silhouetteShaderProgram->bind();
-		silhouetteShaderProgram->setUniformValue("uMVPMatrix", QMatrix4x4(modelViewProjectionMatrix.val));
-		silhouetteShaderProgram->setUniformValue("uAlpha", 1.0f);
+		// Bind back to the main framebuffer
+        glUseProgram(silhouetteShaderProgram);
+        
+		// visualize camera
+        glUniformMatrix4fv(m_MatrixId, 1, GL_TRUE, modelViewProjectionMatrix.val);
+		glUniform1f(m_AlphaId, 1.0f);
 
-		Point3f color = Point3f((float)(model->getModelID()) / 255.0f, 0.0f, 0.0f);
-		silhouetteShaderProgram->setUniformValue("uColor", QVector3D(color.x, color.y, color.z));
+		glm::vec3 color = glm::vec3((float)(model->getModelID()) / 255.0f, 0.0f, 0.0f);
+		glUniform3fv(m_ColorId, 1, &color[0]);
 
 		glPolygonMode(GL_FRONT_AND_BACK, polyonMode);
 
@@ -323,43 +270,6 @@ void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 	{
 		LOG(ERROR) << "WRONG IMAGE TYPE";
 	}
-}
-
-void View::RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, const cv::Point3f color, bool drawAll)
-{
-	glViewport(0, 0, width, height);
-
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-	if (model->isInitialized() || drawAll)
-	{
-		Matx44f pose = model->getPose();
-		Matx44f normalization = model->getNormalization();
-
-		Matx44f modelViewMatrix = lookAtMatrix * (pose * normalization);
-
-		Matx33f normalMatrix = modelViewMatrix.get_minor<3, 3>(0, 0).inv().t();
-
-		Matx44f modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
-
-		phongblinnShaderProgram->bind();
-		phongblinnShaderProgram->setUniformValue("uMVMatrix", QMatrix4x4(modelViewMatrix.val));
-		phongblinnShaderProgram->setUniformValue("uMVPMatrix", QMatrix4x4(modelViewProjectionMatrix.val));
-		phongblinnShaderProgram->setUniformValue("uNormalMatrix", QMatrix3x3(normalMatrix.val));
-		phongblinnShaderProgram->setUniformValue("uLightPosition1", QVector3D(0.1, 0.1, -0.02));
-		phongblinnShaderProgram->setUniformValue("uLightPosition2", QVector3D(-0.1, 0.1, -0.02));
-		phongblinnShaderProgram->setUniformValue("uLightPosition3", QVector3D(0.0, 0.0, 0.1));
-		phongblinnShaderProgram->setUniformValue("uShininess", 100.0f);
-		phongblinnShaderProgram->setUniformValue("uAlpha", 1.0f);
-
-		phongblinnShaderProgram->setUniformValue("uColor", QVector3D(color.x, color.y, color.z));
-
-		glPolygonMode(GL_FRONT_AND_BACK, polyonMode);
-
-		model->draw(phongblinnShaderProgram);
-	}
-
-	glFinish();
 }
 
 void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
@@ -420,6 +330,8 @@ void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Poin
 
 Mat View::DownloadFrame(View::FrameType type)
 {
+	glBindVertexArray(m_VAO);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
 	Mat res;
 	switch (type)
 	{

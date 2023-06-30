@@ -17,19 +17,31 @@ list(REMOVE_ITEM TTool_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc)
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
+#GLFW
+if(UNIX AND INSTALL_GLFW33)
+    execute_process(COMMAND ./cmake/install_glfw_3_3.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
+find_package(glfw3 3.3 REQUIRED)
+find_package(GLEW REQUIRED)
+
 add_library(TTool SHARED ${TTool_SOURCES} ${glsl_SOURCES})
 target_link_libraries(TTool PUBLIC
         ${OpenCV_LIBS}
         ${CMAKE_THREAD_LIBS_INIT}
         Qt5::Widgets
         Qt5::OpenGL
+        glfw
+        GLU
         glog::glog
+        ${GLEW_LIBRARIES}
         ${OPENGL_LIBRARIES}
         ${ASSIMP_LIBRARIES})
 target_include_directories(TTool PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${OpenCV_INCLUDE_DIRS}
-        ${OPENGL_INCLUDE_DIR})
+        ${OPENGL_INCLUDE_DIR}
+        ${GLEW_INCLUDE_DIRS})
 
 # FIXME: attach dependecies to install TTool
 install(TARGETS TTool DESTINATION lib)

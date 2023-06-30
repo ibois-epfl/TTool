@@ -1,8 +1,7 @@
 #pragma once
 
-#include <QOpenGLBuffer>
-#include <QOpenGLShaderProgram>
-
+#include <GL/glew.h>
+#include <glm/glm.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
@@ -47,10 +46,9 @@ public:
      *  Draws the model with a given shader programm and
      *  a specified OpenGL data primitive type using VBOs.
      *
-     *  @param  program    The shader programm to be used.
      *  @param  primitives The primitive type that shall be used for drawing (e.g. GL_POINTS, GL_LINES,...). The default value is set to GL_TRIANGLES.
      */
-    void draw(QOpenGLShaderProgram *program, GLint primitives = GL_TRIANGLES);
+    void draw(GLint program, GLint primitives = GL_TRIANGLES);
     
     /**
      *  The 3d data is packed into VOBs and uploaded to the GPU.
@@ -160,8 +158,8 @@ public:
      *
      *  @return  A vector containing all unnormalized 3D model verticies.
      */
-    std::vector<cv::Vec3f> getVertices();
-    std::vector<cv::Vec3f> getSimpleVertices();
+    std::vector<glm::vec3> getVertices();
+    std::vector<glm::vec3> getSimpleVertices();
 
     /**
      *  Returns the total number of 3D model verticies.
@@ -195,7 +193,7 @@ public:
      */
     void reset();
     
-    std::vector<cv::Vec3f> vertices;
+    std::vector<glm::vec3> vertices;
     std::vector<GLuint> indices;
 
 private:
@@ -212,15 +210,13 @@ private:
     
     bool hasNormals;
     
-    //std::vector<cv::Vec3f> vertices;
-    std::vector<cv::Vec3f> svertices;
-    std::vector<cv::Vec3f> normals;
-    //std::vector<GLuint> indices;
+    std::vector<glm::vec3> svertices;
+    std::vector<glm::vec3> normals;
     std::vector<GLuint> offsets;
     
-    QOpenGLBuffer vertexBuffer;
-    QOpenGLBuffer normalBuffer;
-    QOpenGLBuffer indexBuffer;
+    GLuint vertexBuffer;
+    GLuint normalBuffer;
+    GLuint indexBuffer;
     
     bool buffersInitialsed;
     

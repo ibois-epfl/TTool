@@ -7,11 +7,23 @@
 #include <iomanip>
 #include <filesystem>
 #include <string_view>
-
+#include <glm/glm.hpp>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <glog/logging.h>
+
+namespace ttool::gl
+{
+    inline void CvtCvMat2GlmMat(const cv::Mat &cvMat, glm::mat4 &glmMat)
+    {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                glmMat[j][i] = cvMat.at<float>(i, j);
+            }
+        }
+    }
+}
 
 namespace tk {
 

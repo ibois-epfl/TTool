@@ -3,12 +3,13 @@
 #include <iostream>
 #include <vector>
 
-#include <QOpenGLContext>
-#include <QOffscreenSurface>
+#include <GL/glew.h>
 
-#include <QGLFramebufferObject>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLFunctions_3_3_Core>
+#include <GL/glut.h>
+#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
+
+#include "glm/glm.hpp"
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -16,7 +17,7 @@
 #include "transformations.hh"
 #include "model.hh"
 
-class View : public QOpenGLFunctions_3_3_Core
+class View
 {
 public:
 	enum FrameType
@@ -57,7 +58,6 @@ public:
 
 	void RenderSilhouette(std::shared_ptr<Model> model, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
 	void RenderSilhouette(std::vector<std::shared_ptr<Model>> models, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
-	void RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, const cv::Point3f color = cv::Point3f(1.0, 0.5, 0.0), bool drawAll = false);
 
 	void ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid);
 
@@ -66,13 +66,6 @@ public:
 	cv::Mat DownloadFrame(View::FrameType type);
 
 	void destroy();
-
-	void MakeCurrent() { makeCurrent(); };
-	void ReleaseCurrent() { doneCurrent(); };
-
-protected:
-	void makeCurrent();
-	void doneCurrent();
 
 private:
 	static View *instance;
@@ -96,9 +89,6 @@ private:
 	cv::Matx44f projectionMatrix;
 	cv::Matx44f lookAtMatrix;
 
-	QOffscreenSurface *surface;
-	QOpenGLContext *glContext;
-
 	GLuint frameBufferID;
 	GLuint colorTextureID;
 	GLuint depthTextureID;
@@ -107,11 +97,11 @@ private:
 
 	cv::Vec3f lightPosition;
 
-	QString shaderFolder;
-	QOpenGLShaderProgram *silhouetteShaderProgram;
-	QOpenGLShaderProgram *phongblinnShaderProgram;
-	QOpenGLShaderProgram *normalsShaderProgram;
+	GLuint silhouetteShaderProgram;
+	GLuint m_MatrixId;
+	GLuint m_AlphaId;
+	GLuint m_ColorId;
+	GLuint m_VAO;
 
 	bool initRenderingBuffers();
-	bool initShaderProgramFromCode(QOpenGLShaderProgram *program, char *vertex_shader, char *fragment_shader);
 };
