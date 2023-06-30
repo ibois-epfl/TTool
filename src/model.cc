@@ -60,12 +60,12 @@ void Model::initBuffers()
 {
     cout << "Initializing buffers..." << endl;
   	glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertices.size() * sizeof(GLuint), &vertices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &normalBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, normalBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, normals.size() * sizeof(GLuint), &normals[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &indexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
