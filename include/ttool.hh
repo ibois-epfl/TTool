@@ -119,9 +119,6 @@ namespace ttool
         std::shared_ptr<ttool::DModelManager> GetModelManager() { return m_ModelManagerPtr; };
         int GetCurrentObjectID() { return m_CurrentObjectID; };
 
-        void MakeCurrent() { return; };
-        void ReleaseCurrent() { return; };
-
     private:
         void InitializeObjectTracker()
         {
