@@ -63,8 +63,8 @@ configure_file(
 add_custom_target(TTool_uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
-# create TTool executable
-if (OPT_BUILD_TTOOL_EXE)
-    add_executable(ttoolexec src/main.cc)
-    target_link_libraries(ttoolexec TTool)
-endif()
+# # create TTool executable
+# if (OPT_BUILD_TTOOL_EXE)
+#     add_executable(ttoolexec src/main.cc)
+#     target_link_libraries(ttoolexec TTool)
+# endif()
