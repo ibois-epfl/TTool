@@ -41,3 +41,6 @@ if (OPT_BUILD_TTOOL_EXE)
     find_package(Qt5Widgets REQUIRED)
     find_package(Qt5OpenGL REQUIRED)
 endif()
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/glm)
+set(GLM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/deps/glm)

@@ -41,7 +41,10 @@ target_include_directories(TTool PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${OpenCV_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
-        ${GLEW_INCLUDE_DIRS})
+        ${GLEW_INCLUDE_DIRS}
+        ${GLM_INCLUDE_DIR}
+        )
+
 
 # FIXME: attach dependecies to install TTool
 install(TARGETS TTool DESTINATION lib)
