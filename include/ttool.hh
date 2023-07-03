@@ -22,6 +22,9 @@ namespace ttool
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
             m_CameraCalibFile = cameraCalibFile;
             
+            // Initialize the camera matrix from the camera calibration file, as well as the camera size (width and height)
+            ReadCameraMatrix();
+            
             InitializeView();
 
             std::vector<cv::Matx44f> preprocessedGroundTruthPoses = PreprocessGroundTruthPoses(m_ConfigPtr->GetConfigData().GroundTruthPoses);
@@ -34,6 +37,29 @@ namespace ttool
             m_Input = ttool::InputModelManager(m_ModelManagerPtr);
             InitializeObjectTracker();
         };
+
+        TTool(std::string configFile, cv::Mat cameraMatrix, cv::Size cameraSize)
+        {
+            m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            
+
+            CameraMatrix = cameraMatrix.clone();
+            CamSize.height = cameraSize.height;
+            CamSize.width = cameraSize.width;
+
+            InitializeView();
+
+            std::vector<cv::Matx44f> preprocessedGroundTruthPoses = PreprocessGroundTruthPoses(m_ConfigPtr->GetConfigData().GroundTruthPoses);
+
+            m_ModelManagerPtr = std::make_shared<ttool::DModelManager>(
+                m_ConfigPtr->GetConfigData().ModelFiles,
+                preprocessedGroundTruthPoses,
+                m_ConfigPtr);
+
+            m_Input = ttool::InputModelManager(m_ModelManagerPtr);
+            InitializeObjectTracker();
+        };
+
         ~TTool(){};
 
         /**
@@ -96,6 +122,13 @@ namespace ttool
                 cv::waitKey(waitTime);
         }
 
+        void DestrolView()
+        {
+            View *view = View::Instance();
+            view->destroy();
+        }
+
+
         /**
          * @brief Get the Pose object
          * 
@@ -131,6 +164,20 @@ namespace ttool
             InitializeObjectTracker();
         }
 
+        void InitializeObjectTracker()
+        {
+            m_ObjectTracker.Consume(m_ModelManagerPtr->GetObject()->getModelID(), m_ModelManagerPtr->GetObject(), CameraMatrix);
+        }
+
+        void InitializeView()
+        {
+            // Initialize the view
+            View* view = View::Instance();
+            float zn = m_ConfigPtr->GetConfigData().Zn;
+            float zf = m_ConfigPtr->GetConfigData().Zf;
+            view->init(CameraMatrix, CamSize.width, CamSize.height, zn, zf, 4);
+        }
+
 
     public:
         std::shared_ptr<ttool::Config> GetConfig() { return m_ConfigPtr; };
@@ -138,12 +185,6 @@ namespace ttool
         int GetCurrentObjectID() { return m_CurrentObjectID; };
 
     private:
-        void InitializeObjectTracker()
-        {
-            cv::Mat cameraMatrix = ReadCameraMatrix();
-            m_ObjectTracker.Consume(m_ModelManagerPtr->GetObject()->getModelID(), m_ModelManagerPtr->GetObject(), cameraMatrix);
-        }
-
         void CheckObjectChange()
         {
             if (m_ModelManagerPtr->GetObject()->getModelID() != m_CurrentObjectID)
@@ -153,50 +194,37 @@ namespace ttool
             }
         }
     
-        cv::Mat ReadCameraMatrix()
+        /**
+         * @brief Initialize the camera matrix and the camera size (width and height)
+         * This function should be run before initializing the view, and before initializing the object tracker
+         * 
+        */
+        void ReadCameraMatrix()
         {
             cv::FileStorage fs(m_CameraCalibFile, cv::FileStorage::READ);
             if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file: " + m_CameraCalibFile);
 
-            cv::Mat MCamera;
-            fs["camera_matrix"] >> MCamera;
-            
-            fs.release();
-            return MCamera;
-        }
+            int width = -1, height = -1;
+            cv::Mat cameraMatrix;
+            fs["camera_matrix"] >> cameraMatrix;
+            fs["image_width"] >> width;
+            fs["image_height"] >> height;
 
-        void InitializeView()
-        {
-            cv::FileStorage fs(m_CameraCalibFile, cv::FileStorage::READ);
-            if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file:"+m_CameraCalibFile);
-
-            int w = -1, h = -1;
-            cv::Mat MCamera;
-            fs["image_width"] >> w;
-            fs["image_height"] >> h;
-            fs["camera_matrix"] >> MCamera;
-
-            if (MCamera.cols == 0 || MCamera.rows == 0){
-                fs["Camera_Matrix"] >> MCamera;
-                if (MCamera.cols == 0 || MCamera.rows == 0)
+            if (cameraMatrix.cols == 0 || cameraMatrix.rows == 0){
+                if (cameraMatrix.cols == 0 || cameraMatrix.rows == 0)
                     throw std::runtime_error(std::string(__FILE__)+" File :" + m_CameraCalibFile + " does not contains valid camera matrix");
             }
 
-            if (w == -1 || h == 0){
-                fs["image_Width"] >> w;
-                fs["image_Height"] >> h;
-                if (w == -1 || h == 0)
+            if (width == -1 || height == 0){
                 throw std::runtime_error(std::string(__FILE__)+  "File :" + m_CameraCalibFile + " does not contains valid camera dimensions");
             }
-            if (MCamera.type() != CV_32FC1)
-                MCamera.convertTo(MCamera, CV_32FC1);
 
-            // Initialize the view
-            View* view = View::Instance();
-            float zn = m_ConfigPtr->GetConfigData().Zn;
-            float zf = m_ConfigPtr->GetConfigData().Zf;
-            view->init(MCamera, w, h, zn, zf, 4);
+            if (cameraMatrix.type() != CV_32FC1)
+                cameraMatrix.convertTo(cameraMatrix, CV_32FC1);
 
+            CameraMatrix = cameraMatrix.clone();
+            CamSize.height = height;
+            CamSize.width = width;
             fs.release();
         }
 
@@ -227,7 +255,10 @@ namespace ttool
 
             return preprocessedGroundTruthPoses;
         }
-
+    public:
+        cv::Mat CameraMatrix;
+        cv::Size CamSize;
+    
     private:
         std::shared_ptr<ttool::Config> m_ConfigPtr;
         std::string m_CameraCalibFile;
