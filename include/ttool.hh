@@ -33,12 +33,6 @@ namespace ttool
 
             m_Input = ttool::InputModelManager(m_ModelManagerPtr);
             InitializeObjectTracker();
-
-            // View *view = View::Instance();
-            // view->RenderSilhouette(m_ModelManagerPtr->GetObject(), GL_FILL, true);
-            // cv::Mat depth_inv_map = view->DownloadFrame(View::DEPTH);
-            // cv::imshow("depth_inv_map", depth_inv_map);
-            // cv::waitKey(0);
         };
         ~TTool(){};
 
@@ -70,12 +64,36 @@ namespace ttool
             CheckObjectChange();
             m_ObjectTracker.UpdateHistogram(m_CurrentObjectID, frame);
             m_ObjectTracker.CallEstimatePose(m_CurrentObjectID, frame);
+        }
 
-            // View *view = View::Instance();
-            // view->RenderSilhouette(m_ModelManagerPtr->GetObject(), GL_FILL, true);
-            // cv::Mat depth_inv_map = view->DownloadFrame(View::DEPTH);
-            // cv::imshow("depth_inv_map", depth_inv_map);
-            // cv::waitKey(50);
+        /**
+         * @brief DEBUGGING FUNCTION - Show the silhouette of the model on the camera frame
+         * 
+         * @param frame camera frame  
+         */
+        void ShowSilhouette(cv::Mat frame, int waitTime = -1)
+        {
+            cv::Mat result = frame.clone();
+            
+            View *view = View::Instance();
+            view->RenderSilhouette(m_ModelManagerPtr->GetObject(), GL_FILL);
+            cv::Mat depth = view->DownloadFrame(View::DEPTH); // This is the depth map of the model 0.0f and 1.0f are the min and max depth
+
+            float alpha = 0.5f;
+            for (int y = 0; y < frame.rows; y++)
+            	for (int x = 0; x < frame.cols; x++)
+            	{
+                    cv::Vec3b color = cv::Vec3b(255, 128, 0);
+            		if (depth.at<float>(y, x) != 0.0f)
+            		{
+                        result.at<cv::Vec3b>(y, x) = alpha * color + (1.0f - alpha) * result.at<cv::Vec3b>(y, x);
+            		}
+            	}
+
+            cv::cvtColor(result, result, cv::COLOR_BGR2RGB);
+            cv::imshow("TTool Debugging Window", result);
+            if (waitTime >= 0)
+                cv::waitKey(waitTime);
         }
 
         /**

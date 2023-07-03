@@ -213,8 +213,6 @@ void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool inv
 
 	if (model->isInitialized() || drawAll)
 	{
-		cout << "rendering model " << model->getModelID() << endl;
-
 		Matx44f pose = model->getPose();
 		Matx44f normalization = model->getNormalization();
 
