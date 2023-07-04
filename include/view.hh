@@ -66,7 +66,8 @@ public:
 	cv::Mat DownloadFrame(View::FrameType type);
 
 	void destroy();
-
+	
+	cv::Matx44f GetProjectionMatrix() { return projectionMatrix; }
 private:
 	static View *instance;
 	
