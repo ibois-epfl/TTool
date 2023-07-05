@@ -326,6 +326,7 @@ void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Poin
 	boundingRect.height = rb.y - lt.y;
 }
 
+// FIXME: the render view should take back the VAO (SEE COMMENTS BELOW)
 Mat View::DownloadFrame(View::FrameType type)
 {
 	glBindVertexArray(m_VAO);
@@ -353,5 +354,7 @@ Mat View::DownloadFrame(View::FrameType type)
 		res = Mat::zeros(height, width, CV_8UC1);
 		break;
 	}
+	// glBindVertexArray(0);
+	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	return res;
 }
