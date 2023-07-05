@@ -23,9 +23,9 @@ View::View(void)
 
 View::~View(void)
 {
-	// glDeleteTextures(1, &colorTextureID);
-	// glDeleteTextures(1, &depthTextureID);
-	// glDeleteFramebuffers(1, &frameBufferID);
+	glDeleteTextures(1, &colorTextureID);
+	glDeleteTextures(1, &depthTextureID);
+	glDeleteFramebuffers(1, &frameBufferID);
 
 	// delete phongblinnShaderProgram;
 	// delete normalsShaderProgram;
@@ -37,12 +37,12 @@ void View::destroy()
 {
 	// doneCurrent();
 
-	// glBindTexture(GL_TEXTURE_2D, 0);
-	// glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// delete instance;
-	// instance = NULL;
+	delete instance;
+	instance = NULL;
 }
 
 Matx44f View::GetCalibrationMatrix()
@@ -70,6 +70,13 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 	this->numLevels = numLevels;
 
 	projectionMatrix = Transformations::perspectiveMatrix(K, width, height, zNear, zFar, true);
+	// projectionMatrix = Transformations::perspectiveMatrix(35.0f, (float)width / (float)height, 0.1f, 2000.0f);
+	// projectionMatrix = cv::Matx44f(
+	// 	2.378696, 0, 0, 0,
+	// 	0, 3.1715946, 0, 0,
+	// 	0, 0, -1.002002, -0.2002002,
+	// 	0, 0, -1, 0
+	// );
 	LOG(INFO) << "Projection matrix: " << projectionMatrix;
 
 	LOG(INFO) << "Initializing View...";
@@ -153,10 +160,6 @@ int View::getLevel()
 
 bool View::initRenderingBuffers()
 {
-	glGenVertexArrays(1, &m_VAO);
-	glGenVertexArrays(1, &m_VAO);
-	glGenVertexArrays(1, &m_VAO);
-	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
 	std::cout << "VAO ID: " << m_VAO << std::endl;
 
