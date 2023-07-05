@@ -178,12 +178,6 @@ namespace ttool
             view->init(CameraMatrix, CamSize.width, CamSize.height, zn, zf, 4);
         }
 
-        cv::Matx44f GetProjectionMatrix()
-        {
-            return View::Instance()->GetProjectionMatrix();
-        }
-
-
     public:
         std::shared_ptr<ttool::Config> GetConfig() { return m_ConfigPtr; };
         std::shared_ptr<ttool::DModelManager> GetModelManager() { return m_ModelManagerPtr; };
