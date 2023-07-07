@@ -196,14 +196,9 @@ static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 	return (pt(0) < width && pt(1) < height && pt(0) >= 0 && pt(1) >= 0);
 }
 
-void View::RenderSilhouette(vector<shared_ptr<Model>> models, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
-{
-	return;
-}
 void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
 {
 	glViewport(0, 0, width, height);
-
 	if (invertDepth)
 	{
 		glClearDepth(1.0f);

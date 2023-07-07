@@ -39,7 +39,7 @@ namespace ttool
             // dry run to initialize silouhette drawing
             cv::Mat emptyMat = cv::Mat::zeros(480, 640, CV_8UC3);
             RunOnAFrame(emptyMat);
-            DrawSilhouette(emptyMat);
+            // DrawSilhouette(emptyMat);
         };
 
         TTool(std::string configFile, cv::Mat cameraMatrix, cv::Size cameraSize)

@@ -26,6 +26,10 @@ namespace tslet
                 currentModelID = modelID;
                 trackerPtr->ToggleTracking(0, true);
             }
+            if (!hasPose(modelID))
+            {
+                modelID2pose[modelID] = object->getPose();
+            }
         }
 
         void UpdateHistogram(int modelID, cv::Mat frame)
@@ -52,9 +56,14 @@ namespace tslet
 
         void CallEstimatePose(int modelID, cv::Mat frame)
         {
-            if (!hasTracker(modelID) || !hasPose(modelID))
+            if (!hasTracker(modelID))
             {
-                std::cout << "No tracker for model/pose " << modelID << std::endl;
+                std::cout << "No tracker for model " << modelID << std::endl;
+                return;
+            }
+            else if (!hasPose(modelID))
+            {
+                std::cout << "No pose for model " << modelID << std::endl;
                 return;
             }
 
