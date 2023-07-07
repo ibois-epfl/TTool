@@ -279,7 +279,7 @@ namespace ttool
 
             return preprocessedGroundTruthPoses;
         }
-    
+
     public:
         cv::Mat CameraMatrix;
         cv::Size CamSize;

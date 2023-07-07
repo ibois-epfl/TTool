@@ -36,6 +36,10 @@ View::~View(void)
 void View::destroy()
 {
 	// doneCurrent();
+	projectionMatrix = Matx44f::eye();
+	lookAtMatrix = Matx44f::eye();
+	calibrationMatrices.clear();
+	m_IsInitialized = false;
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -69,14 +73,8 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 
 	this->numLevels = numLevels;
 
-	projectionMatrix = Transformations::perspectiveMatrix(K, width, height, zNear, zFar, true);
-	// projectionMatrix = Transformations::perspectiveMatrix(35.0f, (float)width / (float)height, 0.1f, 2000.0f);
-	// projectionMatrix = cv::Matx44f(
-	// 	2.378696, 0, 0, 0,
-	// 	0, 3.1715946, 0, 0,
-	// 	0, 0, -1.002002, -0.2002002,
-	// 	0, 0, -1, 0
-	// );
+	projectionMatrix = Transformations::perspectiveMatrix(K, width, height, this->zn, this->zf, true);
+
 	LOG(INFO) << "Projection matrix: " << projectionMatrix;
 
 	LOG(INFO) << "Initializing View...";
