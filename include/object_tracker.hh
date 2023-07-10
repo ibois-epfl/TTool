@@ -72,6 +72,11 @@ namespace tslet
             trackerPtr->EstimatePoses(init_pose, frame);
         }
 
+        std::string GetTrackingStatus()
+        {
+            return trackerPtr->GetTrackingStatus();
+        }
+
         private:
         bool hasTracker(int modelID)
         {

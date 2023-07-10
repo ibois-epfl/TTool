@@ -24,6 +24,8 @@ public:
 
 	void reset();
 
+	std::string GetTrackingStatus() const { return m_trackingStatus.str(); };
+
 protected:
 	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shared_ptr<Object3D>>& objects, int runs = 1) = 0;
 
@@ -46,6 +48,8 @@ protected:
 	//cv::Mat map2;
 
 	bool initialized;
+
+	std::stringstream m_trackingStatus;
 };
 
 class Histogram;

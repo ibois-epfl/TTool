@@ -287,16 +287,19 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 
         auto deltaT = Transformations::exp(-wJTJ.inv(cv::DECOMP_CHOLESKY) * JT);
 		cv::Matx44f T_cm = deltaT * objects[o]->getPose();
+
+		m_trackingStatus.str(std::string()); // Clearing the string
+		m_trackingStatus.precision(4);
        if (avg < 0.0125 / 2) {
-           objects[o]->setPose(init_pose);
-           std::cout << "[RESET] Mean scores: " << avg << "\n";
-       }
+			objects[o]->setPose(init_pose);
+			m_trackingStatus << "Reset - " << avg;
+	   }
        else if (avg < 0.2 / 2) {
-            std::cout << "[FREEZED] Mean scores: " << avg << "\n";
+			m_trackingStatus << "Freezed - " << avg;
        }
        else {
-           std::cout << "[UPDATE] ROI " << roi.area() << " avg: " << avg << "\n";
-           objects[o]->setPose(T_cm);
+			m_trackingStatus << "Tracking - " << avg;
+			objects[o]->setPose(T_cm);
        }
 	}
 }
