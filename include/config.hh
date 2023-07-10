@@ -20,6 +20,7 @@ namespace ttool
         public:
             // Model
             std::vector<std::string> ModelFiles;
+            std::vector<std::string> AcitFiles;
             std::vector<std::vector<float>> GroundTruthPoses;
 
             // Histogram
@@ -35,7 +36,8 @@ namespace ttool
 
             // Unordered maps are used to help Setters more dynamic typed
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::string>>> stringVectorMembers = {
-                {"modelFiles", std::ref(ModelFiles)}
+                {"modelFiles", std::ref(ModelFiles)},
+                {"acitFiles", std::ref(AcitFiles)}
             };
 
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::vector<float>>>> floatVectorVectorMembers = {
@@ -144,6 +146,10 @@ namespace ttool
                 fs["modelFiles"] >> modelFiles;
                 m_ConfigData.setValue("modelFiles", modelFiles);
 
+                std::vector<std::string> acitFiles;
+                fs["acitFiles"] >> acitFiles;
+                m_ConfigData.setValue("acitFiles", acitFiles);
+
                 std::vector<std::vector<float>> groundTruthPoses;
                 fs["groundTruthPoses"] >> groundTruthPoses;
                 m_ConfigData.setValue("groundTruthPoses", groundTruthPoses);
@@ -171,7 +177,14 @@ namespace ttool
                 for (auto& modelFile : m_ConfigData.ModelFiles)
                 {
                     std::cout << "\t" << modelFile << std::endl;
-                }   
+                }
+
+                std::cout << "ACIT files: " << std::endl;
+                for (auto& acitFile : m_ConfigData.AcitFiles)
+                {
+                    std::cout << "\t" << acitFile << std::endl;
+                }
+
                 std::cout << "Ground truth poses: " << std::endl;
                 for (auto& groundTruthPose : m_ConfigData.GroundTruthPoses)
                 {
@@ -212,6 +225,7 @@ namespace ttool
                 
                 fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;
                 fs << "modelFiles" << m_ConfigData.ModelFiles;
+                fs << "acitFiles" << m_ConfigData.AcitFiles;
 
                 fs.release();
             }
