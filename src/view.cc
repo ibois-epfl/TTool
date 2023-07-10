@@ -159,7 +159,6 @@ int View::getLevel()
 bool View::initRenderingBuffers()
 {
 	glBindVertexArray(m_VAO);
-	std::cout << "VAO ID: " << m_VAO << std::endl;
 
 	glGenFramebuffers(1, &frameBufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
@@ -198,6 +197,9 @@ static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 
 void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
 {
+	glBindVertexArray(m_VAO);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+
 	glViewport(0, 0, width, height);
 	if (invertDepth)
 	{
