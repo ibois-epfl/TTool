@@ -58,7 +58,6 @@ Model::~Model()
 
 void Model::initBuffers()
 {
-    cout << "Initializing buffers..." << endl;
   	glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);

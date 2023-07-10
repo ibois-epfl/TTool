@@ -14,9 +14,7 @@ enum {
 
 SLETracker::SLETracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects)
 	: SLTracker(K, objects)
-{
-	std::cout << "SLETracker::SLETracker" << std::endl;
-}
+{}
 
 void SLETracker::ComputeJac(
 	std::shared_ptr<Object3D> object,
@@ -211,6 +209,10 @@ void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shar
 }
 
 void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, const std::vector<cv::Mat>& imagePyramid, int level, int sl_len, int sl_seg, cv::Matx44f& init_pose) {
+	m_trackingStatus.str(std::string()); // Clearing the string
+	m_trackingStatus.precision(4);
+
+
 	int width = view->GetWidth();
 	int height = view->GetHeight();
 	view->setLevel(level);
@@ -252,7 +254,7 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 		cv::Rect roi = Compute2DROI(objects[o], cv::Size(width / pow(2, level), height / pow(2, level)), 8);
 		if (roi.area() == 0) {
             objects[o]->setPose(init_pose);
-            std::cout << "[RESET] ROI 0\n";
+            m_trackingStatus << "Reset - due to ROI 0";
 			continue;
         }
 
@@ -288,8 +290,6 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
         auto deltaT = Transformations::exp(-wJTJ.inv(cv::DECOMP_CHOLESKY) * JT);
 		cv::Matx44f T_cm = deltaT * objects[o]->getPose();
 
-		m_trackingStatus.str(std::string()); // Clearing the string
-		m_trackingStatus.precision(4);
        if (avg < 0.0125 / 2) {
 			objects[o]->setPose(init_pose);
 			m_trackingStatus << "Reset - " << avg;
