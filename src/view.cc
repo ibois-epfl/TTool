@@ -194,6 +194,8 @@ void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool inv
 {
 	glBindVertexArray(m_VAO);
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+	glEnable(GL_DEPTH);
+	glEnable(GL_DEPTH_TEST);
 
 	glViewport(0, 0, width, height);
 	if (invertDepth)
@@ -319,7 +321,6 @@ void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Poin
 	boundingRect.height = rb.y - lt.y;
 }
 
-// FIXME: the render view should take back the VAO (SEE COMMENTS BELOW)
 Mat View::DownloadFrame(View::FrameType type)
 {
 	glBindVertexArray(m_VAO);
