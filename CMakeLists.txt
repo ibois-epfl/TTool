@@ -18,33 +18,40 @@ include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
 #GLFW
-if(UNIX AND INSTALL_GLFW33)
-    execute_process(COMMAND ./cmake/install_glfw_3_3.sh
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endif()
 find_package(glfw3 3.3 REQUIRED)
 find_package(GLEW REQUIRED)
+if(NOT GLEW_FOUND)
+    message(FATAL_ERROR "GLEW not found!")
+endif()
 
 add_library(TTool SHARED ${TTool_SOURCES} ${glsl_SOURCES})
-target_link_libraries(TTool PUBLIC
-        ${OpenCV_LIBS}
-        ${CMAKE_THREAD_LIBS_INIT}
-        Qt5::Widgets
-        Qt5::OpenGL
-        glfw
-        GLU
-        glog::glog
-        ${GLEW_LIBRARIES}
-        ${OPENGL_LIBRARIES}
-        ${ASSIMP_LIBRARIES})
 target_include_directories(TTool PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${OpenCV_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
-        ${GLEW_INCLUDE_DIRS}
         ${GLM_INCLUDE_DIR}
+        ${GLEW_INCLUDE_DIR}
+        )
+target_link_libraries(TTool PUBLIC
+        ${OpenCV_LIBS}
+        ${CMAKE_THREAD_LIBS_INIT}
+        glfw
+        ${GLFW_LIBRARIES}
+        GLEW
+        GLU
+        glog::glog
+        ${OPENGL_LIBRARIES}
+        ${ASSIMP_LIBRARIES}
+        ${CMAKE_DL_LIBS}
+        ${GLEW_LIBRARIES}
         )
 
+#GLEW
+add_subdirectory(deps/glew)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/deps/glew)
+
+set(DEPS_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/deps)
+target_include_directories(${PROJECT_NAME} PUBLIC ${DEPS_DIRS})
 
 # FIXME: attach dependecies to install TTool
 install(TARGETS TTool DESTINATION lib)
@@ -64,7 +71,9 @@ add_custom_target(TTool_uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
 # # create TTool executable
-# if (OPT_BUILD_TTOOL_EXE)
-#     add_executable(ttoolexec src/main.cc)
-#     target_link_libraries(ttoolexec TTool)
-# endif()
+if (OPT_BUILD_TTOOL_EXE)
+    add_executable(ttoolexec src/main.cc)
+    target_link_libraries(ttoolexec TTool glfw ${GLFW_LIBRARIES} GLEW ${GLEW_LIBRARIES})
+    target_include_directories(ttoolexec PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/deps/glew)
+    target_link_libraries(ttoolexec ${DEP})
+endif()
