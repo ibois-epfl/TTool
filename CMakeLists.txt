@@ -46,13 +46,6 @@ target_link_libraries(TTool PUBLIC
         ${GLEW_LIBRARIES}
         )
 
-#GLEW
-add_subdirectory(deps/glew)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/deps/glew)
-
-set(DEPS_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/deps)
-target_include_directories(${PROJECT_NAME} PUBLIC ${DEPS_DIRS})
-
 # FIXME: attach dependecies to install TTool
 install(TARGETS TTool DESTINATION lib)
 file(GLOB_RECURSE TTool_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hh)
@@ -74,6 +67,4 @@ add_custom_target(TTool_uninstall
 if (OPT_BUILD_TTOOL_EXE)
     add_executable(ttoolexec src/main.cc)
     target_link_libraries(ttoolexec TTool glfw ${GLFW_LIBRARIES} GLEW ${GLEW_LIBRARIES})
-    target_include_directories(ttoolexec PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/deps/glew)
-    target_link_libraries(ttoolexec ${DEP})
 endif()
