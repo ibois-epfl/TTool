@@ -27,8 +27,6 @@ namespace ttool
             int HistOffset;
             int HistRad;
             int SearchRad;
-            float AlphaForeground;
-            float AlphaBackground;
 
             // Visualizer
             float Zn;
@@ -51,8 +49,6 @@ namespace ttool
             };
 
             std::unordered_map<std::string, std::reference_wrapper<float>> floatMembers = {
-                {"alphaForeground", std::ref(AlphaForeground)},
-                {"alphaBackground", std::ref(AlphaBackground)},
                 {"zn", std::ref(Zn)},
                 {"zf", std::ref(Zf)}
             };
@@ -157,8 +153,6 @@ namespace ttool
                 m_ConfigData.setValue("histOffset", (int)fs["histOffset"]);
                 m_ConfigData.setValue("histRad", (int)fs["histRad"]);
                 m_ConfigData.setValue("searchRad", (int)fs["searchRad"]);
-                m_ConfigData.setValue("alphaForeground", (float)fs["alphaForeground"]);
-                m_ConfigData.setValue("alphaBackground", (float)fs["alphaBackground"]);
 
                 m_ConfigData.setValue("zn", (float)fs["zn"]);
                 m_ConfigData.setValue("zf", (float)fs["zf"]);           
@@ -198,8 +192,6 @@ namespace ttool
                 std::cout << "Hist offset: " << m_ConfigData.HistOffset << std::endl;
                 std::cout << "Hist rad: " << m_ConfigData.HistRad << std::endl;
                 std::cout << "Search rad: " << m_ConfigData.SearchRad << std::endl;
-                std::cout << "Alpha foreground: " << m_ConfigData.AlphaForeground << std::endl;
-                std::cout << "Alpha background: " << m_ConfigData.AlphaBackground << std::endl;
                 std::cout << "Zn: " << m_ConfigData.Zn << std::endl;
                 std::cout << "Zf: " << m_ConfigData.Zf << std::endl;
             }
@@ -212,19 +204,16 @@ namespace ttool
             {
                 cv::FileStorage fs(m_ConfigFile, cv::FileStorage::WRITE);
                 if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__) + " could not open file:" + m_ConfigFile);
-
-                fs << "alphaForeground" << m_ConfigData.AlphaForeground;
-                fs << "alphaBackground" << m_ConfigData.AlphaBackground;
-
                 fs << "zn" << m_ConfigData.Zn;
                 fs << "zf" << m_ConfigData.Zf;
 
                 fs << "histOffset" << m_ConfigData.HistOffset;
                 fs << "histRad" << m_ConfigData.HistRad;
                 fs << "searchRad" << m_ConfigData.SearchRad;
-                
+
                 fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;
                 fs << "modelFiles" << m_ConfigData.ModelFiles;
+
                 fs << "acitFiles" << m_ConfigData.AcitFiles;
 
                 fs.release();

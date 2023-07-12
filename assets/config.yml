@@ -1,7 +1,5 @@
 %YAML:1.0
 ---
-alphaForeground: 1.0000000149011612e-01
-alphaBackground: 2.0000000298023224e-01
 zn: 9.9999997473787516e-05
 zf: 4000.
 histOffset: 100
@@ -35,12 +33,6 @@ groundTruthPoses:
    - [ 1.85747266e-01, -4.76315729e-02, -9.81413007e-01, -4.00147825e-01,
        9.08572972e-01, -1.19829834e-01, 8.97417665e-01, 4.14981604e-01,
        1.49699569e-01, 6.66959509e-02, -1.05816480e-02, 7.78000727e-02 ]
-   - [ -5.42542815e-01, 8.39947045e-01, -1.11253709e-02, 5.06054997e-01,
-       3.16238910e-01, -8.02426398e-01, -6.70481861e-01, -4.40981954e-01,
-       -5.96643448e-01, -1.26680557e-03, 4.37926613e-02, 2.52720535e-01 ]
-   - [ 9.84866619e-01, -4.03894819e-02, 1.68541461e-01, -1.62771076e-01,
-       1.18437737e-01, 9.79524612e-01, -5.95245212e-02, -9.92136419e-01,
-       1.10068895e-01, 0., 0., 1.39999986e-01 ]
 modelFiles:
    - "/home/tpp/IBOIS/TTool/assets/toolheads/circular_saw_blade_makita_190/model.obj"
    - "/home/tpp/IBOIS/TTool/assets/toolheads/chain_saw_blade_f_250/model.obj"
@@ -52,12 +44,12 @@ modelFiles:
    - "/home/tpp/IBOIS/TTool/assets/toolheads/brad_point_drill_bit_20_150/model.obj"
    - "/home/tpp/IBOIS/TTool/assets/toolheads/spade_drill_bit_25_150/model.obj"
 acitFiles:
-   - "/home/as/augmented-carpentry/deps/TTool/assets/toolheads/twist_drill_bit_32_165/metadata.acit"
-   - "/home/as/augmented-carpentry/deps/TTool/assets/toolheads/brad_point_drill_bit_20_150/metadata.acit"
-   - "/home/as/augmented-carpentry/deps/TTool/assets/toolheads/self_feeding_bit_40_90/metadata.acit"
-   - "/home/as/augmented-carpentry/deps/TTool/assets/toolheads/spade_drill_bit_25_150/metadata.acit"
-   - "/home/as/augmented-carpentry/deps/TTool/assets/toolheads/saber_saw_blade_makita_t/metadata.acit"
-   - "/home/as/augmented-carpentry/deps/TTool/assets/toolheads/auger_drill_bit_20_235/metadata.acit"
-   - "/home/as/augmented-carpentry/deps/TTool/assets/toolheads/self_feeding_bit_50_90/metadata.acit"
-   - "/home/as/augmented-carpentry/deps/TTool/assets/toolheads/chain_saw_blade_f_250/metadata.acit"
-   - "/home/as/augmented-carpentry/deps/TTool/assets/toolheads/circular_saw_blade_makita_190/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/twist_drill_bit_32_165/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/brad_point_drill_bit_20_150/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_40_90/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/spade_drill_bit_25_150/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/saber_saw_blade_makita_t/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/auger_drill_bit_20_235/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_50_90/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/chain_saw_blade_f_250/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/circular_saw_blade_makita_190/metadata.acit"
