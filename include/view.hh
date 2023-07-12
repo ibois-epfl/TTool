@@ -57,7 +57,6 @@ public:
 	cv::Matx44f GetCalibrationMatrix();
 
 	void RenderSilhouette(std::shared_ptr<Model> model, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
-	void RenderSilhouette(std::vector<std::shared_ptr<Model>> models, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
 
 	void ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid);
 
@@ -66,7 +65,7 @@ public:
 	cv::Mat DownloadFrame(View::FrameType type);
 
 	void destroy();
-
+	
 private:
 	static View *instance;
 	

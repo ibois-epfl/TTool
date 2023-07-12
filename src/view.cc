@@ -23,9 +23,9 @@ View::View(void)
 
 View::~View(void)
 {
-	// glDeleteTextures(1, &colorTextureID);
-	// glDeleteTextures(1, &depthTextureID);
-	// glDeleteFramebuffers(1, &frameBufferID);
+	glDeleteTextures(1, &colorTextureID);
+	glDeleteTextures(1, &depthTextureID);
+	glDeleteFramebuffers(1, &frameBufferID);
 
 	// delete phongblinnShaderProgram;
 	// delete normalsShaderProgram;
@@ -36,13 +36,17 @@ View::~View(void)
 void View::destroy()
 {
 	// doneCurrent();
+	projectionMatrix = Matx44f::eye();
+	lookAtMatrix = Matx44f::eye();
+	calibrationMatrices.clear();
+	m_IsInitialized = false;
 
-	// glBindTexture(GL_TEXTURE_2D, 0);
-	// glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// delete instance;
-	// instance = NULL;
+	delete instance;
+	instance = NULL;
 }
 
 Matx44f View::GetCalibrationMatrix()
@@ -69,12 +73,8 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 
 	this->numLevels = numLevels;
 
-	projectionMatrix = Transformations::perspectiveMatrix(K, width, height, zNear, zFar, true);
-	LOG(INFO) << "Projection matrix: " << projectionMatrix;
+	projectionMatrix = Transformations::perspectiveMatrix(K, width, height, this->zn, this->zf, true);
 
-	LOG(INFO) << "Initializing View...";
-
-	LOG(INFO) << "Creating window...";
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
 	
@@ -153,12 +153,7 @@ int View::getLevel()
 
 bool View::initRenderingBuffers()
 {
-	glGenVertexArrays(1, &m_VAO);
-	glGenVertexArrays(1, &m_VAO);
-	glGenVertexArrays(1, &m_VAO);
-	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
-	std::cout << "VAO ID: " << m_VAO << std::endl;
 
 	glGenFramebuffers(1, &frameBufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
@@ -195,14 +190,14 @@ static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 	return (pt(0) < width && pt(1) < height && pt(0) >= 0 && pt(1) >= 0);
 }
 
-void View::RenderSilhouette(vector<shared_ptr<Model>> models, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
-{
-	return;
-}
 void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
 {
-	glViewport(0, 0, width, height);
+	glBindVertexArray(m_VAO);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+	glEnable(GL_DEPTH);
+	glEnable(GL_DEPTH_TEST);
 
+	glViewport(0, 0, width, height);
 	if (invertDepth)
 	{
 		glClearDepth(1.0f);
@@ -353,5 +348,7 @@ Mat View::DownloadFrame(View::FrameType type)
 		res = Mat::zeros(height, width, CV_8UC1);
 		break;
 	}
+	// glBindVertexArray(0);
+	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	return res;
 }

@@ -50,12 +50,10 @@ void Tracker::ToggleTracking(int objectIndex, bool undistortedFrame) {
 		return;
 
 	if (!objects[objectIndex]->isInitialized()) {
-		std::cout << "Initializing object " << objects[objectIndex]->getModelID() << std::endl;
 		objects[objectIndex]->initialize();
 		initialized = true;
 	}
 	else {
-		std::cout << "Resetting object " << objects[objectIndex]->getModelID() << std::endl;
 		objects[objectIndex]->reset();
 
 		initialized = false;
