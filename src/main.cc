@@ -160,7 +160,7 @@ int main(int argc, char **argv)
 
             auto ti = cv::getTickCount();
 
-            ttool->RunOnAFrame(cameraPtr->image());
+            ttool->RunOnAFrame(cameraPtr->Image());
 
             auto tf = cv::getTickCount();
             auto t = (tf - ti) / cv::getTickFrequency();

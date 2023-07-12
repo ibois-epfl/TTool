@@ -14,114 +14,114 @@ class Model;
 class Viewer
 {
 public:
-	virtual void UpdateViewer(int save_index, int fps) = 0;
+	/**
+	 * @brief Update the viewer with the new frame and the current model
+	 * 
+	 * @param frameID current frame ID (used for saving images and printing it on the frame)
+	 * @param fps     current fps (used for printing it on the frame)
+	 */
+	virtual void UpdateViewer(int frameID, int fps) = 0;
+
+	/**
+	 * @brief Set the Image Save Path object and toggle saving images, which save the current frame as an image to be processed as a video later
+	 * 
+	 * @param path 
+	 */
 	void StartSavingImages(const std::filesystem::path &path);
+	/**
+	 * @brief Stop saving images
+	 * 
+	 */
 	void StopSavingImages();
 
-	void set_display_images(bool dispaly_images);
+	/**
+	 * @brief toggle whether to display images on the viewer or not
+	 * 
+	 * @param displayImages 
+	 */
+	void SetDisplayImage(bool displayImages);
 
-	void UpdateEvent(ttool::EventType event)
-	{
-		m_Event = event;
-	}
+	/**
+	 * @brief Update the event of the viualizer (i.e. the state of the program)
+	 * 
+	 * @param event 
+	 */
+	void UpdateEvent(ttool::EventType event) { m_Event = event; }
 
-	void DrawInterface(cv::Mat frame)
-	{
-		cv::Scalar color(25, 25, 125);
+	/**
+	 * @brief Draw the information on the frame, according to the current event (i.e. the state of the program)
+	 * 
+	 * @param frame 
+	 */
+	void DrawInterface(cv::Mat frame);
 
-		cv::Point statusPosition(5, 40);
-		if (m_Event == ttool::EventType::ReadyLiveCamera)
-		{
-			cv::putText(frame, "Tracking Stopped, press P to continue...", statusPosition, cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-		}
-		else if (m_Event == ttool::EventType::PoseInput)
-		{
-			cv::putText(frame, "Pose Input Mode, adjust with Keymaps, press P to start Tracking...", statusPosition, cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-		}
-		else if (m_Event == ttool::EventType::Tracking)
-		{
-			cv::putText(frame, "Tracking..., press q to stop", statusPosition, cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-		}
-
-		if (m_ShowKeymaps)
-		{
-			cv::putText(frame, "Keymaps:", cv::Point(5, 60), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			// Translation
-			cv::putText(frame, "W: Move model up", cv::Point(5, 80), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "S: Move model down", cv::Point(5, 100), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "A: Move model left", cv::Point(5, 120), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "D: Move model right", cv::Point(5, 140), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "Q: Move model forward", cv::Point(5, 160), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "E: Move model backward", cv::Point(5, 180), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			// Rotation
-			cv::putText(frame, "I: Rotate model up", cv::Point(5, 200), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "K: Rotate model down", cv::Point(5, 220), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "J: Rotate model left", cv::Point(5, 240), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "L: Rotate model right", cv::Point(5, 260), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "U: Rotate model clockwise", cv::Point(5, 280), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "O: Rotate model counterclockwise", cv::Point(5, 300), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			// Model Management
-			cv::putText(frame, "UP: Change model", cv::Point(5, 320), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "R: Reset model to ground truth", cv::Point(5, 340), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "P: Set current model pose as initial", cv::Point(5, 360), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "Y: Set current model pose as initial, and save to config file", cv::Point(5, 380), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			// Tracking
-			cv::putText(frame, "Q: Stop tracking (while tracking)", cv::Point(5, 400), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "P: Start tracking (while not tracking)", cv::Point(5, 420), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-		}
-		else
-		{
-			cv::putText(frame, "Press H to show keymaps", cv::Point(5, 60), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-		}
-	}
-
-	void ToggleShowKeymaps()
-	{
-		m_ShowKeymaps = !m_ShowKeymaps;
-	}
-
-	void PrintFPS(int fps, cv::Mat &frame)
-	{
-		std::stringstream sstr;
-		sstr << "FPS" << std::setw(3) << std::setfill('0') << fps;
-		cv::putText(frame, sstr.str(), cv::Point(frame.size[1] - 150, 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(0, 255, 0), 1);
-	}
+	/**
+	 * @brief Toggle the show keymaps
+	 * 
+	 */
+	void ToggleShowKeymaps() { m_ShowKeymaps = !m_ShowKeymaps; }
 
 protected:
+	/**
+	 * @brief Print the current FPS on the frame
+	 * 
+	 * @param fps	fps
+	 * @param frame frame to print the fps on
+	 */
+	void PrintFPS(int fps, cv::Mat &frame);
+
+	/**
+	 * @brief Print the current frame ID on the frame
+	 * 
+	 * @param fid	frame ID
+	 * @param frame frame to print the frame ID on
+	 */
 	void PrintID(int fid, cv::Mat &frame);
+
+	/**
+	 * @brief Show the image on the viewer, which is the cv::imshow function, but we show the frame on to the same window everytime
+	 * 
+	 * @param frame 
+	 */
 	void ShowImage(const cv::Mat &frame);
 
-	std::shared_ptr<ttool::standaloneUtils::Camera> camera_ptr_ = nullptr;
-	std::string name_{};
-	std::filesystem::path save_path_{};
-	bool display_images_ = true;
-	bool save_images_ = false;
-	bool initialized_ = false;
-	
+	std::shared_ptr<ttool::standaloneUtils::Camera> m_CameraPtr = nullptr;
+	std::string m_WindowName{};
+	std::filesystem::path m_SavePath{};
+	bool m_DisplayImages = true;
+	bool m_SaveImages = false;
+	bool m_IsInitialzed = false;
+
 	bool m_ShowKeymaps = false;
 	ttool::EventType m_Event = ttool::EventType::None;
 };
 
-class ImageViewer : public Viewer
-{
-public:
-	void Init(const std::string &name, std::shared_ptr<ttool::standaloneUtils::Camera> camera_ptr);
-	ImageViewer() = default;
-
-	void UpdateViewer(int save_index, int fps);
-};
-
 class View;
 
+/**
+ * @brief Unified viewer shows the model and the cameraPtr on the same window
+ * 
+ */
 class UnifiedViewer : public Viewer
 {
 public:
-	void Init(const std::string &name, View *view, std::shared_ptr<Model> object, std::shared_ptr<Camera> camera);
+	/**
+	 * @brief Initialize the viewer
+	 * 
+	 * @param name 		name of the window
+	 * @param view 		view object to render the model
+	 * @param object 	current model to be rendered
+	 * @param cameraPtr camera pointer object to render the current frame
+	 */
+	void Init(const std::string &name, View *view, std::shared_ptr<Model> object, std::shared_ptr<Camera> cameraPtr);
 	UnifiedViewer() = default;
 	void StopSavingImages();
 
-	void UpdateViewer(int fps, int save_index);
+	void UpdateViewer(int frameID, int fps) override;
+
+private:
 	cv::Mat DrawOverlay(View *view, std::shared_ptr<Model> object, const cv::Mat &frame);
+
 protected:
 	View *renderer_;
 	std::shared_ptr<Model> objects_;

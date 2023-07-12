@@ -24,7 +24,7 @@ namespace ttool::standaloneUtils
 
             m_CameraPtr = cameraPtr;
 
-            m_viewerPtr = std::make_shared<UnifiedViewer>();
+            m_ViewerPtr = std::make_shared<UnifiedViewer>();
 
         }
 
@@ -50,7 +50,7 @@ namespace ttool::standaloneUtils
         void SetModels()
         {
             View* view = View::Instance();
-            m_viewerPtr->Init("Viewer", view, m_ModelManagerPtr->GetObject(), m_CameraPtr);
+            m_ViewerPtr->Init("Viewer", view, m_ModelManagerPtr->GetObject(), m_CameraPtr);
         }
 
         /**
@@ -60,24 +60,39 @@ namespace ttool::standaloneUtils
          */
         void UpdateVisualizer(int frameId, int fps = -1)
         {
-            m_viewerPtr->UpdateViewer(frameId, fps);
+            m_ViewerPtr->UpdateViewer(frameId, fps);
         }
 
+        /**
+         * @brief Toggle the show keymaps
+         * 
+         */
         void ToggleShowKeymaps()
         {
-            m_viewerPtr->ToggleShowKeymaps();
+            m_ViewerPtr->ToggleShowKeymaps();
         }
 
+        /**
+         * @brief Update the event of the viualizer (i.e. the state of the program)
+         * 
+         * @param event 
+         */
         void UpdateEvent(ttool::EventType event)
         {
-            m_viewerPtr->UpdateEvent(event);
+            m_ViewerPtr->UpdateEvent(event);
         }
 
+        /**
+         * @brief Toggle the saving of images
+         * 
+         * This is useful for debugging, when running a program and you want to save the images which will be processed as a video later
+         * 
+         */
         void ToggleSavingImages()
         {
             if (m_IsSavingImages)
             {
-                m_viewerPtr->StopSavingImages();
+                m_ViewerPtr->StopSavingImages();
                 m_IsSavingImages = false;
             }
             else
@@ -93,12 +108,12 @@ namespace ttool::standaloneUtils
                 std::filesystem::create_directory(path);
                 std::filesystem::create_directory(path + "/raw/");
 
-                m_viewerPtr->StartSavingImages(path);
+                m_ViewerPtr->StartSavingImages(path);
             }
         }
 
     private:
-        std::shared_ptr<UnifiedViewer> m_viewerPtr;
+        std::shared_ptr<UnifiedViewer> m_ViewerPtr;
         std::shared_ptr<Camera> m_CameraPtr;
         std::shared_ptr<DModelManager> m_ModelManagerPtr;
 

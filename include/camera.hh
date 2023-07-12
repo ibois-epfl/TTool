@@ -17,87 +17,103 @@
 namespace ttool::standaloneUtils
 {
 	class VideoLoaderCamera;
-	class Camera {
+	class Camera
+	{
 	public:
+		/**
+		 * @brief Construct a new Camera object from a video file or a directory of images
+		 * 
+		 * @param frames 
+		 */
 		static Camera* BuildCamera(const std::string& frames);
+
+		/**
+		 * @brief Construct a new Camera object from a webcam
+		 * 
+		 * @param cameraID 
+		 */
 		static Camera* BuildCamera(int cameraID);
 
+		/**
+		 * @brief Update the camera and return true if a new frame is available
+		 * 
+		 * @return true 
+		 * @return false 
+		 */
 		virtual bool UpdateCamera() = 0;
 
-		const cv::Mat& image() const;
+		/**
+		 * @brief Get the current frame image
+		 * 
+		 * @return const cv::Mat& 
+		 */
+		const cv::Mat& Image() const;
 
-		void preprocess();
-
-		void SetK(cv::Matx33f K)
-		{
-			m_K = K;
-		}
-
-		cv::Matx33f GetK()
-		{
-			return m_K;
-		}
-
-		void SetDistCoeff(std::vector<float> distCoeff)
-		{
-			m_distCoeff = distCoeff;
-		}
-
-		void SetPreprocessSize(int width, int height)
-		{
-			m_preprocessWidth = width;
-			m_preprocessHeight = height;
-		}
-
-		int GetPreprocessWidth()
-		{
-			return m_preprocessWidth;
-		}
-
-		int GetPreprocessHeight()
-		{
-			return m_preprocessHeight;
-		}
-
+		/**
+		 * @brief Intialize camera parameters from a file
+		 * 
+		 * @param filePath is a path to the calibration YAML file
+		 */
 		void ReadFromFile(std::string filePath);
 
-		int width = -1;
-		int height = -1;
-	protected:
-		cv::Mat image_;
-		int frame_index_ = 0;
+	public: // Getters and Setters
+		void SetK(cv::Matx33f K) { m_K = K; }
 
+		cv::Matx33f GetK() { return m_K; }
+
+		void SetDistCoeff(std::vector<float> distCoeff) { m_DistCoeff = distCoeff; }
+
+		void SetPreprocessSize(int width, int height) { m_PreprocessWidth = width; m_PreprocessHeight = height; }
+
+		int GetPreprocessWidth() { return m_PreprocessWidth; }
+
+		int GetPreprocessHeight() { return m_PreprocessHeight; }
+
+	protected:
+		void Preprocess();
+
+	public:
+		int Width = -1;
+		int Height = -1;
+
+	protected:
+		int m_FrameIndex = 0;
+		cv::Mat m_Image;
 		cv::Matx33f m_K;
-		std::vector<float> m_distCoeff;
-		int m_preprocessWidth;
-		int m_preprocessHeight;
+		std::vector<float> m_DistCoeff;
+		int m_PreprocessWidth;
+		int m_PreprocessHeight;
 	};
 
 	class VideoLoaderCamera: public Camera {
 	public:
-		VideoLoaderCamera(const std::string& frames) {
-			if (cap_.open(frames)) {
-				width = (int)cap_.get(cv::CAP_PROP_FRAME_WIDTH);
-				height = (int)cap_.get(cv::CAP_PROP_FRAME_HEIGHT);
+		VideoLoaderCamera(const std::string& frames)
+		{
+			if (Capture.open(frames))
+			{
+				Width = (int)Capture.get(cv::CAP_PROP_FRAME_WIDTH);
+				Height = (int)Capture.get(cv::CAP_PROP_FRAME_HEIGHT);
 			}
 		}
 
-		VideoLoaderCamera(int cam_id) {
-			if (cap_.open(cam_id)) {
-				width = (int)cap_.get(cv::CAP_PROP_FRAME_WIDTH);
-				height = (int)cap_.get(cv::CAP_PROP_FRAME_HEIGHT);
+		VideoLoaderCamera(int cam_id)
+		{
+			if (Capture.open(cam_id))
+			{
+				Width = (int)Capture.get(cv::CAP_PROP_FRAME_WIDTH);
+				Height = (int)Capture.get(cv::CAP_PROP_FRAME_HEIGHT);
 			}
 		}
 
 		virtual bool UpdateCamera() override {
 			bool ret = false;
-			ret = cap_.read(image_);
-			preprocess();
-			frame_index_++;
+			ret = Capture.read(m_Image);
+			Preprocess();
+			m_FrameIndex++;
 			return ret;
 		}
 
-		cv::VideoCapture cap_;
+		cv::VideoCapture Capture;
 	};
 
 	static int only_png(const struct dirent *entry) {
@@ -125,45 +141,50 @@ namespace ttool::standaloneUtils
 		return strcoll((*pa)->d_name, (*pb)->d_name);
 	}
 
-	class ImageLoaderCamera: public Camera{
+	class ImageLoaderCamera: public Camera
+	{
 	public:
-		ImageLoaderCamera(const std::string& image_dir) {
-			image_dir_ = image_dir;
-			frame_count_ = scandir(image_dir.c_str(), &files, only_png, alphasort);
+		ImageLoaderCamera(const std::string& image_dir)
+		{
+			ImageDir = image_dir;
+			FrameCount = scandir(image_dir.c_str(), &Files, only_png, alphasort);
 
 			std::stringstream stm;
-			stm << image_dir << '/' << files[0]->d_name;
+			stm << image_dir << '/' << Files[0]->d_name;
 			cv::Mat frame = cv::imread(stm.str());
-			if (!frame.empty()) {
-				width = frame.cols;
-				height = frame.rows;
+			if (!frame.empty())
+			{
+				Width = frame.cols;
+				Height = frame.rows;
 			}
 		}
 
-		~ImageLoaderCamera() {
-			for (int i = 0; i < frame_count_; i++) {
-				free (files[i]);
+		~ImageLoaderCamera()
+		{
+			for (int i = 0; i < FrameCount; i++) {
+				free (Files[i]);
 			}
-			free (files);
+			free (Files);
 		}
 
-		virtual bool UpdateCamera() override {
-			if (frame_index_ == frame_count_)
+		virtual bool UpdateCamera() override
+		{
+			if (m_FrameIndex == FrameCount)
 				return false;
 
 			std::stringstream stm;
-			stm << image_dir_ << '/' << files[frame_index_]->d_name;
-			image_ = cv::imread(stm.str());
-			preprocess();
-			if (image_.empty())
+			stm << ImageDir << '/' << Files[m_FrameIndex]->d_name;
+			m_Image = cv::imread(stm.str());
+			Preprocess();
+			if (m_Image.empty())
 				return false;
 
-			frame_index_++;
+			m_FrameIndex++;
 			return true;
 		}
 
-		std::string image_dir_;
-		struct dirent **files;
-		int frame_count_;
+		std::string ImageDir;
+		struct dirent **Files;
+		int FrameCount;
 	};
 }
