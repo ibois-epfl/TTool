@@ -57,7 +57,6 @@ public:
 	cv::Matx44f GetCalibrationMatrix();
 
 	void RenderSilhouette(std::shared_ptr<Model> model, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
-	void RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, const cv::Point3f color = cv::Point3f(1.0, 0.5, 0.0), bool drawAll = false);
 
 	void ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid);
 
@@ -97,21 +96,10 @@ private:
 
 	cv::Vec3f lightPosition;
 
-	GLuint m_PhongblinnShaderProgram;
-	GLuint m_PhongblinnMVPMatrixID;
-	GLuint m_PhongblinnMVMatrixID;
-	GLuint m_PhongblinnNormalMatrixID;
-	GLuint m_PhongblinnLightPosition1ID;
-	GLuint m_PhongblinnLightPosition2ID;
-	GLuint m_PhongblinnLightPosition3ID;
-	GLuint m_PhongblinnShininessID;
-	GLuint m_PhongblinnAlphaID;
-	GLuint m_PhongblinnColorID;
-
-	GLuint m_SilhouetteShaderProgram;
-	GLuint m_SilhouetteMatrixId;
-	GLuint m_SilhouetteAlphaId;
-	GLuint m_SilhouetteColorId;
+	GLuint silhouetteShaderProgram;
+	GLuint m_MatrixId;
+	GLuint m_AlphaId;
+	GLuint m_ColorId;
 	GLuint m_VAO;
 
 	bool initRenderingBuffers();
