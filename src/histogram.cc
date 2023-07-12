@@ -1,5 +1,4 @@
 #include <opencv2/highgui.hpp>
-#include "global_param.hh"
 #include "view.hh"
 #include "search_line.hh"
 #include "histogram.hh"
