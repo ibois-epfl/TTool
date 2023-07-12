@@ -1,3 +1,0 @@
-[submodule "deps/glew"]
-	path = deps/glew
-	url = git@github.com:ibois-epfl/glew.git
