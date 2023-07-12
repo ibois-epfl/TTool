@@ -123,8 +123,10 @@ where,
 - `[-t,--trackPose]`: it saves all poses and objects in a log file
 
 ### Calibration file
-A calibration file contains the information of the camera matrix of the camera device to be used with the TTool
-This is an example of how a [calibration file](./assets/calibration_orange_B_1280_720_r.yml) looks like
+A calibration file contains the information of the camera device to be used with the TTool.
+This includes the camera image size, camera matrix and distortion coefficients of the camera.
+To obtain this file, please refer to this [link](https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html). 
+This is an example of how a [calibration file](./assets/calibration_orange_B_1280_720_r.yml) looks like.
 ```yml
 %YAML:1.0
 ---
@@ -148,7 +150,8 @@ distortion_coefficients: !!opencv-matrix
 ```
 
 ### Configuration File
-A configuration file contains the information about the View, SLET, Model and Augmented Carpentry configuration
+A configuration file contains the information about the View, SLET, Model and Augmented Carpentry configuration.
+The comments indicate where a group of parameters belongs.
 
 ```yml
 %YAML:1.0
@@ -222,22 +225,18 @@ acitFiles:
 
 ```
 
-The groundTruthPoses is in the format of 
+The groundTruthPoses is in the format of 3x3 rotation matrix followed by a vector of a translation matrix.
 ```
-[
-  3x3 Rotation matrix;
-  3 Translation vector
-]
+{
+  R00, R01, R02,
+  R10, R11, R12,
+  R20, R21, R22,
+  T_x, T_y, T_z,
+}
+```
 
-[
-  R00 R01 R02
-  R10 R11 R12
-  R20 R21 R22
-  T_x T_y T_z
-]
-```
 ## TTool API - where to start using / developing
-In order to use this project as an API or start developing from this project, please start from [ttool.h](./include/ttool.hh). This the the header of the class `ttool` from which you can make a call to all the APIs.
+In order to use this project as an API or start developing from this project, please start from [ttool.h](./include/ttool.hh). This is the header of the class `ttool` from which you can make a call to all the APIs.
 
 In order to see how [ttool.h](./include/ttool.hh) is being used, we created a standalone program for this project. This executable file is [main.cc](./src/main.cc). It is a good demonstration of how `ttool` is being used a called.
 
@@ -261,7 +260,7 @@ cv::Matx44f pose = ttool->GetPose();
 ```
 
 ### Standalone notes
-Now that the `ttool` runs alone, there might be no GLFW initialization/OpenGL context that the SLET tracking can run. Thus, in the `main.cc`, it calls intailization and termination before and after using `ttool`. 
+Now that the `ttool` runs alone, there might be no GLFW initialization/OpenGL context that the SLET tracking can run. Thus, in the `main.cc`, it calls intailization and termination before and after using `ttool` or using any OpenGL. 
 
 🚧 **THIS APPLIES TO EVERTHING RELATED TO OPENGL, INCLUDING the ttool::standaloneUtils::Visualizer** 🚧
 
@@ -281,7 +280,7 @@ auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
 ttool::standaloneUtils::TerminateStandalone(GLFWWindow);
 ```
 
-Consequently, we can see the `main.cc` of the standalone program being such as this
+Consequently, we can see the `main.cc` of the standalone program be the following
 ```cpp
 #include "ttool.hh"
 #include "util.hh"
@@ -311,9 +310,9 @@ ttool::standaloneUtils::TerminateStandalone(GLFWWindow);
 
 There are other `ttool::standaloneUtils` that might be useful, but not vital for TTool API. This includes `ttool::standaloneUtils::Camera` and `ttool::standaloneUtils::Visualizer`.
 
-`ttool::standaloneUtils::Camera` is modified from SLET for managing the camera and undistort the frame with the calibration file.
+`ttool::standaloneUtils::Camera` was modified from SLET for managing the camera and undistort the frame with the calibration file.
 
-`ttool::standaloneUtils::Visualizer` is modified the user interface of the standalone program that shows all the keymap help, useful information and most importantly, visualize the 3D model to see the tracker.
+`ttool::standaloneUtils::Visualizer` was modified the user interface of the standalone program that shows all the keymap help, useful information and most importantly, visualize the 3D model to see the tracker.
 
 How to initialize and use them can also be seen in the `main.cc`.
 ## CI/CD
