@@ -20,8 +20,8 @@ RBOTHist::RBOTHist(const std::vector<std::shared_ptr<Object3D>>& objects) {
 }
 
 void RBOTHist::Update(const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, int oid, float afg, float abg){
-	float zNear = view->getZNear();
-	float zFar = view->getZFar();
+	float zNear = view->GetZNear();
+	float zFar = view->GetZFar();
 	cv::Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
 
 	objs[oid]->getTCLCHistograms()->update(frame, mask_map, depth_map, K, zNear, zFar, afg, abg);
@@ -41,7 +41,7 @@ void RBOTHist::GetPixelProb(uchar rc, uchar gc, uchar bc, int x, int y, int oid,
 	float* histogramsFGData = (float*)localFG.ptr<float>();
 	float* histogramsBGData = (float*)localBG.ptr<float>();
 
-	int level = view->getLevel();
+	int level = view->GetLevel();
 	int upscale = pow(2, level);
 
 	int numHistograms = (int)centersIDs.size();
@@ -96,7 +96,7 @@ void RBOTHist::GetPixelProb(uchar rc, uchar gc, uchar bc, int x, int y, int oid,
 void RBOTHist::GetRegionProb(const cv::Mat& frame, int oid, cv::Mat& prob_map) {
 	prob_map = cv::Mat(frame.size(), CV_8UC1);
 
-	int level = view->getLevel();
+	int level = view->GetLevel();
 	int upscale = pow(2, level);
 	
 	std::shared_ptr<TCLCHistograms> tclcHistograms = objs[oid]->getTCLCHistograms();

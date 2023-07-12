@@ -17,7 +17,7 @@ namespace ttool::standaloneUtils
             cv::Matx33f K = cameraPtr->GetK();
 
             View* view = View::Instance();
-            view->init(K, cameraPtr->GetPreprocessWidth(), cameraPtr->GetPreprocessHeight(), zn, zf, 4);
+            view->Initialize(K, cameraPtr->GetPreprocessWidth(), cameraPtr->GetPreprocessHeight(), zn, zf, 4);
 
             m_ModelManagerPtr = modelManagerPtr;
             m_ModelManagerPtr->InitModels();

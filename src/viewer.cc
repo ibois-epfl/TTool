@@ -140,9 +140,9 @@ void UnifiedViewer::UpdateViewer(int frameID, int fps)
 cv::Mat UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<Model> object, const cv::Mat &frame)
 {
 	// render the models with phong shading
-	view->setLevel(0);
+	view->SetLevel(0);
 
-	view->RenderShaded(object, GL_FILL, cv::Point3f(1.0, 0.5, 0.0), true);
+	view->RenderShaded(object, GL_FILL, cv::Point3f(1.0, 0.5, 0.0));
 
 	// download the rendering to the CPU
 	cv::Mat rendering = view->DownloadFrame(View::RGB);
@@ -165,7 +165,7 @@ cv::Mat UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<Model> object, co
 			}
 		}
 
-	view->setLevel(0);
+	view->SetLevel(0);
 	view->RenderSilhouette(object, GL_FILL);
 
 	cv::Mat depth_map = view->DownloadFrame(View::DEPTH);

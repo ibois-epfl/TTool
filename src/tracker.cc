@@ -217,7 +217,7 @@ void TrackerBase::PostProcess(cv::Mat frame) {
 void TrackerBase::UpdateHist(cv::Mat frame) {
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
-		view->setLevel(0);
+		view->SetLevel(0);
 		view->RenderSilhouette(objects[0], GL_FILL);
 		cv::Mat masks_map = view->DownloadFrame(View::MASK);
 		cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
@@ -240,7 +240,7 @@ void SLTracker::GetBundleProb(const cv::Mat& frame, int oid) {
 	std::vector<std::vector<cv::Point2f> >& bundle_prob = search_line->bundle_prob;
 	bundle_prob.clear();
 
-	int level = view->getLevel();
+	int level = view->GetLevel();
 	int upscale = pow(2, level);
 	std::shared_ptr<TCLCHistograms> tclcHistograms = objects[oid]->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
@@ -322,7 +322,7 @@ void RBOTHist::GetBundleProb(SearchLine* search_line, const cv::Mat& frame, int 
 	std::vector<std::vector<cv::Point2f> >& bundle_prob = search_line->bundle_prob;
 	bundle_prob.clear();
 
-	int level = view->getLevel();
+	int level = view->GetLevel();
 	int upscale = pow(2, level);
 
 	std::shared_ptr<TCLCHistograms> tclcHistograms = objs[oid]->getTCLCHistograms();

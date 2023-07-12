@@ -35,8 +35,8 @@ void SLETracker::ComputeJac(
 	float* JT = JTM.val;
 	float* wJTJ = wJTJM.val;
 
-	float zf = view->getZFar();
-	float zn = view->getZNear();
+	float zf = view->GetZFar();
+	float zn = view->GetZNear();
 	cv::Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
     auto K_inv = K.inv();
     auto K_inv_data = K_inv.val;
@@ -215,7 +215,7 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 
 	int width = view->GetWidth();
 	int height = view->GetHeight();
-	view->setLevel(level);
+	view->SetLevel(level);
 	int numInitialized = 0;
 	for (int o = 0; o < objects.size(); o++) {
 		if (!objects[o]->isInitialized())
@@ -231,12 +231,12 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 
 		while (roi.area() < 3000 && level > 0) {
 			level--;
-			view->setLevel(level);
+			view->SetLevel(level);
 			roi = Compute2DROI(objects[o], cv::Size(width / pow(2, level), height / pow(2, level)), 8);
 		}
 	}
 
-	view->setLevel(level);
+	view->SetLevel(level);
 	view->RenderSilhouette(objects[0], GL_FILL);
 	cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 
@@ -323,7 +323,7 @@ void SLETracker::EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) {
 void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, const std::vector<cv::Mat>& imagePyramid, int level, int sl_len, int sl_seg, int run_type) {
     int width = view->GetWidth();
     int height = view->GetHeight();
-    view->setLevel(level);
+    view->SetLevel(level);
     int numInitialized = 0;
     for (int o = 0; o < objects.size(); o++) {
         if (!objects[o]->isInitialized())
@@ -341,7 +341,7 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 
         while (roi.area() < 3000 && level > 0) {
             level--;
-            view->setLevel(level);
+            view->SetLevel(level);
             roi = Compute2DROI(objects[o], cv::Size(width / pow(2, level), height / pow(2, level)), 8);
         }
         if (roi.area() < 3000) {
@@ -349,7 +349,7 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
         }
     }
 
-    view->setLevel(level);
+    view->SetLevel(level);
     view->RenderSilhouette(objects[0], GL_FILL);
     cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 

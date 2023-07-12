@@ -23,8 +23,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
+
 namespace ttool::gl
 {
+    /**
+     * @brief Convert a cv::Mat to glm::mat4
+     * 
+     * @param cvMat 
+     * @param glmMat 
+     */
     inline void CvtCvMat2GlmMat(const cv::Mat &cvMat, glm::mat4 &glmMat)
     {
         for (int i = 0; i < 4; i++) {
@@ -37,11 +45,22 @@ namespace ttool::gl
 
 namespace ttool::standaloneUtils
 {
+    /**
+     * @brief Callback function for GLFW error
+     * 
+     * @param error 
+     * @param description 
+     */
     inline void error_callback(int error, const char* description)
     {
         fprintf(stderr, "Error: %s\n", description);
     }
 
+    /**
+     * @brief Initialize GLFW and GLEW
+     * 
+     * @return GLFWwindow* 
+     */
     inline static GLFWwindow* InitializeStandalone()
     {
         // GLEW initialization
@@ -80,20 +99,25 @@ namespace ttool::standaloneUtils
         return m_GLFWWindow;
     }
 
+    /**
+     * @brief Terminate GLFW
+     * 
+     * @param m_GLFWWindow 
+     */
     inline static void TerminateStandalone(GLFWwindow* m_GLFWWindow)
     {
         glfwDestroyWindow(m_GLFWWindow);
         glfwTerminate();
     }
 }
-namespace tk {
-
-inline bool IsFileExist (const std::string& name) {
-    std::ifstream f(name.c_str());
-    return f.good();
+namespace tk
+{
+    inline bool IsFileExist (const std::string& name)
+    {
+        std::ifstream f(name.c_str());
+        return f.good();
+    }
 }
-
-} // namespace tk
 
 namespace ttool::standaloneUtils
 {
