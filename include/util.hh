@@ -1,5 +1,13 @@
 #pragma once
 
+#define GLFW_INCLUDE_NONE
+#include <GL/glew.h>
+
+#include <GLFW/glfw3.h>
+#include <GL/gl.h>
+
+#include <glm/glm.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -13,6 +21,8 @@
 #include <opencv2/imgproc.hpp>
 #include <glog/logging.h>
 
+#include <stdlib.h>
+#include <stdio.h>
 namespace ttool::gl
 {
     inline void CvtCvMat2GlmMat(const cv::Mat &cvMat, glm::mat4 &glmMat)
@@ -25,6 +35,57 @@ namespace ttool::gl
     }
 }
 
+namespace ttool::standaloneUtils
+{
+    inline void error_callback(int error, const char* description)
+    {
+        fprintf(stderr, "Error: %s\n", description);
+    }
+
+    inline static GLFWwindow* InitializeStandalone()
+    {
+        // GLEW initialization
+        glfwSetErrorCallback(error_callback);
+        if (!glfwInit())
+            exit(EXIT_FAILURE);
+        
+        GLFWwindow* m_GLFWWindow;
+        const char* m_GlslVersion;
+        bool m_IsWindowOpen;
+
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+        glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, false);
+
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
+        m_GLFWWindow = glfwCreateWindow(640, 480, "", NULL, NULL);
+        if (m_GLFWWindow == NULL) {
+            std::cout << "Failed to create GLFW window" << std::endl;
+            glfwTerminate();
+            exit(EXIT_FAILURE);
+        }
+
+        glfwMakeContextCurrent(m_GLFWWindow);
+        glewExperimental = true;
+        if (glewInit() != GLEW_OK)
+        {
+            std::cout << "Failed to initialize GLEW" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        return m_GLFWWindow;
+    }
+
+    inline static void TerminateStandalone(GLFWwindow* m_GLFWWindow)
+    {
+        glfwDestroyWindow(m_GLFWWindow);
+        glfwTerminate();
+    }
+}
 namespace tk {
 
 inline bool IsFileExist (const std::string& name) {
