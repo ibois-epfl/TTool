@@ -29,7 +29,7 @@ View::~View(void)
 
 	// delete phongblinnShaderProgram;
 	// delete normalsShaderProgram;
-	// delete silhouetteShaderProgram;
+	// delete m_SilhouetteShaderProgram;
 	// delete surface;
 }
 
@@ -116,11 +116,24 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 	char* vertexFilePath = (char*)"assets/opengl/Silhouette.vs";
 	char* fragmentFilePath = (char*)"assets/opengl/Silhouette.fs";
 
-	silhouetteShaderProgram = LoadShaders(vertexFilePath, fragmentFilePath);
+	m_SilhouetteShaderProgram = LoadShaders(vertexFilePath, fragmentFilePath);
 	// Get a handle for our "MVP" uniform
-	m_MatrixId = glGetUniformLocation(silhouetteShaderProgram, "uMVPMatrix");
-	m_AlphaId = glGetUniformLocation(silhouetteShaderProgram, "uAlpha");
-	m_ColorId = glGetUniformLocation(silhouetteShaderProgram, "uColor");
+	m_SilhouetteMatrixId = glGetUniformLocation(m_SilhouetteShaderProgram, "uMVPMatrix");
+	m_SilhouetteAlphaId = glGetUniformLocation(m_SilhouetteShaderProgram, "uAlpha");
+	m_SilhouetteColorId = glGetUniformLocation(m_SilhouetteShaderProgram, "uColor");
+
+	// Phongblinn Shader
+	m_PhongblinnShaderProgram		= LoadShaders((char*)"assets/opengl/Phongblinn.vs", (char*)"assets/opengl/Phongblinn.fs");
+	m_PhongblinnMVPMatrixID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uMVPMatrix");
+	m_PhongblinnMVMatrixID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uMVMatrix");
+	m_PhongblinnNormalMatrixID		= glGetUniformLocation(m_PhongblinnShaderProgram, "uNormalMatrix");
+	m_PhongblinnLightPosition1ID	= glGetUniformLocation(m_PhongblinnShaderProgram, "uLightPosition1");
+	m_PhongblinnLightPosition2ID	= glGetUniformLocation(m_PhongblinnShaderProgram, "uLightPosition2");
+	m_PhongblinnLightPosition3ID	= glGetUniformLocation(m_PhongblinnShaderProgram, "uLightPosition3");
+	m_PhongblinnShininessID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uShininess");
+	m_PhongblinnAlphaID				= glGetUniformLocation(m_PhongblinnShaderProgram, "uAlpha");
+	m_PhongblinnColorID				= glGetUniformLocation(m_PhongblinnShaderProgram, "uColor");
+
 
 
 	angle = 0;
@@ -219,18 +232,18 @@ void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool inv
 		Matx44f modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
 
 		// Bind back to the main framebuffer
-        glUseProgram(silhouetteShaderProgram);
+        glUseProgram(m_SilhouetteShaderProgram);
         
 		// visualize camera
-        glUniformMatrix4fv(m_MatrixId, 1, GL_TRUE, modelViewProjectionMatrix.val);
-		glUniform1f(m_AlphaId, 1.0f);
+        glUniformMatrix4fv(m_SilhouetteMatrixId, 1, GL_TRUE, modelViewProjectionMatrix.val);
+		glUniform1f(m_SilhouetteAlphaId, 1.0f);
 
 		glm::vec3 color = glm::vec3((float)(model->getModelID()) / 255.0f, 0.0f, 0.0f);
-		glUniform3fv(m_ColorId, 1, &color[0]);
+		glUniform3fv(m_SilhouetteColorId, 1, &color[0]);
 
 		glPolygonMode(GL_FRONT_AND_BACK, polyonMode);
 
-		model->draw(silhouetteShaderProgram);
+		model->draw(m_SilhouetteShaderProgram);
 	}
 
 	glClearDepth(0.0f);
@@ -267,6 +280,51 @@ void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 		LOG(ERROR) << "WRONG IMAGE TYPE";
 	}
 }
+
+void View::RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, const cv::Point3f color, bool drawAll)
+{
+	glBindVertexArray(m_VAO);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+
+	glViewport(0, 0, width, height);
+
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+	if (model->isInitialized() || drawAll)
+	{
+		Matx44f pose = model->getPose();
+		Matx44f normalization = model->getNormalization();
+
+		Matx44f modelViewMatrix = lookAtMatrix * (pose * normalization);
+
+		Matx33f normalMatrix = modelViewMatrix.get_minor<3, 3>(0, 0).inv().t();
+
+		Matx44f modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
+
+		glUseProgram(m_PhongblinnShaderProgram);
+		glUniformMatrix4fv(m_PhongblinnMVMatrixID, 1, GL_TRUE, modelViewMatrix.val);
+		glUniformMatrix4fv(m_PhongblinnMVPMatrixID, 1, GL_TRUE, modelViewProjectionMatrix.val);
+		glUniformMatrix3fv(m_PhongblinnNormalMatrixID, 1, GL_TRUE, normalMatrix.val);
+		auto lightPosition1 = glm::vec3(0.1, 0.1, -0.02);
+		auto lightPosition2 = glm::vec3(-0.1, 0.1, -0.02);
+		auto lightPosition3 = glm::vec3(0.0, 0.0, 0.1);
+		glUniform3fv(m_PhongblinnLightPosition1ID, 1, &lightPosition1[0]);
+		glUniform3fv(m_PhongblinnLightPosition2ID, 1, &lightPosition2[0]);
+		glUniform3fv(m_PhongblinnLightPosition3ID, 1, &lightPosition3[0]);
+		glUniform1f(m_PhongblinnShininessID, 100.0f);
+		glUniform1f(m_PhongblinnAlphaID, 1.0f);
+
+		glm::vec3 colorGlm = glm::vec3(color.x, color.y, color.z);
+		glUniform3fv(m_PhongblinnColorID, 1, &colorGlm[0]);
+
+		glPolygonMode(GL_FRONT_AND_BACK, polyonMode);
+
+		model->draw(m_PhongblinnShaderProgram);
+	}
+
+	glFinish();
+}
+
 
 void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
 {

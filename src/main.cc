@@ -160,21 +160,7 @@ int main(int argc, char **argv)
     // main thread
     bool exit = false;
     if (isVideoRecording) {visualizerPtr->ToggleSavingImages();}
-    // FIXME: Test just what we have with the shader
     while (!exit)
-    {
-        cameraPtr->UpdateCamera();
-        auto frame = cameraPtr->image();
-        ttool->DrawSilhouette(frame);
-        cv::imshow("Test Draw Silhouette", frame);
-        cv::waitKey(1);
-        if (27 == cv::waitKey(1))
-        {
-            exit = true;
-        }
-    }
-
-    while (false && !glfwWindowShouldClose(m_GLFWWindow) && !exit)
     {
         int fid = 0;
 
