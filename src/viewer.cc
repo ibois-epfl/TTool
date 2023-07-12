@@ -102,54 +102,53 @@ void UnifiedViewer::UpdateViewer(int fid, int fps)
 
 cv::Mat UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<Model> object, const cv::Mat &frame)
 {
-	return frame.clone();
-	// // render the models with phong shading
-	// view->setLevel(0);
+	// render the models with phong shading
+	view->setLevel(0);
 
-	// view->RenderShaded(object, GL_FILL, cv::Point3f(1.0, 0.5, 0.0), true);
+	view->RenderShaded(object, GL_FILL, cv::Point3f(1.0, 0.5, 0.0), true);
 
-	// // download the rendering to the CPU
-	// cv::Mat rendering = view->DownloadFrame(View::RGB);
+	// download the rendering to the CPU
+	cv::Mat rendering = view->DownloadFrame(View::RGB);
 
-	// // download the depth buffer to the CPU
-	// cv::Mat depth = view->DownloadFrame(View::DEPTH);
+	// download the depth buffer to the CPU
+	cv::Mat depth = view->DownloadFrame(View::DEPTH);
 
-	// // compose the rendering with the current camera image for demo purposes (can be done more efficiently directly in OpenGL)
-	// float alpha = 0.5f;
-	// cv::Mat result = frame.clone();
-	// for (int y = 0; y < frame.rows; y++)
-	// 	for (int x = 0; x < frame.cols; x++)
-	// 	{
-	// 		cv::Vec3b color = rendering.at<cv::Vec3b>(y, x);
-	// 		if (depth.at<float>(y, x) != 0.0f)
-	// 		{
-	// 			result.at<cv::Vec3b>(y, x)[0] = alpha * color[2] + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x)[2];
-	// 			result.at<cv::Vec3b>(y, x)[1] = alpha * color[1] + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x)[1];
-	// 			result.at<cv::Vec3b>(y, x)[2] = alpha * color[0] + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x)[0];
-	// 		}
-	// 	}
+	// compose the rendering with the current camera image for demo purposes (can be done more efficiently directly in OpenGL)
+	float alpha = 0.5f;
+	cv::Mat result = frame.clone();
+	for (int y = 0; y < frame.rows; y++)
+		for (int x = 0; x < frame.cols; x++)
+		{
+			cv::Vec3b color = rendering.at<cv::Vec3b>(y, x);
+			if (depth.at<float>(y, x) != 0.0f)
+			{
+				result.at<cv::Vec3b>(y, x)[0] = alpha * color[2] + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x)[2];
+				result.at<cv::Vec3b>(y, x)[1] = alpha * color[1] + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x)[1];
+				result.at<cv::Vec3b>(y, x)[2] = alpha * color[0] + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x)[0];
+			}
+		}
 
-	// view->setLevel(0);
-	// view->RenderSilhouette(object, GL_FILL);
+	view->setLevel(0);
+	view->RenderSilhouette(object, GL_FILL);
 
-	// cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
-	// cv::Mat masks_map;
-	// masks_map = depth_map;
+	cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
+	cv::Mat masks_map;
+	masks_map = depth_map;
 
-	// cv::Mat mask_map;
-	// view->ConvertMask(masks_map, mask_map, object->getModelID());
+	cv::Mat mask_map;
+	view->ConvertMask(masks_map, mask_map, object->getModelID());
 
-	// std::vector<std::vector<cv::Point>> contours;
-	// cv::findContours(mask_map, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+	std::vector<std::vector<cv::Point>> contours;
+	cv::findContours(mask_map, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
 
-	// cv::Vec3b color;
-	// color = cv::Vec3b(0, 255, 0);
+	cv::Vec3b color;
+	color = cv::Vec3b(0, 255, 0);
 
-	// for (auto contour : contours)
-	// 	for (auto pt : contour)
-	// 	{
-	// 		result.at<cv::Vec3b>(pt) = color;
-	// 	}
+	for (auto contour : contours)
+		for (auto pt : contour)
+		{
+			result.at<cv::Vec3b>(pt) = color;
+		}
 
-	// return result;
+	return result;
 }
