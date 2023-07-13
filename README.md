@@ -315,12 +315,3 @@ There are other `ttool::standaloneUtils` that might be useful, but not vital for
 `ttool::standaloneUtils::Visualizer` was modified the user interface of the standalone program that shows all the keymap help, useful information and most importantly, visualize the 3D model to see the tracker.
 
 How to initialize and use them can also be seen in the `main.cc`.
-## CI/CD
-If you commit and push some code that does not influence the compilation (e.g. readme, docs, etc), add one of these texts to your commit message, it will stop the run of the github action.
-```
-[skip ci]
-[ci skip]
-[no ci]
-[skip actions]
-[actions skip]
-```
