@@ -40,6 +40,7 @@ namespace ttool
             cv::Mat emptyMat = cv::Mat::zeros(480, 640, CV_8UC3);
             RunOnAFrame(emptyMat);
             // DrawSilhouette(emptyMat);
+            CheckObjectChange();
         };
 
         TTool(std::string configFile, cv::Mat cameraMatrix, cv::Size cameraSize)
@@ -62,6 +63,7 @@ namespace ttool
 
             m_Input = ttool::InputModelManager(m_ModelManagerPtr);
             InitializeObjectTracker();
+            CheckObjectChange();
         };
 
         ~TTool(){};
