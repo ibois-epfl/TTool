@@ -8,53 +8,53 @@
 using namespace std;
 using namespace cv;
 
-View *View::instance;
+View *View::m_Instance;
 
 View::View(void)
 {
-	calibrationMatrices.push_back(Matx44f::eye());
+	m_CalibrationMatrices.push_back(Matx44f::eye());
 
-	projectionMatrix = Transformations::perspectiveMatrix(40, 4.0f / 3.0f, 0.1, 1000.0);
+	m_ProjectionMatrix = Transformations::perspectiveMatrix(40, 4.0f / 3.0f, 0.1, 1000.0);
 
-	lookAtMatrix = Transformations::lookAtMatrix(0, 0, 0, 0, 0, 1, 0, -1, 0);
+	m_LookAtMatrix = Transformations::lookAtMatrix(0, 0, 0, 0, 0, 1, 0, -1, 0);
 
-	currentLevel = 0;
+	m_CurrentLevel = 0;
 }
 
 View::~View(void)
 {
-	glDeleteTextures(1, &colorTextureID);
-	glDeleteTextures(1, &depthTextureID);
-	glDeleteFramebuffers(1, &frameBufferID);
+	glDeleteTextures(1, &m_ColorTextureID);
+	glDeleteTextures(1, &m_DepthTextureID);
+	glDeleteFramebuffers(1, &m_FrameBufferID);
 
 	// delete phongblinnShaderProgram;
 	// delete normalsShaderProgram;
-	// delete silhouetteShaderProgram;
+	// delete m_SilhouetteShaderProgram;
 	// delete surface;
 }
 
-void View::destroy()
+void View::Destroy()
 {
 	// doneCurrent();
-	projectionMatrix = Matx44f::eye();
-	lookAtMatrix = Matx44f::eye();
-	calibrationMatrices.clear();
+	m_ProjectionMatrix = Matx44f::eye();
+	m_LookAtMatrix = Matx44f::eye();
+	m_CalibrationMatrices.clear();
 	m_IsInitialized = false;
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	delete instance;
-	instance = NULL;
+	delete m_Instance;
+	m_Instance = NULL;
 }
 
 Matx44f View::GetCalibrationMatrix()
 {
-	return calibrationMatrices[currentLevel];
+	return m_CalibrationMatrices[m_CurrentLevel];
 }
 
-void View::init(const Matx33f &K, int width, int height, float zNear, float zFar, int numLevels)
+void View::Initialize(const Matx33f &K, int width, int height, float zNear, float zFar, int numLevels)
 {
 	if (m_IsInitialized)
 	{
@@ -62,23 +62,28 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 		return;
 	}
 
-	this->width = width;
-	this->height = height;
+	this->m_Width = width;
+	this->m_Height = height;
 
-	fullWidth = width;
-	fullHeight = height;
+	m_FullWidth = width;
+	m_FullHeight = height;
 
-	this->zn = zNear;
-	this->zf = zFar;
+	this->m_Zn = zNear;
+	this->m_Zf = zFar;
 
-	this->numLevels = numLevels;
+	this->m_NumLevels = numLevels;
 
-	projectionMatrix = Transformations::perspectiveMatrix(K, width, height, this->zn, this->zf, true);
+	m_ProjectionMatrix = Transformations::perspectiveMatrix(K, width, height, this->m_Zn, this->m_Zf, true);
 
+	LOG(INFO) << "Projection matrix: " << endl
+			  << m_ProjectionMatrix;
+	LOG(INFO) << "Generating VAO..." << endl;
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
+
+	LOG(INFO) << "Generating VAO... DONE" << endl;
 	
-	calibrationMatrices.clear();
+	m_CalibrationMatrices.clear();
 
 	for (int i = 0; i < numLevels; i++)
 	{
@@ -90,9 +95,9 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 		K_l(0, 2) = K(0, 2) / s;
 		K_l(1, 2) = K(1, 2) / s;
 
-		calibrationMatrices.push_back(K_l);
+		m_CalibrationMatrices.push_back(K_l);
 	}
-	initRenderingBuffers();
+	InitRenderingBuffers();
 
 	glEnable(GL_DEPTH);
 	glEnable(GL_DEPTH_TEST);
@@ -111,70 +116,67 @@ void View::init(const Matx33f &K, int width, int height, float zNear, float zFar
 	char* vertexFilePath = (char*)"assets/opengl/Silhouette.vs";
 	char* fragmentFilePath = (char*)"assets/opengl/Silhouette.fs";
 
-	silhouetteShaderProgram = LoadShaders(vertexFilePath, fragmentFilePath);
+	m_SilhouetteShaderProgram = LoadShaders(vertexFilePath, fragmentFilePath);
 	// Get a handle for our "MVP" uniform
-	m_MatrixId = glGetUniformLocation(silhouetteShaderProgram, "uMVPMatrix");
-	m_AlphaId = glGetUniformLocation(silhouetteShaderProgram, "uAlpha");
-	m_ColorId = glGetUniformLocation(silhouetteShaderProgram, "uColor");
+	m_SilhouetteMatrixId = glGetUniformLocation(m_SilhouetteShaderProgram, "uMVPMatrix");
+	m_SilhouetteAlphaId = glGetUniformLocation(m_SilhouetteShaderProgram, "uAlpha");
+	m_SilhouetteColorId = glGetUniformLocation(m_SilhouetteShaderProgram, "uColor");
 
-
-	angle = 0;
-
-	lightPosition = cv::Vec3f(0, 0, 0);
+	// Phongblinn Shader
+	m_PhongblinnShaderProgram		= LoadShaders((char*)"assets/opengl/Phongblinn.vs", (char*)"assets/opengl/Phongblinn.fs");
+	m_PhongblinnMVPMatrixID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uMVPMatrix");
+	m_PhongblinnMVMatrixID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uMVMatrix");
+	m_PhongblinnNormalMatrixID		= glGetUniformLocation(m_PhongblinnShaderProgram, "uNormalMatrix");
+	m_PhongblinnLightPosition1ID	= glGetUniformLocation(m_PhongblinnShaderProgram, "uLightPosition1");
+	m_PhongblinnLightPosition2ID	= glGetUniformLocation(m_PhongblinnShaderProgram, "uLightPosition2");
+	m_PhongblinnLightPosition3ID	= glGetUniformLocation(m_PhongblinnShaderProgram, "uLightPosition3");
+	m_PhongblinnShininessID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uShininess");
+	m_PhongblinnAlphaID				= glGetUniformLocation(m_PhongblinnShaderProgram, "uAlpha");
+	m_PhongblinnColorID				= glGetUniformLocation(m_PhongblinnShaderProgram, "uColor");
 
 	m_IsInitialized = true;
 }
 
-float View::getZNear()
+void View::SetLevel(int level)
 {
-	return zn;
+	m_CurrentLevel = level;
+	int s = pow(2, m_CurrentLevel);
+	m_Width = m_FullWidth / s;
+	m_Height = m_FullHeight / s;
+
+	m_Width += m_Width % 4;
+	m_Height += m_Height % 4;
 }
 
-float View::getZFar()
+int View::GetLevel()
 {
-	return zf;
+	return m_CurrentLevel;
 }
 
-void View::setLevel(int level)
-{
-	currentLevel = level;
-	int s = pow(2, currentLevel);
-	width = fullWidth / s;
-	height = fullHeight / s;
-
-	width += width % 4;
-	height += height % 4;
-}
-
-int View::getLevel()
-{
-	return currentLevel;
-}
-
-bool View::initRenderingBuffers()
+bool View::InitRenderingBuffers()
 {
 	glBindVertexArray(m_VAO);
 
-	glGenFramebuffers(1, &frameBufferID);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+	glGenFramebuffers(1, &m_FrameBufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
 
-	glGenTextures(1, &colorTextureID);
-	glBindTexture(GL_TEXTURE_2D, colorTextureID);
+	glGenTextures(1, &m_ColorTextureID);
+	glBindTexture(GL_TEXTURE_2D, m_ColorTextureID);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glGenTextures(1, &depthTextureID);
-	glBindTexture(GL_TEXTURE_2D, depthTextureID);
+	glGenTextures(1, &m_DepthTextureID);
+	glBindTexture(GL_TEXTURE_2D, m_DepthTextureID);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTextureID, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorTextureID, 0);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureID, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthTextureID, 0);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
@@ -190,14 +192,14 @@ static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 	return (pt(0) < width && pt(1) < height && pt(0) >= 0 && pt(1) >= 0);
 }
 
-void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool invertDepth, const std::vector<cv::Point3f> &colors, bool drawAll)
+void View::RenderSilhouette(shared_ptr<Model> model, GLenum polygonMode, bool invertDepth)
 {
 	glBindVertexArray(m_VAO);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
 	glEnable(GL_DEPTH);
 	glEnable(GL_DEPTH_TEST);
 
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, m_Width, m_Height);
 	if (invertDepth)
 	{
 		glClearDepth(1.0f);
@@ -206,28 +208,28 @@ void View::RenderSilhouette(shared_ptr<Model> model, GLenum polyonMode, bool inv
 
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	if (model->isInitialized() || drawAll)
+	if (model->isInitialized())
 	{
 		Matx44f pose = model->getPose();
 		Matx44f normalization = model->getNormalization();
 
-		Matx44f modelViewMatrix = lookAtMatrix * (pose * normalization);
+		Matx44f modelViewMatrix = m_LookAtMatrix * (pose * normalization);
 
-		Matx44f modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
+		Matx44f modelViewProjectionMatrix = m_ProjectionMatrix * modelViewMatrix;
 
 		// Bind back to the main framebuffer
-        glUseProgram(silhouetteShaderProgram);
+        glUseProgram(m_SilhouetteShaderProgram);
         
 		// visualize camera
-        glUniformMatrix4fv(m_MatrixId, 1, GL_TRUE, modelViewProjectionMatrix.val);
-		glUniform1f(m_AlphaId, 1.0f);
+        glUniformMatrix4fv(m_SilhouetteMatrixId, 1, GL_TRUE, modelViewProjectionMatrix.val);
+		glUniform1f(m_SilhouetteAlphaId, 1.0f);
 
 		glm::vec3 color = glm::vec3((float)(model->getModelID()) / 255.0f, 0.0f, 0.0f);
-		glUniform3fv(m_ColorId, 1, &color[0]);
+		glUniform3fv(m_SilhouetteColorId, 1, &color[0]);
 
-		glPolygonMode(GL_FRONT_AND_BACK, polyonMode);
+		glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
 
-		model->draw(silhouetteShaderProgram);
+		model->draw(m_SilhouetteShaderProgram);
 	}
 
 	glClearDepth(0.0f);
@@ -265,6 +267,51 @@ void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 	}
 }
 
+void View::RenderShaded(std::shared_ptr<Model> model, GLenum polygonMode, const cv::Point3f color)
+{
+	glBindVertexArray(m_VAO);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
+
+	glViewport(0, 0, m_Width, m_Height);
+
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+	if (model->isInitialized())
+	{
+		Matx44f pose = model->getPose();
+		Matx44f normalization = model->getNormalization();
+
+		Matx44f modelViewMatrix = m_LookAtMatrix * (pose * normalization);
+
+		Matx33f normalMatrix = modelViewMatrix.get_minor<3, 3>(0, 0).inv().t();
+
+		Matx44f modelViewProjectionMatrix = m_ProjectionMatrix * modelViewMatrix;
+
+		glUseProgram(m_PhongblinnShaderProgram);
+		glUniformMatrix4fv(m_PhongblinnMVMatrixID, 1, GL_TRUE, modelViewMatrix.val);
+		glUniformMatrix4fv(m_PhongblinnMVPMatrixID, 1, GL_TRUE, modelViewProjectionMatrix.val);
+		glUniformMatrix3fv(m_PhongblinnNormalMatrixID, 1, GL_TRUE, normalMatrix.val);
+		auto lightPosition1 = glm::vec3(0.1, 0.1, -0.02);
+		auto lightPosition2 = glm::vec3(-0.1, 0.1, -0.02);
+		auto lightPosition3 = glm::vec3(0.0, 0.0, 0.1);
+		glUniform3fv(m_PhongblinnLightPosition1ID, 1, &lightPosition1[0]);
+		glUniform3fv(m_PhongblinnLightPosition2ID, 1, &lightPosition2[0]);
+		glUniform3fv(m_PhongblinnLightPosition3ID, 1, &lightPosition3[0]);
+		glUniform1f(m_PhongblinnShininessID, 100.0f);
+		glUniform1f(m_PhongblinnAlphaID, 1.0f);
+
+		glm::vec3 colorGlm = glm::vec3(color.x, color.y, color.z);
+		glUniform3fv(m_PhongblinnColorID, 1, &colorGlm[0]);
+
+		glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
+
+		model->draw(m_PhongblinnShaderProgram);
+	}
+
+	glFinish();
+}
+
+
 void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
 {
 	Vec3f lbn = model->getLBN();
@@ -297,7 +344,7 @@ void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Poin
 
 	for (auto &i : points3D)
 	{
-		Vec4f p = calibrationMatrices[currentLevel] * pose * normalization * i;
+		Vec4f p = m_CalibrationMatrices[m_CurrentLevel] * pose * normalization * i;
 
 		if (p[2] == 0)
 			continue;
@@ -324,28 +371,28 @@ void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Poin
 Mat View::DownloadFrame(View::FrameType type)
 {
 	glBindVertexArray(m_VAO);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
 	Mat res;
 	switch (type)
 	{
 	case MASK:
-		res = Mat(height, width, CV_8UC1);
+		res = Mat(m_Height, m_Width, CV_8UC1);
 		glReadPixels(0, 0, res.cols, res.rows, GL_RED, GL_UNSIGNED_BYTE, res.data);
 		break;
 	case RGB:
-		res = Mat(height, width, CV_8UC3);
+		res = Mat(m_Height, m_Width, CV_8UC3);
 		glReadPixels(0, 0, res.cols, res.rows, GL_RGB, GL_UNSIGNED_BYTE, res.data);
 		break;
 	case RGB_32F:
-		res = Mat(height, width, CV_32FC3);
+		res = Mat(m_Height, m_Width, CV_32FC3);
 		glReadPixels(0, 0, res.cols, res.rows, GL_RGB, GL_FLOAT, res.data);
 		break;
 	case DEPTH:
-		res = Mat(height, width, CV_32FC1);
+		res = Mat(m_Height, m_Width, CV_32FC1);
 		glReadPixels(0, 0, res.cols, res.rows, GL_DEPTH_COMPONENT, GL_FLOAT, res.data);
 		break;
 	default:
-		res = Mat::zeros(height, width, CV_8UC1);
+		res = Mat::zeros(m_Height, m_Width, CV_8UC1);
 		break;
 	}
 	// glBindVertexArray(0);

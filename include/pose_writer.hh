@@ -11,6 +11,14 @@ namespace ttool::standaloneUtils
     {
         public:
             PoseWriter(){};
+
+            /**
+             * @brief Construct a new PoseWriter object
+             * 
+             * @param filename   path to the output file
+             * @param configFile path to the config file
+             * @param modelFiles list of model files
+             */
             PoseWriter(const std::string& filename, const std::string &configFile, const std::vector<std::string> &modelFiles)
             : m_ModelFiles(modelFiles)
             {
@@ -36,6 +44,12 @@ namespace ttool::standaloneUtils
                 m_OutputFile.close();
             }
 
+            /**
+             * @brief Write the pose to the file
+             * 
+             * @param pose 
+             * @param objectID 
+             */
             void write(cv::Matx44f& pose, int objectID)
             {
                 m_OutputFile << "objectID: " << objectID << std::endl;

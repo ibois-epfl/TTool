@@ -1,7 +1,4 @@
-// #include <memory>
 #include <iostream>
-#include <QApplication>
-#include <QThread>
 
 #include "camera.hh"
 #include "ttool.hh"
@@ -90,8 +87,8 @@ int main(int argc, char **argv)
         }
     }
 
-    // Qt
-    QApplication a(argc, argv);
+    // Intiailizing GLFW
+    auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
 
     // ttool setup
     std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(__TTOOL_CONFIG_PATH__, calibFilePath);
@@ -163,7 +160,7 @@ int main(int argc, char **argv)
 
             auto ti = cv::getTickCount();
 
-            ttool->RunOnAFrame(cameraPtr->image());
+            ttool->RunOnAFrame(cameraPtr->Image());
 
             auto tf = cv::getTickCount();
             auto t = (tf - ti) / cv::getTickFrequency();
@@ -183,4 +180,7 @@ int main(int argc, char **argv)
     cv::destroyAllWindows();
     if (isVideoRecording) {ttool::standaloneUtils::makeVideoFromAllSavedImages(saveImagePath);}
 
+    // Terminate GLFW
+    ttool::standaloneUtils::TerminateStandalone(GLFWWindow);
+    return 0;
 }

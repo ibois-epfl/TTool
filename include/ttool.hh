@@ -136,7 +136,7 @@ namespace ttool
         void DestrolView()
         {
             View *view = View::Instance();
-            view->destroy();
+            view->Destroy();
         }
 
         /**
@@ -194,7 +194,7 @@ namespace ttool
             View* view = View::Instance();
             float zn = m_ConfigPtr->GetConfigData().Zn;
             float zf = m_ConfigPtr->GetConfigData().Zf;
-            view->init(CameraMatrix, CamSize.width, CamSize.height, zn, zf, 4);
+            view->Initialize(CameraMatrix, CamSize.width, CamSize.height, zn, zf, 4);
         }
 
         std::string GetTrackingStatus()
