@@ -10,10 +10,10 @@ class Viewer;
 
 class Tracker {
 public:
-	Tracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects);
+	Tracker(const cv::Matx33f& K, std::shared_ptr<Object3D> objects);
 	void Init() {}
 
-	static Tracker* GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<std::shared_ptr<Object3D>>& objects);
+	static Tracker* GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<Object3D> objects);
 
 	virtual void ToggleTracking(int objectIndex, bool undistortedFrame);
 	virtual void EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) = 0;
@@ -25,7 +25,7 @@ public:
 	std::string GetTrackingStatus() const { return m_trackingStatus.str(); };
 
 protected:
-	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shared_ptr<Object3D>>& objects, int runs, cv::Matx44f& initialPose) = 0;
+	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<Object3D> objects, int runs, cv::Matx44f& initialPose) = 0;
 
 	cv::Rect Compute2DROI(std::shared_ptr<Object3D> object, const cv::Size& maxSize, int offset);
 	static cv::Rect computeBoundingBox(const std::vector<cv::Point3i>& centersIDs, int offset, int level, const cv::Size& maxSize);
@@ -35,7 +35,7 @@ protected:
 	static void ShowMask(const cv::Mat& masks, cv::Mat& buf);
 
 protected:
-	std::vector<std::shared_ptr<Object3D>> objects;
+	std::shared_ptr<Object3D> m_Object;
 	
 	View* view;
 	cv::Matx33f K;
@@ -49,7 +49,7 @@ class Histogram;
 
 class TrackerBase : public Tracker {
 public:
-	TrackerBase(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects);
+	TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> objects);
 
 	virtual void PreProcess(cv::Mat frame) override;
 	virtual void PostProcess(cv::Mat frame) override;
@@ -66,9 +66,9 @@ class SearchLine;
 
 class SLTracker: public TrackerBase {
 public:
-	SLTracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects);
+	SLTracker(const cv::Matx33f& K, std::shared_ptr<Object3D> objects);
 
-	void GetBundleProb(const cv::Mat& frame, int oid);
+	void GetBundleProb(const cv::Mat& frame);
 	void FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth);
 
 protected:

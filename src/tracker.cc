@@ -9,26 +9,24 @@
 #include "tracker_sle.hh"
 #include "viewer.hh"
 
-Tracker::Tracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects) {
+Tracker::Tracker(const cv::Matx33f& K, std::shared_ptr<Object3D> object) {
 	initialized = false;
 
 	view = View::Instance();
 
 	this->K = K;
 
-	for (int i = 0; i < objects.size(); i++) {
-		if (objects[i]->getModelID() == 0) {
-			objects[i]->setModelID(i + 1);
-		}
-		this->objects.push_back(objects[i]);
-		this->objects[i]->initBuffers();
-		// Maybe this should be move to the run_on_video where the histogram is generated, otherwise segmentation fault
-		// this->objects[i]->generateTemplates();
-		this->objects[i]->reset();
+	if (object->getModelID() == 0) {
+		object->setModelID(1);
 	}
+	this->m_Object = object;
+	this->m_Object->initBuffers();
+	// Maybe this should be move to the run_on_video where the histogram is generated, otherwise segmentation fault
+	// this->objects[i]->generateTemplates();
+	this->m_Object->reset();
 }
 
-Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<std::shared_ptr<Object3D>>& objects) {
+Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<Object3D> objects) {
 	Tracker* poseEstimator = NULL;
 	poseEstimator = new SLETracker(K, objects);
 
@@ -37,29 +35,20 @@ Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& di
 }
 
 void Tracker::Reset() {
-	for (auto & object : objects) {
-		object->reset();
-	}
+	m_Object->reset();
 
 	initialized = false;
 }
 
 
 void Tracker::ToggleTracking(int objectIndex, bool undistortedFrame) {
-	if (objectIndex >= objects.size())
-		return;
-
-	if (!objects[objectIndex]->isInitialized()) {
-		objects[objectIndex]->initialize();
+	if (!m_Object->isInitialized()) {
+		m_Object->initialize();
 		initialized = true;
 	}
 	else {
-		objects[objectIndex]->reset();
-
+		m_Object->reset();
 		initialized = false;
-		for (int o = 0; o < objects.size(); o++) {
-			initialized |= objects[o]->isInitialized();
-		}
 	}
 }
 
@@ -189,7 +178,7 @@ void Tracker::ShowMask(const cv::Mat& masks, cv::Mat& buf) {
 	}
 }
 
-TrackerBase::TrackerBase(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects) 
+TrackerBase::TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> objects) 
 : Tracker(K, objects) 
 {
 	hists = new RBOTHist(objects);
@@ -216,31 +205,28 @@ void TrackerBase::UpdateHist(cv::Mat frame) {
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
 		view->SetLevel(0);
-		view->RenderSilhouette(objects[0], GL_FILL);
+		view->RenderSilhouette(m_Object, GL_FILL);
 		cv::Mat masks_map = view->DownloadFrame(View::MASK);
 		cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 
-		for (int oid = 0; oid < objects.size(); oid++) {
-			hists->Update(frame, masks_map, depth_map, oid, afg, abg);
-		}
+		hists->Update(frame, masks_map, depth_map, afg, abg);
 	}
 }
 
-SLTracker::SLTracker(const cv::Matx33f& K, std::vector<std::shared_ptr<Object3D>>& objects)
+SLTracker::SLTracker(const cv::Matx33f& K, std::shared_ptr<Object3D> objects)
 	: TrackerBase(K, objects)
 {
 	search_line = std::make_shared<SearchLine>();
 }
 
-#if 1
-void SLTracker::GetBundleProb(const cv::Mat& frame, int oid) {
+void SLTracker::GetBundleProb(const cv::Mat& frame) {
 	std::vector<std::vector<cv::Point> >& search_points = search_line->search_points;
 	std::vector<std::vector<cv::Point2f> >& bundle_prob = search_line->bundle_prob;
 	bundle_prob.clear();
 
 	int level = view->GetLevel();
 	int upscale = pow(2, level);
-	std::shared_ptr<TCLCHistograms> tclcHistograms = objects[oid]->getTCLCHistograms();
+	std::shared_ptr<TCLCHistograms> tclcHistograms = m_Object->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();
 	int numBins = tclcHistograms->getNumBins();
@@ -314,90 +300,6 @@ void SLTracker::GetBundleProb(const cv::Mat& frame, int oid) {
 		bundle_prob.push_back(slp);
 	} // for rows
 }
-#else
-void RBOTHist::GetBundleProb(SearchLine* search_line, const cv::Mat& frame, int oid) {
-	std::vector<std::vector<cv::Point> >& search_points = search_line->search_points;
-	std::vector<std::vector<cv::Point2f> >& bundle_prob = search_line->bundle_prob;
-	bundle_prob.clear();
-
-	int level = view->GetLevel();
-	int upscale = pow(2, level);
-
-	std::shared_ptr<TCLCHistograms> tclcHistograms = objs[oid]->getTCLCHistograms();
-	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
-	int numHistograms = (int)centersIDs.size();
-	int numBins = tclcHistograms->getNumBins();
-	int binShift = 8 - log(numBins) / log(2);
-	int radius = tclcHistograms->getRadius();
-	int radius2 = radius * radius;
-	uchar* initializedData = tclcHistograms->getInitialized().data;
-	uchar* frameData = frame.data;
-	cv::Mat localFG = tclcHistograms->getLocalForegroundHistograms();
-	cv::Mat localBG = tclcHistograms->getLocalBackgroundHistograms();
-	float* histogramsFGData = (float*)localFG.ptr<float>();
-	float* histogramsBGData = (float*)localBG.ptr<float>();
-
-	cv::Mat sumsFB = tclcHistograms->sumsFB;
-
-	for (int r = 0; r < search_points.size(); r++) {
-		std::vector<cv::Point2f> slp;
-		for (int c = 0; c < search_points[r].size() - 1; c++) {
-			int i = search_points[r][c].x;
-			int j = search_points[r][c].y;
-			int pidx = j * frame.cols + i;
-
-			int ru = (frameData[3 * pidx] >> binShift);
-			int gu = (frameData[3 * pidx + 1] >> binShift);
-			int bu = (frameData[3 * pidx + 2] >> binShift);
-
-			int binIdx = (ru * numBins + gu) * numBins + bu;
-
-			float ppf = .0f;
-			float ppb = .0f;
-
-			float cnt = 0;
-
-			for (int h = 0; h < numHistograms; h++) {
-				cv::Point3i centerID = centersIDs[h];
-				if (initializedData[centerID.z]) {
-					int dx = centerID.x - upscale * (i + 0.5f);
-					int dy = centerID.y - upscale * (j + 0.5f);
-					int distance = dx * dx + dy * dy;
-
-					if (distance <= radius2) {
-						float pf = localFG.at<float>(centerID.z, binIdx);
-						float pb = localBG.at<float>(centerID.z, binIdx);
-
-						int* sumFB = (int*)sumsFB.ptr<int>() + centerID.z * 2;
-						int etaf = sumFB[0];
-						int etab = sumFB[1];
-
-						pf += 0.0000001f;
-						pb += 0.0000001f;
-
-						//ppf += etaf*pf / (etaf*pf + etab*pb);
-						//ppb += etab*pb / (etaf*pf + etab*pb);
-
-						ppf += pf / (pf + pb) * tclcHistograms->wes[h];
-						ppb += pb / (pf + pb) * tclcHistograms->wes[h];
-
-						cnt += tclcHistograms->wes[h];
-					}
-				}
-			}
-
-			if (cnt) {
-				ppf /= cnt;
-				ppb /= cnt;
-			}
-
-			slp.push_back(cv::Point2f(ppf, ppb));
-		} // for cols
-
-		bundle_prob.push_back(slp);
-	} // for rows
-}
-#endif
 
 void SLTracker::FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth) {
 	const std::vector<std::vector<cv::Point> >& search_points = search_line->search_points;

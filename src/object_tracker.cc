@@ -12,8 +12,7 @@ void ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D> object, cv::M
         m_TrackerPtr->Reset(); // Go through the objects in the tracker and reset its histogram
         m_TrackerPtr.reset();
     }
-    std::vector<std::shared_ptr<Object3D>>objects = {object};
-    m_TrackerPtr = std::shared_ptr<Tracker>(Tracker::GetTracker(1, K, distCoeffs, objects));
+    m_TrackerPtr = std::shared_ptr<Tracker>(Tracker::GetTracker(1, K, distCoeffs, object));
     m_CurrentModelID = modelID;
     m_TrackerPtr->ToggleTracking(0, true);
     if (!HasPose(modelID))
