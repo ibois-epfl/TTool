@@ -43,10 +43,11 @@ namespace tslet
         /**
          * @brief Call the EstimatePose function of the tracker which estimate the pose of the object to be tracked
          * 
+         * @param object  the object to be tracked
          * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
          * @param frame   the current frame from the camera
          */
-        void CallEstimatePose(int modelID, cv::Mat frame);
+        void CallEstimatePose(std::shared_ptr<Object3D>object, int modelID, cv::Mat frame);
 
         /**
          * @brief Get the Tracking Status from the tracker

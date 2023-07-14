@@ -95,7 +95,7 @@ namespace ttool
         {
             CheckObjectChange();
             m_ObjectTracker.UpdateHistogram(m_CurrentObjectID, frame);
-            m_ObjectTracker.CallEstimatePose(m_CurrentObjectID, frame);
+            m_ObjectTracker.CallEstimatePose(m_ModelManagerPtr->GetObject(), m_CurrentObjectID, frame);
         }
 
         /**

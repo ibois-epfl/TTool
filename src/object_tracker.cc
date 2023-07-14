@@ -43,7 +43,7 @@ void ObjectTracker::SetPose(int modelID, cv::Matx44f pose)
     m_ModelID2pose[modelID] = pose;
 }
 
-void ObjectTracker::CallEstimatePose(int modelID, cv::Mat frame)
+void ObjectTracker::CallEstimatePose(std::shared_ptr<Object3D>object, int modelID, cv::Mat frame)
 {
     if (!HasTracker(modelID))
     {
@@ -56,7 +56,6 @@ void ObjectTracker::CallEstimatePose(int modelID, cv::Mat frame)
         return;
     }
 
-    cv::Matx44f init_pose = m_ModelID2pose[modelID];
-    // cv::imshow("What Tracker Sees", frame);
-    m_TrackerPtr->EstimatePoses(init_pose, frame);
+    cv::Matx44f initialPose = m_ModelID2pose[modelID];
+    m_TrackerPtr->EstimatePoses(object, initialPose, frame);
 }

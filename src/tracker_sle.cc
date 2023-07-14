@@ -292,7 +292,7 @@ void SLETracker::RunIteration(std::shared_ptr<Object3D> object, const std::vecto
 	}
 }
 
-void SLETracker::EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) {
+void SLETracker::EstimatePoses(std::shared_ptr<Object3D> object, cv::Matx44f& init_pose, cv::Mat& frame) {
     std::vector<cv::Mat> imagePyramid;
     imagePyramid.push_back(frame);
 
@@ -302,6 +302,6 @@ void SLETracker::EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) {
     }
 
     if (initialized) {
-        Track(imagePyramid, m_Object, 1, init_pose);
+        Track(imagePyramid, object, 1, init_pose);
     }
 }
