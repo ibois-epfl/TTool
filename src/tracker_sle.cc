@@ -180,20 +180,6 @@ void SLETracker::FindMatchPointMaxProb(float diff) {
 	}
 }
 
-void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shared_ptr<Object3D>>& objects, int runs) {
-	for (int iter = 0; iter < runs * 4; iter++) {
-		RunIteration(objects, imagePyramid, 2, 12, 2);
-	}
-
-	for (int iter = 0; iter < runs * 2; iter++) {
-		RunIteration(objects, imagePyramid, 1, 12, 2);
-	}
-
-	for (int iter = 0; iter < runs * 1; iter++) {
-		RunIteration(objects, imagePyramid, 0, 12, 2);
-	}
-}
-
 void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shared_ptr<Object3D>>& objects, int runs, cv::Matx44f& init_pose) {
     for (int iter = 0; iter < runs * 4; iter++) {
         RunIteration(objects, imagePyramid, 2, 12, 2, init_pose);
@@ -304,8 +290,6 @@ void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, c
 	}
 }
 
-void SLETracker::EstimatePoses(cv::Matx44f& init_pose) {}
-
 void SLETracker::EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) {
     std::vector<cv::Mat> imagePyramid;
     imagePyramid.push_back(frame);
@@ -317,79 +301,5 @@ void SLETracker::EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) {
 
     if (initialized) {
         Track(imagePyramid, objects, 1, init_pose);
-    }
-}
-
-void SLETracker::RunIteration(std::vector<std::shared_ptr<Object3D>>& objects, const std::vector<cv::Mat>& imagePyramid, int level, int sl_len, int sl_seg, int run_type) {
-    int width = view->GetWidth();
-    int height = view->GetHeight();
-    view->SetLevel(level);
-    int numInitialized = 0;
-    for (int o = 0; o < objects.size(); o++) {
-        if (!objects[o]->isInitialized())
-            continue;
-
-        numInitialized++;
-
-        cv::Rect roi = Compute2DROI(objects[o], cv::Size(width / pow(2, level), height / pow(2, level)), 8);
-        if (roi.area() == 0) {
-            std::cout << "tracker_sle.cc::\n";
-            std::cout << "Roi Area is ZERO\n";
-            continue;
-        }
-
-
-        while (roi.area() < 3000 && level > 0) {
-            level--;
-            view->SetLevel(level);
-            roi = Compute2DROI(objects[o], cv::Size(width / pow(2, level), height / pow(2, level)), 8);
-        }
-        if (roi.area() < 3000) {
-            std::cout << "Roi Area: " << roi.area() << "\n";
-        }
-    }
-
-    view->SetLevel(level);
-    view->RenderSilhouette(objects[0], GL_FILL);
-    cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
-
-    cv::Mat masks_map;
-    if (numInitialized > 1) {
-        masks_map = view->DownloadFrame(View::MASK);
-    }	else {
-        masks_map = depth_map;
-    }
-
-    for (int o = 0; o < objects.size(); o++) {
-        if (!objects[o]->isInitialized())
-            continue;
-
-        cv::Rect roi = Compute2DROI(objects[o], cv::Size(width / pow(2, level), height / pow(2, level)), 8);
-        if (roi.area() == 0)
-            continue;
-
-        int m_id = (numInitialized <= 1) ? -1 : objects[o]->getModelID();
-        cv::Mat mask_map;
-        ConvertMask(masks_map, m_id, roi, mask_map);
-
-        search_line->FindSearchLine(mask_map, imagePyramid[level], sl_len, sl_seg, true);
-
-        if (numInitialized > 1) {
-            FilterOccludedPoint(masks_map, depth_map);
-        }
-
-        GetBundleProb(imagePyramid[level], o);
-
-        FindMatchPointMaxProb(0.2);
-
-        view->RenderSilhouette(objects[o], GL_FILL, true);
-        cv::Mat depth_inv_map = view->DownloadFrame(View::DEPTH);
-        cv::Matx66f wJTJ;
-        cv::Matx61f JT;
-        ComputeJac(objects[o], m_id, imagePyramid[level], depth_map, depth_inv_map, wJTJ, JT);
-
-        auto deltaT = Transformations::exp(-wJTJ.inv(cv::DECOMP_CHOLESKY) * JT);
-        cv::Matx44f T_cm = deltaT * objects[o]->getPose();
-        objects[o]->setPose(T_cm);
     }
 }

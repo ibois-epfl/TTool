@@ -36,7 +36,7 @@ Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& di
 	return poseEstimator;
 }
 
-void Tracker::reset() {
+void Tracker::Reset() {
 	for (auto & object : objects) {
 		object->reset();
 	}
@@ -62,8 +62,6 @@ void Tracker::ToggleTracking(int objectIndex, bool undistortedFrame) {
 		}
 	}
 }
-
-void Tracker::EstimatePoses() {}
 
 cv::Rect Tracker::Compute2DROI(std::shared_ptr<Object3D> object, const cv::Size& maxSize, int offset) {
 	// PROJECT THE 3D BOUNDING BOX AS 2D ROI

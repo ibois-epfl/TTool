@@ -16,18 +16,16 @@ public:
 	static Tracker* GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<std::shared_ptr<Object3D>>& objects);
 
 	virtual void ToggleTracking(int objectIndex, bool undistortedFrame);
-	virtual void EstimatePoses();
-    virtual void EstimatePoses(cv::Matx44f& init_pose) = 0;
 	virtual void EstimatePoses(cv::Matx44f& init_pose, cv::Mat& frame) = 0;
     virtual void PreProcess(cv::Mat frame) {}
 	virtual void PostProcess(cv::Mat frame) {}
 
-	void reset();
+	void Reset();
 
 	std::string GetTrackingStatus() const { return m_trackingStatus.str(); };
 
 protected:
-	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shared_ptr<Object3D>>& objects, int runs = 1) = 0;
+	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::vector<std::shared_ptr<Object3D>>& objects, int runs, cv::Matx44f& initialPose) = 0;
 
 	cv::Rect Compute2DROI(std::shared_ptr<Object3D> object, const cv::Size& maxSize, int offset);
 	static cv::Rect computeBoundingBox(const std::vector<cv::Point3i>& centersIDs, int offset, int level, const cv::Size& maxSize);
@@ -37,15 +35,10 @@ protected:
 	static void ShowMask(const cv::Mat& masks, cv::Mat& buf);
 
 protected:
-	std::vector<std::shared_ptr<Viewer>> viewer_ptrs_;
-
 	std::vector<std::shared_ptr<Object3D>> objects;
 	
 	View* view;
 	cv::Matx33f K;
-	//cv::Matx14f distCoeffs;
-	//cv::Mat map1;
-	//cv::Mat map2;
 
 	bool initialized;
 

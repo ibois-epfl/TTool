@@ -9,7 +9,7 @@ void ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D> object, cv::M
     if (HasPreviousTracker())
     {
         m_TrackerPtr->ToggleTracking(0, false);
-        m_TrackerPtr->reset(); // Go through the objects in the tracker and reset its histogram
+        m_TrackerPtr->Reset(); // Go through the objects in the tracker and reset its histogram
         m_TrackerPtr.reset();
     }
     std::vector<std::shared_ptr<Object3D>>objects = {object};
