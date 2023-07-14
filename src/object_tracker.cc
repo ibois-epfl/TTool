@@ -6,11 +6,6 @@ void ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D> object, cv::M
 {
     // We expect the frame to already be undistorted
     cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
-    // if (HasTracker(modelID) && object->isInitialized())
-    // {
-    //     std::cout << "Tracker already set up for model " << modelID << std::endl;
-    //     return;
-    // }
     m_TrackerPtr = std::shared_ptr<Tracker>(Tracker::GetTracker(1, K, distCoeffs, object));
     m_CurrentModelID = modelID;
     m_TrackerPtr->ToggleTracking(object);
