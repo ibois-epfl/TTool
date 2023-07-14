@@ -6,19 +6,16 @@ void ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D> object, cv::M
 {
     // We expect the frame to already be undistorted
     cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
-    if (!HasTracker(modelID))
+    if (HasPreviousTracker())
     {
-        if (HasPreviousTracker())
-        {
-            m_TrackerPtr->ToggleTracking(0, false);
-            m_TrackerPtr->reset(); // Go through the objects in the tracker and reset its histogram
-            m_TrackerPtr.reset();
-        }
-        std::vector<std::shared_ptr<Object3D>>objects = {object};
-        m_TrackerPtr = std::shared_ptr<Tracker>(Tracker::GetTracker(1, K, distCoeffs, objects));
-        m_CurrentModelID = modelID;
-        m_TrackerPtr->ToggleTracking(0, true);
+        m_TrackerPtr->ToggleTracking(0, false);
+        m_TrackerPtr->reset(); // Go through the objects in the tracker and reset its histogram
+        m_TrackerPtr.reset();
     }
+    std::vector<std::shared_ptr<Object3D>>objects = {object};
+    m_TrackerPtr = std::shared_ptr<Tracker>(Tracker::GetTracker(1, K, distCoeffs, objects));
+    m_CurrentModelID = modelID;
+    m_TrackerPtr->ToggleTracking(0, true);
     if (!HasPose(modelID))
     {
         m_ModelID2pose[modelID] = object->getPose();
