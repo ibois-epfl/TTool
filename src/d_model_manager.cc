@@ -38,6 +38,10 @@ void DModelManager::SetObjectID(int objectID)
 {
     SnapshotObjectPose();
     m_CurrentObjectID = objectID;
+
+    // Reset the object to the initial pose
+    // Clear the histogram information used by the tracker
+    m_CurrentObjectPtr->reset();
     SetCurrentObjectPtr();
 }
 

@@ -254,7 +254,7 @@ void SLETracker::RunIteration(std::shared_ptr<Object3D> object, const std::vecto
 		FilterOccludedPoint(masks_map, depth_map);
 	}
 
-	GetBundleProb(imagePyramid[level]);
+	GetBundleProb(object, imagePyramid[level]);
 
 	FindMatchPointMaxProb(0.2);
 	float avg = 0.0f;

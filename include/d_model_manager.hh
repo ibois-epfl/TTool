@@ -32,7 +32,7 @@ namespace ttool
         * because Model needs OpenGL context to initialize
         * objects should be initialized before any rendering can be done
         * 
-         */
+        */
         void InitModels();
 
         /**

@@ -15,12 +15,12 @@ public:
 
 	static Tracker* GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<Object3D> object);
 
-	virtual void ToggleTracking(int objectIndex, bool undistortedFrame);
+	virtual void ToggleTracking(std::shared_ptr<Object3D> object);
 	virtual void EstimatePoses(std::shared_ptr<Object3D> object, cv::Matx44f& initialPose, cv::Mat& frame) = 0;
-    virtual void PreProcess(cv::Mat frame) {}
-	virtual void PostProcess(cv::Mat frame) {}
 
-	void Reset();
+	virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<Object3D> object) = 0;
+
+	void Reset(std::shared_ptr<Object3D> object);
 
 	std::string GetTrackingStatus() const { return m_trackingStatus.str(); };
 
@@ -35,8 +35,6 @@ protected:
 	static void ShowMask(const cv::Mat& masks, cv::Mat& buf);
 
 protected:
-	std::shared_ptr<Object3D> m_Object;
-	
 	View* view;
 	cv::Matx33f K;
 
@@ -51,9 +49,7 @@ class TrackerBase : public Tracker {
 public:
 	TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> object);
 
-	virtual void PreProcess(cv::Mat frame) override;
-	virtual void PostProcess(cv::Mat frame) override;
-	virtual void UpdateHist(cv::Mat frame);
+	virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<Object3D> object) override;
 
 protected:
 	void DetectEdge(const cv::Mat& img, cv::Mat& edge_map);
@@ -68,7 +64,7 @@ class SLTracker: public TrackerBase {
 public:
 	SLTracker(const cv::Matx33f& K, std::shared_ptr<Object3D> object);
 
-	void GetBundleProb(const cv::Mat& frame);
+	void GetBundleProb(std::shared_ptr<Object3D> object, const cv::Mat& frame);
 	void FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth);
 
 protected:

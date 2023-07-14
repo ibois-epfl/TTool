@@ -25,12 +25,13 @@ namespace tslet
         void Consume(int modelID, std::shared_ptr<Object3D> object, cv::Matx33f K);
 
         /**
-         * @brief Call the PostProcess function of the tracker which update the TCLC histogram from the projected model on the frame
+         * @brief Call the UpdateHistogram function of the tracker which update the TCLC histogram from the projected model on the frame
          * 
+         * @param object  the object to be tracked
          * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
          * @param frame   the current frame from the camera
          */
-        void UpdateHistogram(int modelID, cv::Mat frame);
+        void UpdateHistogram(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame);
 
         /**
          * @brief Set the Pose object

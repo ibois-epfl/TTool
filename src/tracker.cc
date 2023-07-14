@@ -19,11 +19,10 @@ Tracker::Tracker(const cv::Matx33f& K, std::shared_ptr<Object3D> object) {
 	if (object->getModelID() == 0) {
 		object->setModelID(1);
 	}
-	this->m_Object = object;
-	this->m_Object->initBuffers();
+	object->initBuffers();
 	// Maybe this should be move to the run_on_video where the histogram is generated, otherwise segmentation fault
 	// this->objects[i]->generateTemplates();
-	this->m_Object->reset();
+	object->reset();
 }
 
 Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<Object3D> objects) {
@@ -34,20 +33,15 @@ Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& di
 	return poseEstimator;
 }
 
-void Tracker::Reset() {
-	m_Object->reset();
 
-	initialized = false;
-}
-
-
-void Tracker::ToggleTracking(int objectIndex, bool undistortedFrame) {
-	if (!m_Object->isInitialized()) {
-		m_Object->initialize();
+void Tracker::ToggleTracking(std::shared_ptr<Object3D> object) {
+	if (!object->isInitialized()) {
+		object->initialize();
 		initialized = true;
 	}
 	else {
-		m_Object->reset();
+		// FIXME: This part might be useless, as model manager already reset the object
+		object->reset();
 		initialized = false;
 	}
 }
@@ -178,10 +172,10 @@ void Tracker::ShowMask(const cv::Mat& masks, cv::Mat& buf) {
 	}
 }
 
-TrackerBase::TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> objects) 
-: Tracker(K, objects) 
+TrackerBase::TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> object) 
+: Tracker(K, object) 
 {
-	hists = new RBOTHist(objects);
+	hists = new RBOTHist(object);
 }
 
 void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
@@ -193,19 +187,11 @@ void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
 	cv::Canny(img_gray, img_edge, CANNY_LOW_THRESH, CANNY_HIGH_THRESH);
 }
 
-void TrackerBase::PreProcess(cv::Mat frame) {
-	UpdateHist(frame);
-}
-
-void TrackerBase::PostProcess(cv::Mat frame) {
-	UpdateHist(frame);
-}
-
-void TrackerBase::UpdateHist(cv::Mat frame) {
+void TrackerBase::UpdateHistogram(cv::Mat frame, std::shared_ptr<Object3D> object) {
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
 		view->SetLevel(0);
-		view->RenderSilhouette(m_Object, GL_FILL);
+		view->RenderSilhouette(object, GL_FILL);
 		cv::Mat masks_map = view->DownloadFrame(View::MASK);
 		cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 
@@ -219,14 +205,14 @@ SLTracker::SLTracker(const cv::Matx33f& K, std::shared_ptr<Object3D> objects)
 	search_line = std::make_shared<SearchLine>();
 }
 
-void SLTracker::GetBundleProb(const cv::Mat& frame) {
+void SLTracker::GetBundleProb(std::shared_ptr<Object3D> object, const cv::Mat& frame) {
 	std::vector<std::vector<cv::Point> >& search_points = search_line->search_points;
 	std::vector<std::vector<cv::Point2f> >& bundle_prob = search_line->bundle_prob;
 	bundle_prob.clear();
 
 	int level = view->GetLevel();
 	int upscale = pow(2, level);
-	std::shared_ptr<TCLCHistograms> tclcHistograms = m_Object->getTCLCHistograms();
+	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();
 	int numBins = tclcHistograms->getNumBins();

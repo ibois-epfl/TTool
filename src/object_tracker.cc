@@ -6,22 +6,21 @@ void ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D> object, cv::M
 {
     // We expect the frame to already be undistorted
     cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
-    if (HasPreviousTracker())
-    {
-        m_TrackerPtr->ToggleTracking(0, false);
-        m_TrackerPtr->Reset(); // Go through the objects in the tracker and reset its histogram
-        m_TrackerPtr.reset();
-    }
+    // if (HasTracker(modelID) && object->isInitialized())
+    // {
+    //     std::cout << "Tracker already set up for model " << modelID << std::endl;
+    //     return;
+    // }
     m_TrackerPtr = std::shared_ptr<Tracker>(Tracker::GetTracker(1, K, distCoeffs, object));
     m_CurrentModelID = modelID;
-    m_TrackerPtr->ToggleTracking(0, true);
+    m_TrackerPtr->ToggleTracking(object);
     if (!HasPose(modelID))
     {
         m_ModelID2pose[modelID] = object->getPose();
     }
 }
 
-void ObjectTracker::UpdateHistogram(int modelID, cv::Mat frame)
+void ObjectTracker::UpdateHistogram(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame)
 {
     if (!HasTracker(modelID))
     {
@@ -29,7 +28,7 @@ void ObjectTracker::UpdateHistogram(int modelID, cv::Mat frame)
         return;
     }
 
-    m_TrackerPtr->PostProcess(frame);
+    m_TrackerPtr->UpdateHistogram(frame, object);
 }
 
 void ObjectTracker::SetPose(int modelID, cv::Matx44f pose)
@@ -43,7 +42,7 @@ void ObjectTracker::SetPose(int modelID, cv::Matx44f pose)
     m_ModelID2pose[modelID] = pose;
 }
 
-void ObjectTracker::CallEstimatePose(std::shared_ptr<Object3D>object, int modelID, cv::Mat frame)
+void ObjectTracker::CallEstimatePose(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame)
 {
     if (!HasTracker(modelID))
     {
