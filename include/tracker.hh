@@ -55,7 +55,7 @@ protected:
 	void DetectEdge(const cv::Mat& img, cv::Mat& edge_map);
 	
 protected:
-	Histogram* hists;
+	Histogram* m_Histogram;
 };
 
 class SearchLine;

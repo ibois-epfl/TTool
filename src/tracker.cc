@@ -175,7 +175,7 @@ void Tracker::ShowMask(const cv::Mat& masks, cv::Mat& buf) {
 TrackerBase::TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> object) 
 : Tracker(K, object) 
 {
-	hists = new RBOTHist(object);
+	m_Histogram = new RBOTHist(object);
 }
 
 void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
@@ -195,7 +195,7 @@ void TrackerBase::UpdateHistogram(cv::Mat frame, std::shared_ptr<Object3D> objec
 		cv::Mat masks_map = view->DownloadFrame(View::MASK);
 		cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
 
-		hists->Update(frame, masks_map, depth_map, afg, abg);
+		m_Histogram->Update(object, frame, masks_map, depth_map, afg, abg);
 	}
 }
 

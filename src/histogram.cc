@@ -10,23 +10,22 @@ Histogram::Histogram() {
 Histogram::~Histogram() {}
 
 RBOTHist::RBOTHist(const std::shared_ptr<Object3D> object) {
-	m_Object = object;
 	if (object->getTCLCHistograms() == nullptr)
 		object->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(object, 32, 40, 10.0f)));
 	else
 		std::cout << "RBOTHist::RBOTHist: TCLCHistograms already exists!" << std::endl;
 }
 
-void RBOTHist::Update(const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, float afg, float abg){
+void RBOTHist::Update(std::shared_ptr<Object3D> object, const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, float afg, float abg){
 	float zNear = view->GetZNear();
 	float zFar = view->GetZFar();
 	cv::Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
 
-	m_Object->getTCLCHistograms()->update(frame, mask_map, depth_map, K, zNear, zFar, afg, abg);
+	object->getTCLCHistograms()->update(frame, mask_map, depth_map, K, zNear, zFar, afg, abg);
 }
 
-void RBOTHist::GetPixelProb(uchar rc, uchar gc, uchar bc, int x, int y, float& ppf, float& ppb) {
-	std::shared_ptr<TCLCHistograms> tclcHistograms = m_Object->getTCLCHistograms();
+void RBOTHist::GetPixelProb(std::shared_ptr<Object3D> object, uchar rc, uchar gc, uchar bc, int x, int y, float& ppf, float& ppb) {
+	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	uchar* initializedData = tclcHistograms->getInitialized().data;
@@ -91,13 +90,13 @@ void RBOTHist::GetPixelProb(uchar rc, uchar gc, uchar bc, int x, int y, float& p
 	}
 }
 
-void RBOTHist::GetRegionProb(const cv::Mat& frame, cv::Mat& prob_map) {
+void RBOTHist::GetRegionProb(std::shared_ptr<Object3D> object, const cv::Mat& frame, cv::Mat& prob_map) {
 	prob_map = cv::Mat(frame.size(), CV_8UC1);
 
 	int level = view->GetLevel();
 	int upscale = pow(2, level);
 	
-	std::shared_ptr<TCLCHistograms> tclcHistograms = m_Object->getTCLCHistograms();
+	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();
 	int numBins = tclcHistograms->getNumBins();
