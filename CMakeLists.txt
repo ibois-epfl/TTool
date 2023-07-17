@@ -9,57 +9,77 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(cmake/dataset.cmake)
 
-FILE(GLOB glsl_SOURCES src/shader/*.glsl)
+file(GLOB glsl_SOURCES src/shader/*.glsl)
 source_group("shader" FILES ${glsl_SOURCES})
 
-FILE(GLOB TTool_SOURCES src/*.cc)
+file(GLOB TTool_SOURCES src/*.cc)
 list(REMOVE_ITEM TTool_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc)
+
+set(TTOOL_INSTALL_TARGETS ttool_lib)
+
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
-add_library(TTool SHARED ${TTool_SOURCES} ${glsl_SOURCES})
-target_include_directories(TTool PUBLIC 
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${OpenCV_INCLUDE_DIRS}
-        ${OPENGL_INCLUDE_DIR}
-        ${GLM_INCLUDE_DIR}
-        ${GLEW_INCLUDE_DIR}
-        )
-target_link_libraries(TTool PUBLIC
-        ${OpenCV_LIBS}
-        ${CMAKE_THREAD_LIBS_INIT}
-        glfw
-        ${GLFW_LIBRARIES}
-        GLEW
-        GLU
-        glog::glog
-        ${OPENGL_LIBRARIES}
-        ${ASSIMP_LIBRARIES}
-        ${CMAKE_DL_LIBS}
-        ${TORCH_LIBRARIES}
-        )
+add_library(ttool_lib SHARED
+    ${TTool_SOURCES} ${glsl_SOURCES})
 
-# FIXME: attach dependecies to install TTool
-install(TARGETS TTool DESTINATION lib)
-file(GLOB_RECURSE TTool_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hh)
-foreach(HEADER_FILE ${TTool_HEADERS})
-    get_filename_component(HEADER_FILE_DIR ${HEADER_FILE} DIRECTORY)
-    file(RELATIVE_PATH HEADER_FILE_DIR_REL ${CMAKE_CURRENT_SOURCE_DIR}/include ${HEADER_FILE_DIR})
-    install(FILES ${HEADER_FILE} DESTINATION include/TTool/${HEADER_FILE_DIR_REL})
-endforeach()
+add_library(TTool::ttool ALIAS ttool_lib)
 
-# Add uninstall target
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
-add_custom_target(TTool_uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+target_link_libraries(ttool_lib
+    #        ${CMAKE_THREAD_LIBS_INIT}
+    PUBLIC
+      ${OpenCV_LIBS}
+      glm::glm
+      glog::glog
+      assimp
+      GLEW::GLEW
+      OpenGL::GL
+    #        ${CMAKE_DL_LIBS}
+)
+
+set_property(TARGET ttool_lib PROPERTY PUBLIC_HEADER ${TTOOL_PUBLIC_HDRS})
+target_include_directories(ttool_lib
+    PUBLIC    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    INTERFACE $<INSTALL_INTERFACE:include/TTool>
+)
 
 # # create TTool executable
-if (OPT_BUILD_TTOOL_EXE)
+if (TTOOL_BUILD_TTOOL_EXE)
     add_executable(ttoolexec src/main.cc)
     target_link_libraries(ttoolexec
-                          TTool
-                          )
+        ttool_lib
+        glfw
+        OpenGL::GLU
+    )
+    list(APPEND TTOOL_INSTALL_TARGETS ttoolexec)
 endif()
+
+if(NOT TTOOL_TARGETS_EXPORT)
+    set(TTOOL_TARGETS_EXPORT ${PROJECT_NAME}Targets)
+endif()
+
+include(GNUInstallDirs)
+install(TARGETS ${TTOOL_INSTALL_TARGETS}
+    EXPORT ${TTOOL_TARGETS_EXPORT}
+    LIBRARY
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      COMPONENT Libraries
+    ARCHIVE
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      COMPONENT Libraries
+    RUNTIME
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      COMPONENT Executables
+    PUBLIC_HEADER
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/TTool
+      COMPONENT Developpment
+)
+
+install(EXPORT ${TTOOL_TARGETS_EXPORT}
+    NAMESPACE TTool::
+    DESTINATION lib/cmake/${PROJECT_NAME}
+    COMPONENT Developpment)
+
+# Export for build tree
+export(EXPORT ${TTOOL_TARGETS_EXPORT}
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/${TTOOL_TARGETS_EXPORT}.cmake")
