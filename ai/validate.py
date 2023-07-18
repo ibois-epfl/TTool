@@ -10,16 +10,9 @@ import torchvision
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from train import (
-    FabricationDataset,
-    LitClassifier,
-    ResNet,
-    ToolDataset,
-    TransferEfficientNet,
-    TransferResNet,
-    label_transform,
-    labels,
-)
+import datasets
+import models
+import train
 
 torch.set_float32_matmul_precision("high")
 
@@ -37,7 +30,7 @@ if model_type == "ResNet":
     image_transform = transforms.Normalize(train_means, train_stds)
     image_transform = transforms.Normalize(train_means, train_stds)
     ckpt = "./lightning_logs/version_0/checkpoints/epoch=199-step=22800.ckpt"
-    network = ResNet()
+    network = models.ResNet()
 if model_type == "ResNet222":
     train_means_stds = pd.read_csv("train_means_stds.csv")
     train_means = train_means_stds["Mean"].values
@@ -45,33 +38,35 @@ if model_type == "ResNet222":
     image_transform = transforms.Normalize(train_means, train_stds)
     image_transform = transforms.Normalize(train_means, train_stds)
     ckpt = "./lightning_logs/version_1/checkpoints/epoch=184-step=21090.ckpt"
-    network = ResNet(nun_blocks=[2, 2, 2])
+    network = models.ResNet(nun_blocks=[2, 2, 2])
 elif model_type == "TransferResNet":
     image_transform = torchvision.models.ResNet18_Weights.DEFAULT.transforms()
     ckpt = "./lightning_logs/version_2/checkpoints/epoch=88-step=10146.ckpt"
-    network = TransferResNet()
+    network = models.TransferResNet()
 elif model_type == "TransferEfficientNet":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
     ckpt = "./lightning_logs/version_3/checkpoints/epoch=176-step=20178.ckpt"
-    network = TransferEfficientNet()
+    network = models.TransferEfficientNet()
 elif model_type == "TransferEfficientNetNewSplit":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
     ckpt = "./lightning_logs/version_61/checkpoints/epoch=45-step=28934.ckpt"
-    network = TransferEfficientNet()
+    network = models.TransferEfficientNet()
 
-val_dataset = ToolDataset(
-    img_dir / "val", transform=image_transform, target_transform=label_transform
+val_dataset = datasets.ToolDataset(
+    img_dir / "val",
+    transform=image_transform,
+    target_transform=datasets.label_transform,
 )
 data_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images/")
-val_dataset = FabricationDataset(
+val_dataset = datasets.FabricationDataset(
     data_dir,
     transform=image_transform,
-    target_transform=label_transform,
+    target_transform=datasets.label_transform,
     subsampling=100,
 )
 val_dataloader = DataLoader(val_dataset, batch_size=25, num_workers=8)
 
-model = LitClassifier.load_from_checkpoint(
+model = train.LitClassifier.load_from_checkpoint(
     ckpt,
     network=network,
 )
@@ -88,11 +83,11 @@ y = torch.cat(ys)
 acc = (y == y_hat).float().mean()
 
 confusion_matrix = sklearn.metrics.confusion_matrix(
-    y, y_hat, labels=np.argsort(labels), normalize="true"
+    y, y_hat, labels=np.argsort(datasets.labels), normalize="true"
 )
 disp = sklearn.metrics.ConfusionMatrixDisplay(
     confusion_matrix=confusion_matrix,
-    display_labels=np.sort(np.array(labels)),  # [np.unique(y)]),
+    display_labels=np.sort(np.array(datasets.labels)),  # [np.unique(y)]),
 )
 disp.plot(text_kw={"fontsize": 6})
 ax = plt.gca()

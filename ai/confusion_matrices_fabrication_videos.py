@@ -8,18 +8,14 @@ import torch
 import torchvision
 from torch.utils.data import DataLoader
 
-from train import (
-    FabricationDataset,
-    LitClassifier,
-    TransferEfficientNet,
-    label_transform,
-    labels,
-)
+import datasets
+import models
+import train
 
 torch.set_float32_matmul_precision("high")
 
 image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
-network = TransferEfficientNet()
+network = models.TransferEfficientNet()
 
 cross_val_dict = {
     # 1: "lightning_logs/version_92/checkpoints/epoch=0-step=146.ckpt",
@@ -42,15 +38,15 @@ cross_val_dict = {
 
 for vid_id, ckpt in cross_val_dict.items():
     data_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images/")
-    val_dataset = FabricationDataset(
+    val_dataset = datasets.FabricationDataset(
         data_dir,
         transform=image_transform,
-        target_transform=label_transform,
+        target_transform=datasets.label_transform,
         videos=[vid_id],
     )
     val_dataloader = DataLoader(val_dataset, batch_size=25, num_workers=8)
 
-    model = LitClassifier.load_from_checkpoint(
+    model = train.LitClassifier.load_from_checkpoint(
         ckpt,
         network=network,
     )
@@ -67,11 +63,11 @@ for vid_id, ckpt in cross_val_dict.items():
     acc = (y == y_hat).float().mean()
 
     confusion_matrix = sklearn.metrics.confusion_matrix(
-        y, y_hat, labels=np.argsort(labels), normalize="true"
+        y, y_hat, labels=np.argsort(datasets.labels), normalize="true"
     )
     disp = sklearn.metrics.ConfusionMatrixDisplay(
         confusion_matrix=confusion_matrix,
-        display_labels=np.sort(np.array(labels)),  # [np.unique(y)]),
+        display_labels=np.sort(np.array(datasets.labels)),  # [np.unique(y)]),
     )
     disp.plot(text_kw={"fontsize": 6})
     ax = plt.gca()
