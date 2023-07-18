@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from train import (
+    FabricationDataset,
     LitClassifier,
     ResNet,
     ToolDataset,
@@ -26,7 +27,8 @@ img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
 # model_type = "ResNet"
 # model_type = "ResNet222"
 # model_type = "TransferResNet"
-model_type = "TransferEfficientNet"
+# model_type = "TransferEfficientNet"
+model_type = "TransferEfficientNetNewSplit"
 
 if model_type == "ResNet":
     train_means_stds = pd.read_csv("train_means_stds.csv")
@@ -52,9 +54,20 @@ elif model_type == "TransferEfficientNet":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
     ckpt = "./lightning_logs/version_3/checkpoints/epoch=176-step=20178.ckpt"
     network = TransferEfficientNet()
+elif model_type == "TransferEfficientNetNewSplit":
+    image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
+    ckpt = "./lightning_logs/version_61/checkpoints/epoch=45-step=28934.ckpt"
+    network = TransferEfficientNet()
 
 val_dataset = ToolDataset(
     img_dir / "val", transform=image_transform, target_transform=label_transform
+)
+data_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images/")
+val_dataset = FabricationDataset(
+    data_dir,
+    transform=image_transform,
+    target_transform=label_transform,
+    subsampling=100,
 )
 val_dataloader = DataLoader(val_dataset, batch_size=25, num_workers=8)
 
@@ -79,7 +92,7 @@ confusion_matrix = sklearn.metrics.confusion_matrix(
 )
 disp = sklearn.metrics.ConfusionMatrixDisplay(
     confusion_matrix=confusion_matrix,
-    display_labels=np.sort(np.array(labels)[np.unique(y)]),
+    display_labels=np.sort(np.array(labels)),  # [np.unique(y)]),
 )
 disp.plot(text_kw={"fontsize": 6})
 ax = plt.gca()
@@ -88,5 +101,5 @@ ax.tick_params(axis="both", which="minor", labelsize=6)
 plt.xticks(rotation=90)
 plt.tight_layout()
 plt.title(f"{model_type} acc={acc:.2f}")
-plt.savefig(f"confusion_matrix_{model_type}.pdf")
+plt.savefig(f"confusion_matrix_{model_type}_fabrication_shifted_labels.pdf")
 plt.close()
