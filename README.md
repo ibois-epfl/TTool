@@ -37,6 +37,16 @@ gantt
     (10)2d detection - integration API                           :2ddetinteg, after 2ddetrefin, 10d
     (11) 3d pose detector                                        :crit, 3dposde, after 2ddetinteg, 12d
 
+    section ML imaging team
+    (12)provide the trained model to AC team :providemodel, 2023-07-18, 2023-07-20
+    (13)CAM visualization for visual debugging :camvis, after providemodel, 5d
+    (14)Retrain the model with synthetic data :retrain, after synth, 5d
+
+    section ML AC team
+    (15)Getting more fixed camera view data :getdata, 2023-07-18, 2023-07-20
+    (16)Integrate the model in AC :integ, after getdata, 5d
+    (17)Synthetic data generation :synth, after integ, 7d
+
     section optimisation
     (**)tSLET optimisation                                        :crit, optim, after 2ddetinteg, 12d
 
