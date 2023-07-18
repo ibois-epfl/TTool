@@ -1,5 +1,5 @@
-DATADIR="/home/aymanns/projects/ENAC_augmented_carpentry/data/raw_data"
-IMAGEDIR="/home/aymanns/projects/ENAC_augmented_carpentry/data/images"
+DATADIR="/data/ENAC/iBOIS/undistorted_videos"
+IMAGEDIR="/data/ENAC/iBOIS/images"
 
 for TOOLDIR in $DATADIR/*
 do
@@ -10,6 +10,6 @@ do
         echo "\t${VIDFILE}"
         VIDNAME="$(basename ${VIDFILE})"
         # echo "\t\t${VIDNAME%.*}"
-        ffmpeg -i $VIDFILE -r 1/1 "${IMAGEDIR}/${TOOLNAME}__${VIDNAME%.*}_%09d.png"
+        ffmpeg -i $VIDFILE "${IMAGEDIR}/${TOOLNAME}__${VIDNAME%.*}_%09d.png"
     done
 done
