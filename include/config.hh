@@ -251,11 +251,25 @@ namespace ttool
              * @brief Get the Config Data object. This object is const meaning that it cannot be modified. To modify the config file, use the write function.
              * 
              * 
-             * @return const ConfigData& 
+             * @return ConfigData
              */
-            const ConfigData& GetConfigData() const
+            ConfigData GetConfigData()
             {
-                return m_ConfigData;
+                // Create a copy of the ConfigData object
+                ConfigData configData = this->m_ConfigData;
+                // Prefix the model files with the __TTOOL_ROOT_PATH__ macro
+                for (auto& modelFile : configData.ModelFiles)
+                {
+                    modelFile = std::string(__TTOOL_ROOT_PATH__) + "/" + modelFile;
+                }
+                // Prefix the acit files with the __TTOOL_ROOT_PATH__ macro
+                for (auto& acitFile : configData.AcitFiles)
+                {
+                    acitFile = std::string(__TTOOL_ROOT_PATH__) + "/" + acitFile;
+                }
+                // Prefix the classifier model path with the __TTOOL_ROOT_PATH__ macro
+                configData.ClassifierModelPath = std::string(__TTOOL_ROOT_PATH__) + "/" + configData.ClassifierModelPath;
+                return configData;
             }
 
             /**
