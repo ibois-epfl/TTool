@@ -1,4 +1,14 @@
 /debug/*
+
+# ai classifier
+ai/__pycache__
+
+ai/checkpoints/*
+!ai/checkpoints/.keep
+
+ai/torchscripts/*
+!ai/torchscripts/.keep
+
 ## >>>>>>>>> cmake >>>>>>>>>
 # Compiled Object files
 **/.DS_Store
