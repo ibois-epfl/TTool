@@ -16,7 +16,6 @@ import train
 
 torch.set_float32_matmul_precision("high")
 
-img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
 # model_type = "ResNet"
 # model_type = "ResNet222"
 # model_type = "TransferResNet"
@@ -52,17 +51,24 @@ elif model_type == "TransferEfficientNetNewSplit":
     ckpt = "./lightning_logs/version_61/checkpoints/epoch=45-step=28934.ckpt"
     network = models.TransferEfficientNet()
 
+# img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
+# val_dataset = datasets.ToolDataset(
+#     img_dir / "val",
+#     transform=image_transform,
+#     target_transform=datasets.label_transform,
+# )
+# data_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images/")
+# val_dataset = datasets.FabricationDataset(
+#     data_dir,
+#     transform=image_transform,
+#     target_transform=datasets.label_transform,
+#     subsampling=100,
+# )
+img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images")
 val_dataset = datasets.ToolDataset(
-    img_dir / "val",
+    img_dir,
     transform=image_transform,
     target_transform=datasets.label_transform,
-)
-data_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images/")
-val_dataset = datasets.FabricationDataset(
-    data_dir,
-    transform=image_transform,
-    target_transform=datasets.label_transform,
-    subsampling=100,
 )
 val_dataloader = DataLoader(val_dataset, batch_size=25, num_workers=8)
 
@@ -96,5 +102,5 @@ ax.tick_params(axis="both", which="minor", labelsize=6)
 plt.xticks(rotation=90)
 plt.tight_layout()
 plt.title(f"{model_type} acc={acc:.2f}")
-plt.savefig(f"confusion_matrix_{model_type}_fabrication_shifted_labels.pdf")
+plt.savefig(f"confusion_matrix_{model_type}_test_dataset.pdf")
 plt.close()
