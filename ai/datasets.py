@@ -25,30 +25,35 @@ labels = [
 # Map used to homogenise the labels between the
 # first data set and the labels of the fabrication data set
 mapping = {
-    "auger_bit_24_400": "auger_bit_24_400",
-    "auger_drill_bit_20_450": "auger_drill_bit_20_450",
-    "chain_saw_blade_f_250": "chain_saw_blade_f_250",
-    "self_feeding_bit_50": "self_feeding_bit_50",
-    "spade_drill_bit_35": "spade_drill_bit_35",
-    "auger_drill_bit_20_235": "auger_drill_bit_20_235",
-    "auger_drill_bit_30_400": "auger_drill_bit_30_400",
-    "circular_saw_blade_makita_190": "circular_saw_blade_makita_190",
-    "self_feeding_drill_bit_30_90": "self_feeding_drill_bit_30_90",
-    "twist_drill_bit_32_90": "twist_drill_bit_32_90",
     "auger_drill_bit_20_400": "auger_drill_bit_20_400",
+    "auger_drill_bit_20_450": "auger_drill_bit_20_450",
+    "auger_drill_bit_20_235": "auger_drill_bit_20_235",
+    "auger_bit_24_400": "auger_bit_24_400",
+    "auger_drill_bit_30_400": "auger_drill_bit_30_400",
     "brad_point_drill_bit_20_150": "brad_point_drill_bit_20_150",
-    "saber_saw_blade": "saber_saw_blade",
-    "spade_drill_bit_25": "spade_drill_bit_25",
+    "chain_saw_blade_f_250": "chain_saw_blade_f_250",
     "circular_sawblade_140": "circular_saw_blade_makita_190",
-    "saber_sawblade_t1": "saber_saw_blade",
+    "circular_saw_blade_makita_190": "circular_saw_blade_makita_190",
     "drill_oblique_hole_bit_40": "twist_drill_bit_32_90",
     "drill_auger_bit_25_500": "auger_drill_bit_20_450",
     "drill_auger_bit_20_200": "auger_drill_bit_20_235",
     "drill_hinge_cutter_bit_50": "self_feeding_bit_50",
-    "st_screw_120": "NA",
-    "st_screw_100": "NA",
-    "st_screw_80": "NA",
+    "saber_saw_blade": "saber_saw_blade",
+    "saber_saw_blade_makita_t": "saber_saw_blade",  # check this
+    "saber_sawblade_t1": "saber_saw_blade",
+    "self_feeding_drill_bit_30_90": "self_feeding_drill_bit_30_90",
+    "self_feeding_bit_40_90": "self_feeding_drill_bit_30_90",  # check this
+    "self_feeding_bit_50": "self_feeding_bit_50",
+    "self_feeding_bit_50_90": "self_feeding_bit_50",  # check this
+    "spade_drill_bit_25": "spade_drill_bit_25",
+    "spade_drill_bit_25_150": "spade_drill_bit_25",
+    "spade_drill_bit_35": "spade_drill_bit_35",
     "st_screw_45": "NA",
+    "st_screw_80": "NA",
+    "st_screw_100": "NA",
+    "st_screw_120": "NA",
+    "twist_drill_bit_32_90": "twist_drill_bit_32_90",
+    "twist_drill_bit_32_165": "twist_drill_bit_32_90",  # check this
 }
 
 
@@ -74,6 +79,7 @@ class ToolDataset(torch.utils.data.Dataset):
         image = torchvision.io.read_image(str(img_path))
         image = image.float() / 255
         label = img_path.stem.split("__")[0]
+        label = mapping[label]
         if self.transform:
             image = self.transform(image)
         if self.target_transform:
