@@ -1,58 +1,55 @@
 %YAML:1.0
 ---
-alphaForeground: 1.0000000149011612e-01
-alphaBackground: 2.0000000298023224e-01
-zn: 1.
+zn: 9.9999997473787516e-05
 zf: 4000.
 histOffset: 100
 histRad: 40
 searchRad: 25
-cameraConfigFile: "./live_camera/calibration_orange_A_1280_720_r.yml"
 groundTruthPoses:
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
-   - [ 1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1 ,0 ]
+   - [ 9.84866619e-01, -4.03894819e-02, 1.68541461e-01, -1.62771076e-01,
+       1.18437737e-01, 9.79524612e-01, -5.95245212e-02, -9.92136419e-01,
+       1.10068895e-01, 0., 0., 1.39999986e-01 ]
+   - [ -5.42542815e-01, 8.39947045e-01, -1.11253709e-02, 5.06054997e-01,
+       3.16238910e-01, -8.02426398e-01, -6.70481861e-01, -4.40981954e-01,
+       -5.96643448e-01, -1.26680557e-03, 4.37926613e-02, 2.52720535e-01 ]
+   - [ 8.19440663e-01, 5.45331001e-01, -1.76395491e-01, 1.42224208e-01,
+       -4.91604596e-01, -8.59123707e-01, -5.55223823e-01, 6.78913355e-01,
+       -4.80406970e-01, 1.67723373e-02, 2.61279512e-02, 1.92897707e-01 ]
+   - [ 9.50834990e-01, 2.37247661e-01, -1.99040413e-01, 2.44926587e-02,
+       -6.98316872e-01, -7.15365469e-01, -3.08712870e-01, 6.75321281e-01,
+       -6.69801235e-01, -2.26506889e-02, 2.32661795e-02, 1.76990986e-01 ]
+   - [ -8.28246951e-01, 2.30366185e-01, 5.10807216e-01, 2.39123389e-01,
+       -6.79095149e-01, 6.94000125e-01, 5.06760836e-01, 6.96950197e-01,
+       5.07382751e-01, -2.56683957e-02, 2.72371043e-02, 1.72090665e-01 ]
+   - [ -8.07440519e-01, 4.48605478e-01, -3.83105516e-01, -5.85106611e-01,
+       -6.91857159e-01, 4.23044086e-01, -7.52737448e-02, 5.65754294e-01,
+       8.21124077e-01, -5.82594611e-03, 2.99568456e-02, 1.46538332e-01 ]
+   - [ -7.73640037e-01, 4.15423065e-01, -4.78431463e-01, -5.23223341e-01,
+       -8.44716668e-01, 1.12603128e-01, -3.57363552e-01, 3.37440640e-01,
+       8.70876431e-01, 0., 0., 2.20000029e-01 ]
+   - [ 1.33818597e-01, 8.97907972e-01, 4.19309229e-01, 9.80942905e-01,
+       -5.99305406e-02, -1.84715152e-01, -1.40733391e-01, 4.36035246e-01,
+       -8.88844311e-01, 2.64838710e-02, 1.45047512e-02, 1.02048650e-01 ]
+   - [ 1.85747266e-01, -4.76315729e-02, -9.81413007e-01, -4.00147825e-01,
+       9.08572972e-01, -1.19829834e-01, 8.97417665e-01, 4.14981604e-01,
+       1.49699569e-01, 6.66959509e-02, -1.05816480e-02, 7.78000727e-02 ]
 modelFiles:
-   - "/home/as/TTool/assets/toolheads/holzkombihorer_20/model.obj"
-   - "/home/as/TTool/assets/toolheads/ck30/model.obj"
-   - "/home/as/TTool/assets/toolheads/drillBit_20_110/model.obj"
-   - "/home/as/TTool/assets/toolheads/drillBit_14_105/model.obj"
-   - "/home/as/TTool/assets/toolheads/holzspiralbohrer_sp_20/5kmodel.obj"
-   - "/home/as/TTool/assets/toolheads/circular_blade_scaled/circular_blade_scaled.obj"
-   - "/home/as/TTool/assets/toolheads/flachbohrer_25/flachbohrer_25.obj"
-   - "/home/as/TTool/assets/toolheads/selfFeedBits_50/model.obj"
-   - "/home/as/TTool/assets/toolheads/saw_blade_scaled/saw_blade_thin_verythin.obj"
-   - "/home/as/TTool/assets/toolheads/forstnerbohrer_40/forstnerbohrer_40.obj"
-   - "/home/as/TTool/assets/toolheads/selfFeedBits_40_90/model.obj"
-frames: ""
-cameraID: 0
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/circular_saw_blade_makita_190/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/chain_saw_blade_f_250/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/auger_drill_bit_20_235/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/twist_drill_bit_32_165/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_40_90/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_50_90/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/saber_saw_blade_makita_t/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/brad_point_drill_bit_20_150/model.obj"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/spade_drill_bit_25_150/model.obj"
+acitFiles:
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/twist_drill_bit_32_165/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/brad_point_drill_bit_20_150/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_40_90/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/spade_drill_bit_25_150/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/saber_saw_blade_makita_t/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/auger_drill_bit_20_235/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_50_90/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/chain_saw_blade_f_250/metadata.acit"
+   - "/home/tpp/IBOIS/TTool/assets/toolheads/circular_saw_blade_makita_190/metadata.acit"

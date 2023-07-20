@@ -2,13 +2,14 @@
 #include "opencv2/calib3d.hpp"
 #include "opencv2/opencv.hpp"
 
+using namespace ttool::standaloneUtils;
+
 Camera* Camera::BuildCamera(const std::string& frames)
 {
 	struct stat buf;
 
 	Camera* grabber = NULL;
 	if (0 != stat(frames.c_str(), &buf)) {
-        std::cout << "Openning VideoLoaderCamera(1)\n";
 		grabber = new VideoLoaderCamera(2); // <-- TODO: set index as param, for external webcam (4), mounted webcam (2)
 	} else if(S_ISDIR(buf.st_mode)) {
 		grabber = new ImageLoaderCamera(frames);
@@ -16,7 +17,7 @@ Camera* Camera::BuildCamera(const std::string& frames)
 		grabber = new VideoLoaderCamera(frames);
 	}
 
-	if (-1 == grabber->width) {
+	if (-1 == grabber->Width) {
 		delete grabber;
 		return NULL;
 	}	else {
@@ -30,7 +31,7 @@ Camera* Camera::BuildCamera(const int cameraId)
 
 	Camera* grabber = new VideoLoaderCamera(cameraId); // <-- TODO: set index as param, for external webcam (4), mounted webcam (2)
 
-	if (-1 == grabber->width) {
+	if (-1 == grabber->Width) {
 		delete grabber;
 		return NULL;
 	}	else {
@@ -38,17 +39,17 @@ Camera* Camera::BuildCamera(const int cameraId)
 	}
 }
 
-const cv::Mat& Camera::image() const { return image_; }
+const cv::Mat& Camera::Image() const { return m_Image; }
 
-void Camera::preprocess()
+void Camera::Preprocess()
 {
-    cv::resize(image_, image_, cv::Size2i(m_preprocessWidth, m_preprocessHeight));
+    cv::resize(m_Image, m_Image, cv::Size2i(m_PreprocessWidth, m_PreprocessHeight));
     std::vector<cv::Mat> undistMap;
     if( undistMap.size() == 0){
         undistMap.resize(2);
-        cv::initUndistortRectifyMap(m_K, m_distCoeff, cv::Mat(), cv::Mat(), image_.size(), CV_32FC1, undistMap[0], undistMap[1]);
+        cv::initUndistortRectifyMap(m_K, m_DistCoeff, cv::Mat(), cv::Mat(), m_Image.size(), CV_32FC1, undistMap[0], undistMap[1]);
     }
-    cv::remap(image_, image_, undistMap[0], undistMap[1], cv::INTER_CUBIC);
+    cv::remap(m_Image, m_Image, undistMap[0], undistMap[1], cv::INTER_CUBIC);
 }
 
 void Camera::ReadFromFile(std::string filePath)

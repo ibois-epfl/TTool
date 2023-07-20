@@ -1,0 +1,111 @@
+#pragma once
+
+#include "object3d.hh"
+#include "config.hh"
+
+#include <opencv2/opencv.hpp>
+
+
+namespace ttool
+{
+    /**
+     * @brief Class to manage the models, all other classes should use this class to access the models
+     * The current model can be accessed via GetObject()
+     * 
+     */
+    struct DModelManager
+    {
+        public:
+        /**
+         * @brief Construct a new DModelManager object
+         * 
+         * @param modelFiles list of path to the model files
+         * @param gtPoses    list of ground truth poses
+         * @param configPtr  pointer to the config
+         */
+        DModelManager(std::vector<cv::String> modelFiles, std::vector<cv::Matx44f> &gtPoses, std::shared_ptr<Config> configPtr);
+
+        /**
+         * @brief Initialize the models
+        * After view is initialized, OpenGL context is created
+        * this function should be called after view is initialized
+        * because Model needs OpenGL context to initialize
+        * objects should be initialized before any rendering can be done
+        * 
+        */
+        void InitModels();
+
+        /**
+         * @brief Reset the object to ground truth (from a text file)
+         * 
+         */
+        void ResetObjectToInitialPose();
+
+        /**
+         * @brief Get the current object
+         * 
+         * @return std::shared_ptr<Object3D> 
+         */
+        std::shared_ptr<Object3D> GetObject() { return m_CurrentObjectPtr; }
+
+        /**
+         * @brief Set the object ID
+         * 
+         * @param objectID 
+         */
+        void SetObjectID(int objectID);
+
+        /**
+         * @brief Increase the object ID
+         * 
+         */
+        void IncreaseObjectID();
+
+        /**
+         * @brief Get number of objects
+         * 
+         */
+        int GetNumObjects();
+
+        /**
+         * @brief Snapshot the current pose of the current object
+         * Because pose is in the object, but we want that to be in sync with the model manager
+         * 
+         */
+        void SnapshotObjectPose();
+
+        /**
+         * @brief Save all the poses of the model to the specified config file (m_PoseOutput)
+         * 
+         */
+        void SavePosesToConfig();
+
+        private:
+        /**
+         * @brief Convert a vector to a map with ID as key
+         * The ID is 1 based
+         * 
+         * @tparam T 
+         * @param someVector 
+         * @return std::map<int, T>  map with ID as key
+         */
+        template <typename T>
+        std::map<int, T> ConvertVectorToMapID(std::vector<T> someVector);
+
+        /**
+         * @brief Set the Current Object Ptr object to the current ID and initialize it
+         * 
+         */
+        void SetCurrentObjectPtr();
+
+        private:
+        std::map<int, std::string> m_ModelID2ModelFiles;
+        std::map<int, cv::Matx44f> m_ModelID2InitialPoses;
+        std::map<int, cv::Matx44f> m_ModelID2ModelPoses;
+
+        std::shared_ptr<Config> m_ConfigPtr;
+
+        int m_CurrentObjectID = 1; // 1 based indexing
+        std::shared_ptr<Object3D> m_CurrentObjectPtr;
+    };
+}

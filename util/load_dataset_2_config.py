@@ -37,35 +37,49 @@ def get_keys_yml(path : str) -> dict:
 
 def main(dataset_path : str, config_path : str) -> None:
     _log_process("Loading the dataset paths...")
-    num_folders : int = 0
+
     # count the number of subfolders in the dataset path
+    num_folders : int = 0
     for root, dirs, files in os.walk(dataset_path):
         num_folders += len(dirs)
     _log_info("Found {} folders.".format(num_folders))
     model_obj_paths : list[str] = []
+    model_acit_paths : list[str] = []
+    model_init_pose_paths : list[str] = []
     for root, dirs, files in os.walk(dataset_path):
         for file in files:
             if file.endswith(".obj"):
                 model_obj_paths.append(os.path.join(root, file))
+            if file.endswith(".initpose"):
+                model_init_pose_paths.append(os.path.join(root, file))
+            if file.endswith(".acit"):
+                model_acit_paths.append(os.path.join(root, file))
+    _log_info("Found {} .initpose files.".format(len(model_init_pose_paths)))
     _log_info("Found {} .obj files.".format(len(model_obj_paths)))
     print(f"model_obj_paths: {model_obj_paths}")
     print(f"num_folders: {num_folders}")
-    assert len(model_obj_paths) == num_folders, "The number of .obj files is not equal to the number of folders."
+    assert len(model_obj_paths) == num_folders, "The number of .obj files is not equal to the number of folders.\
+        \nPlease make sure that each folder has a .obj file."
+    assert len(model_init_pose_paths) == num_folders, "The number of .initpose files is not equal to the number of folders.\
+        \nPlease make sure that each folder has a .initpose file."
     _log_success("Obj paths found.")
 
     _log_process("Parsing/Modifying the config file with dataset paths and reset poses...")
     key_modelFiles : str = "modelFiles"
     key_resetPoses : str = "groundTruthPoses"
+    key_acitFiles : str = "acitFiles"
 
     dict_keys_lnnbr : dict = get_keys_yml(config_path)
     if key_modelFiles not in dict_keys_lnnbr.keys() or \
-        key_resetPoses not in dict_keys_lnnbr.keys():
-            _log_error("The key 'modelFiles' or 'groundTruthPoses' is not found in the config file.")
-            sys.exit()
+        key_resetPoses not in dict_keys_lnnbr.keys() or \
+            key_acitFiles not in dict_keys_lnnbr.keys():
+        _log_error("The key 'modelFiles' or 'groundTruthPoses' is not found in the config file.")
+        sys.exit()
     
     # cleaning
     key_modelFiles_IDX = list(dict_keys_lnnbr.keys()).index(key_modelFiles)
     key_resetPoses_IDX = list(dict_keys_lnnbr.keys()).index(key_resetPoses)
+    key_acitFiles_IDX = list(dict_keys_lnnbr.keys()).index(key_acitFiles)
     try:
         key_modelFiles_IDX_NEXT = list(dict_keys_lnnbr.keys())[key_modelFiles_IDX + 1]
     except IndexError:
@@ -74,6 +88,11 @@ def main(dataset_path : str, config_path : str) -> None:
         key_resetPoses_IDX_NEXT = list(dict_keys_lnnbr.keys())[key_resetPoses_IDX + 1]
     except IndexError:
         key_resetPoses_IDX_NEXT = None
+    try:
+        key_acitFiles_IDX_NEXT = list(dict_keys_lnnbr.keys())[key_acitFiles_IDX + 1]
+    except IndexError:
+        key_acitFiles_IDX_NEXT = None
+
     with open(config_path, "r") as f:
         lines = f.readlines()
         for i in range(len(lines)):
@@ -89,6 +108,13 @@ def main(dataset_path : str, config_path : str) -> None:
             else:
                 if dict_keys_lnnbr[key_resetPoses] < i:
                     lines[i] = ""
+            if key_acitFiles_IDX_NEXT != None:
+                if dict_keys_lnnbr[key_acitFiles] < i < dict_keys_lnnbr[key_acitFiles_IDX_NEXT]:
+                    lines[i] = ""
+            else:
+                if dict_keys_lnnbr[key_acitFiles] < i:
+                    lines[i] = ""
+
     with open(config_path, "w") as f:
         f.writelines(lines)
     
@@ -99,11 +125,22 @@ def main(dataset_path : str, config_path : str) -> None:
 
     new_lines_modelFiles : list[str] = []
     new_lines_gtPoses : list[str] = []
+    new_lines_acitFiles : list[str] = []
+
     for i in range(len(model_obj_paths)):
+        # load the model path from the file
         new_model_path : str = ""
         new_lines_modelFiles.append("   - \"{}\"\n".format(model_obj_paths[i]))
-        identity_matrix : str = "   - [ 1, 0, 0, 0,\n       0, 1, 0, 0,\n       0, 0, 1 ,0 ]\n"
-        new_lines_gtPoses.append(identity_matrix)
+
+        # load the pose from the file
+        with open(model_init_pose_paths[i], "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                new_model_path += line
+        new_lines_gtPoses.append("{}\n".format(new_model_path))
+
+        # load the acit file
+        new_lines_acitFiles.append("   - \"{}\"\n".format(model_acit_paths[i]))
 
     with open(config_path, "r+") as f:
         lines = f.readlines()
@@ -118,6 +155,10 @@ def main(dataset_path : str, config_path : str) -> None:
             if i == (dict_keys_lnnbr[key_modelFiles]):
                 f.write(lines[i])
                 f.writelines(new_lines_modelFiles)
+                continue
+            if i == (dict_keys_lnnbr[key_acitFiles]):
+                f.write(lines[i])
+                f.writelines(new_lines_acitFiles)
                 continue
             f.write(lines[i])
     _log_success("Config file modified.")
