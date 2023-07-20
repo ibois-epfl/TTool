@@ -65,8 +65,24 @@ int main(int argc, const char* argv[])
     Transform(image, inp);
 
     torch::Tensor output = module.forward({inp}).toTensor();
-    std::cout << output.size(0) << " " << output.size(1) << std::endl;
-    std::cout << output << std::endl;
+    int pred = output.argmax(1).item<int>();
+    std::string pred2tool[NUM_CLASSES] = {
+      "auger_bit_24_400",
+      "auger_drill_bit_20_450",
+      "chain_saw_blade_f_250",
+      "self_feeding_bit_50",
+      "spade_drill_bit_35",
+      "auger_drill_bit_20_235",
+      "auger_drill_bit_30_400",
+      "circular_saw_blade_makita_190",
+      "self_feeding_drill_bit_30_90",
+      "twist_drill_bit_32_90",
+      "auger_drill_bit_20_400",
+      "brad_point_drill_bit_20_150",
+      "saber_saw_blade",
+      "spade_drill_bit_25"
+    };
+    std::cout << "Predicted: " << pred2tool[pred] << std::endl;
   }
   catch (const c10::Error& e)
   {
