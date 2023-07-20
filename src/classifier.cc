@@ -8,6 +8,8 @@ ttool::ML::Classifier::Classifier(std::string modelPath)
 int ttool::ML::Classifier::Classify(cv::Mat image)
 {
     torch::Tensor tensor;
+    cv::imshow("What classifier sees", image);
+    cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
     Transform(image, tensor);
 
     torch::Tensor output = m_Module.forward({tensor}).toTensor();
@@ -22,7 +24,7 @@ int ttool::ML::Classifier::Classify(cv::Mat image)
     return pred;
 }
 
-void ttool::ML::Classifier::Transform(cv::Mat& image, torch::Tensor& tensor)
+void ttool::ML::Classifier::Transform(cv::Mat image, torch::Tensor& tensor)
 {
     cv::resize(image, image, cv::Size(IMAGE_SIZE, IMAGE_SIZE), 0, 0, cv::INTER_CUBIC); // It should be BILINEAR but it is not supported by OpenCV
     image.convertTo(image, CV_32FC3, 1.0f / 255.0f);

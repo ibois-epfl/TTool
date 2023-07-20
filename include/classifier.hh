@@ -42,7 +42,7 @@ namespace ttool::ML
          * @param image   The input image (RGB format)
          * @param tensor  The output tensor
          */
-        void Transform(cv::Mat& image, torch::Tensor& tensor);
+        void Transform(cv::Mat image, torch::Tensor& tensor);
 
         private:
         torch::jit::script::Module m_Module;
