@@ -32,6 +32,9 @@ namespace ttool
             float Zn;
             float Zf;
 
+            // ML
+            std::string ClassifierModelPath;
+
             // Unordered maps are used to help Setters more dynamic typed
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::string>>> stringVectorMembers = {
                 {"modelFiles", std::ref(ModelFiles)},
@@ -51,6 +54,10 @@ namespace ttool
             std::unordered_map<std::string, std::reference_wrapper<float>> floatMembers = {
                 {"zn", std::ref(Zn)},
                 {"zf", std::ref(Zf)}
+            };
+
+            std::unordered_map<std::string, std::reference_wrapper<std::string>> stringMembers = {
+                {"classifierModelPath", std::ref(ClassifierModelPath)}
             };
 
             /**
@@ -118,6 +125,22 @@ namespace ttool
                     it->second.get() = value;
                 }
             }
+
+            /**
+             * @brief Set the Value object
+             * 
+             * @param key key of the value to set
+             * @param value value to set
+             */
+            void setValue(std::string key, std::string value)
+            {
+                SET_UNORDERED_MAP_VALUE(stringMembers, key, value);
+                return;
+                if (auto it = stringMembers.find(key); it != stringMembers.end())
+                {
+                    it->second.get() = value;
+                }
+            }
     };
 
     class Config
@@ -155,7 +178,9 @@ namespace ttool
                 m_ConfigData.setValue("searchRad", (int)fs["searchRad"]);
 
                 m_ConfigData.setValue("zn", (float)fs["zn"]);
-                m_ConfigData.setValue("zf", (float)fs["zf"]);           
+                m_ConfigData.setValue("zf", (float)fs["zf"]);
+
+                m_ConfigData.setValue("classifierModelPath", (std::string)fs["classifierModelPath"]);      
 
                 return fs.release();
             }
@@ -194,6 +219,7 @@ namespace ttool
                 std::cout << "Search rad: " << m_ConfigData.SearchRad << std::endl;
                 std::cout << "Zn: " << m_ConfigData.Zn << std::endl;
                 std::cout << "Zf: " << m_ConfigData.Zf << std::endl;
+                std::cout << "Classifier model path: " << m_ConfigData.ClassifierModelPath << std::endl;
             }
 
             /**
@@ -210,6 +236,8 @@ namespace ttool
                 fs << "histOffset" << m_ConfigData.HistOffset;
                 fs << "histRad" << m_ConfigData.HistRad;
                 fs << "searchRad" << m_ConfigData.SearchRad;
+
+                fs << "classifierModelPath" << m_ConfigData.ClassifierModelPath;
 
                 fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;
                 fs << "modelFiles" << m_ConfigData.ModelFiles;

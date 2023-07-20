@@ -24,6 +24,10 @@ if(NOT GLEW_FOUND)
     message(FATAL_ERROR "GLEW not found!")
 endif()
 
+#libtorch
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/deps/libtorch")
+find_package(Torch REQUIRED)
+
 add_library(TTool SHARED ${TTool_SOURCES} ${glsl_SOURCES})
 target_include_directories(TTool PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -43,6 +47,7 @@ target_link_libraries(TTool PUBLIC
         ${OPENGL_LIBRARIES}
         ${ASSIMP_LIBRARIES}
         ${CMAKE_DL_LIBS}
+        ${TORCH_LIBRARIES}
         ${GLEW_LIBRARIES}
         )
 
