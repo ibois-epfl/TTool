@@ -12,6 +12,8 @@ ai/torchscripts/*
 !ai/torchscripts/.keep
 !ai/torchscripts/efficientnet.pt
 
+deps/libtorch
+
 ## >>>>>>>>> cmake >>>>>>>>>
 # Compiled Object files
 **/.DS_Store
