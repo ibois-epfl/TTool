@@ -10,6 +10,7 @@ ai/checkpoints/*
 
 ai/torchscripts/*
 !ai/torchscripts/.keep
+!ai/torchscripts/efficientnet.pt
 
 ## >>>>>>>>> cmake >>>>>>>>>
 # Compiled Object files
