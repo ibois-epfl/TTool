@@ -11,6 +11,12 @@ int ttool::ML::Classifier::Classify(cv::Mat image)
     Transform(image, tensor);
 
     torch::Tensor output = m_Module.forward({tensor}).toTensor();
+    output = output.softmax(1);
+    auto topk = torch::topk(output, 3, 1); // (values, indices)
+    for (int i = 0; i < 3; ++i)
+    {
+        std::cout << "Top " << i << ": " << std::get<0>(topk)[0][i].item<float>() << " and " << GetLabel(std::get<1>(topk)[0][i].item<int>()) << std::endl;
+    }
     int pred = output.argmax(1).item<int>();
 
     return pred;
