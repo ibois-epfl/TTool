@@ -3,7 +3,7 @@ import subprocess
 
 import pandas as pd
 
-from train import mapping
+from datasets import mapping
 
 out_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_videos_for_inspection")
 data_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images")
@@ -18,11 +18,8 @@ for index, df in annotations.groupby(["Video", "Tool", "UID"]):
         continue
     input_pattern = str(data_dir / f"{vid_id:02}_%9d.png")
     output_file = str(out_dir / f"{tool}_{vid_id}_{uid}.mp4")
-    start_number = df["Frame"].min() - 90
-    if start_number < 0:
-        continue
-    n_frames = 90
-    # n_frames = df["Frame"].max() - start_number
+    start_number = df["Frame"].min()
+    n_frames = df["Frame"].max() - start_number
     subprocess.run(
         [
             "ffmpeg",
