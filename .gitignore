@@ -1,13 +1,18 @@
 ## >>>>>>>>> ttool >>>>>>>>>
 
 /debug/*
-debug/
-debug/**/*
-dataset/
-*.log
 
-# ignore all files in the root directory
-/*.mp4
+# ai classifier
+ai/__pycache__
+
+ai/checkpoints/*
+!ai/checkpoints/.keep
+
+ai/torchscripts/*
+!ai/torchscripts/.keep
+!ai/torchscripts/efficientnet.pt
+
+deps/libtorch
 
 ## >>>>>>>>> cmake >>>>>>>>>
 # Compiled Object files

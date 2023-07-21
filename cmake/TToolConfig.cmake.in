@@ -19,6 +19,10 @@ set(TTool_LIBRARIES TTool)
 # zenodo direct doi link (to change if dataset us updated)
 set(__DSET_DOI__ "https://zenodo.org/record/8144251")
 
-# ttol config loader/unloader
+# ttool config loader/unloader
 set(__TTOOL_CONFIG_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.yml")
 add_compile_definitions(__TTOOL_CONFIG_PATH__="${__TTOOL_CONFIG_PATH__}")
+
+# ttool root path
+set(__TTOOL_ROOT_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}")
+add_compile_definitions(__TTOOL_ROOT_PATH__="${__TTOOL_ROOT_PATH__}")

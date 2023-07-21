@@ -16,6 +16,32 @@ namespace ttool
     class TTOOL_API TTool
     {
     public:
+        TTool(std::string ttoolRootPath, std::string configFile, std::string cameraCalibFile)
+        {
+            m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
+            m_CameraCalibFile = cameraCalibFile;
+            
+            // Initialize the camera matrix from the camera calibration file, as well as the camera size (width and height)
+            ReadCameraMatrix();
+            
+            InitializeView();
+
+            std::vector<cv::Matx44f> preprocessedGroundTruthPoses = PreprocessGroundTruthPoses(m_ConfigPtr->GetConfigData().GroundTruthPoses);
+
+            m_ModelManagerPtr = std::make_shared<ttool::DModelManager>(
+                m_ConfigPtr->GetConfigData().ModelFiles,
+                preprocessedGroundTruthPoses,
+                m_ConfigPtr);
+
+            m_Input = ttool::InputModelManager(m_ModelManagerPtr);
+            InitializeObjectTracker();
+
+            // dry run to initialize silouhette drawing
+            cv::Mat emptyMat = cv::Mat::zeros(480, 640, CV_8UC3);
+            RunOnAFrame(emptyMat);
+        }
+
         TTool(std::string configFile, std::string cameraCalibFile)
         {
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
@@ -43,9 +69,10 @@ namespace ttool
             CheckObjectChange();
         };
 
-        TTool(std::string configFile, cv::Mat cameraMatrix, cv::Size cameraSize)
+        TTool(std::string ttoolRootPath, std::string configFile, cv::Mat cameraMatrix, cv::Size cameraSize)
         {
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
             
 
             CameraMatrix = cameraMatrix.clone();

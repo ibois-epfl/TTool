@@ -10,6 +10,9 @@ RUN apt-get -y install libassimp-dev
 RUN apt-get -y install libgoogle-glog-dev
 RUN apt-get -y install freeglut3-dev libglew-dev libglfw3 libglfw3-dev
 
+# For extracting the libtorch zip
+RUN apt-get -y install unzip
+
 # For downloading the dataset
 RUN apt-get install -y python3
 RUN  apt-get update \

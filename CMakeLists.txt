@@ -43,7 +43,7 @@ target_link_libraries(TTool PUBLIC
         ${OPENGL_LIBRARIES}
         ${ASSIMP_LIBRARIES}
         ${CMAKE_DL_LIBS}
-        ${GLEW_LIBRARIES}
+        ${TORCH_LIBRARIES}
         )
 
 # FIXME: attach dependecies to install TTool
@@ -66,5 +66,10 @@ add_custom_target(TTool_uninstall
 # # create TTool executable
 if (OPT_BUILD_TTOOL_EXE)
     add_executable(ttoolexec src/main.cc)
-    target_link_libraries(ttoolexec TTool glfw ${GLFW_LIBRARIES} GLEW ${GLEW_LIBRARIES})
+    target_link_libraries(ttoolexec
+                          TTool
+                          glfw
+                          ${GLFW_LIBRARIES}
+                          GLEW
+                          )
 endif()

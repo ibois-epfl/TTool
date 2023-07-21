@@ -28,6 +28,18 @@ if (OPT_WITH_CGAL)
     )
 endif()
 
+# libtorch
+if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/libtorch")
+    set(EXTRACT_LIBTORCH_CMD "${PROJECT_SOURCE_DIR}/util/extract_libtorch.sh")
+    execute_process(
+        COMMAND chmod +x ${EXTRACT_LIBTORCH_CMD}
+        COMMAND ${EXTRACT_LIBTORCH_CMD} ${PROJECT_SOURCE_DIR}
+    )
+endif()
+
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/deps/libtorch")
+find_package(Torch REQUIRED)
+
 if (OPT_BUILD_TTOOL_EXE)
     find_package(assimp REQUIRED)
     if(NOT assimp_FOUND)

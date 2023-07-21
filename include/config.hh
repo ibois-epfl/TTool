@@ -32,6 +32,9 @@ namespace ttool
             float Zn;
             float Zf;
 
+            // ML
+            std::string ClassifierModelPath;
+
             // Unordered maps are used to help Setters more dynamic typed
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::string>>> stringVectorMembers = {
                 {"modelFiles", std::ref(ModelFiles)},
@@ -51,6 +54,10 @@ namespace ttool
             std::unordered_map<std::string, std::reference_wrapper<float>> floatMembers = {
                 {"zn", std::ref(Zn)},
                 {"zf", std::ref(Zf)}
+            };
+
+            std::unordered_map<std::string, std::reference_wrapper<std::string>> stringMembers = {
+                {"classifierModelPath", std::ref(ClassifierModelPath)}
             };
 
             /**
@@ -118,6 +125,22 @@ namespace ttool
                     it->second.get() = value;
                 }
             }
+
+            /**
+             * @brief Set the Value object
+             * 
+             * @param key key of the value to set
+             * @param value value to set
+             */
+            void setValue(std::string key, std::string value)
+            {
+                SET_UNORDERED_MAP_VALUE(stringMembers, key, value);
+                return;
+                if (auto it = stringMembers.find(key); it != stringMembers.end())
+                {
+                    it->second.get() = value;
+                }
+            }
     };
 
     class Config
@@ -155,7 +178,9 @@ namespace ttool
                 m_ConfigData.setValue("searchRad", (int)fs["searchRad"]);
 
                 m_ConfigData.setValue("zn", (float)fs["zn"]);
-                m_ConfigData.setValue("zf", (float)fs["zf"]);           
+                m_ConfigData.setValue("zf", (float)fs["zf"]);
+
+                m_ConfigData.setValue("classifierModelPath", (std::string)fs["classifierModelPath"]);      
 
                 return fs.release();
             }
@@ -194,6 +219,7 @@ namespace ttool
                 std::cout << "Search rad: " << m_ConfigData.SearchRad << std::endl;
                 std::cout << "Zn: " << m_ConfigData.Zn << std::endl;
                 std::cout << "Zf: " << m_ConfigData.Zf << std::endl;
+                std::cout << "Classifier model path: " << m_ConfigData.ClassifierModelPath << std::endl;
             }
 
             /**
@@ -211,6 +237,8 @@ namespace ttool
                 fs << "histRad" << m_ConfigData.HistRad;
                 fs << "searchRad" << m_ConfigData.SearchRad;
 
+                fs << "classifierModelPath" << m_ConfigData.ClassifierModelPath;
+
                 fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;
                 fs << "modelFiles" << m_ConfigData.ModelFiles;
 
@@ -223,11 +251,36 @@ namespace ttool
              * @brief Get the Config Data object. This object is const meaning that it cannot be modified. To modify the config file, use the write function.
              * 
              * 
-             * @return const ConfigData& 
+             * @return ConfigData
              */
-            const ConfigData& GetConfigData() const
+            ConfigData GetConfigData()
             {
-                return m_ConfigData;
+                // Create a copy of the ConfigData object
+                ConfigData configData = this->m_ConfigData;
+                // Prefix the model files with the m_TToolRootPath
+                for (auto& modelFile : configData.ModelFiles)
+                {
+                    modelFile = std::string(m_TToolRootPath) + "/" + modelFile;
+                }
+                // Prefix the acit files with the m_TToolRootPath
+                for (auto& acitFile : configData.AcitFiles)
+                {
+                    acitFile = std::string(m_TToolRootPath) + "/" + acitFile;
+                }
+                // Prefix the classifier model path with the m_TToolRootPath
+                configData.ClassifierModelPath = std::string(m_TToolRootPath) + "/" + configData.ClassifierModelPath;
+                return configData;
+            }
+
+            /**
+             * @brief Set the TToolRootPath
+             * TToolRootPath is the path to the root of the ttool folder. It is used to prefix the model files, acit files and classifier model path.
+             * 
+             * @return std::string 
+             */
+            void SetTToolRootPath(std::string ttoolRootPath)
+            {
+                m_TToolRootPath = ttoolRootPath;
             }
 
             /**
@@ -248,5 +301,6 @@ namespace ttool
         private:
             std::string m_ConfigFile;
             ConfigData m_ConfigData;
+            std::string m_TToolRootPath = "";
     };
 }
