@@ -1,0 +1,90 @@
+timestamp: Jul 14 2023 11:00:03
+config_file: /home/tpp/IBOIS/TTool/assets/config.yml
+model_files: 
+	modelID (1)/home/tpp/IBOIS/TTool/assets/toolheads/circular_saw_blade_makita_190/model.obj
+	modelID (2)/home/tpp/IBOIS/TTool/assets/toolheads/chain_saw_blade_f_250/model.obj
+	modelID (3)/home/tpp/IBOIS/TTool/assets/toolheads/auger_drill_bit_20_235/model.obj
+	modelID (4)/home/tpp/IBOIS/TTool/assets/toolheads/twist_drill_bit_32_165/model.obj
+	modelID (5)/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_40_90/model.obj
+	modelID (6)/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_50_90/model.obj
+	modelID (7)/home/tpp/IBOIS/TTool/assets/toolheads/saber_saw_blade_makita_t/model.obj
+	modelID (8)/home/tpp/IBOIS/TTool/assets/toolheads/brad_point_drill_bit_20_150/model.obj
+	modelID (9)/home/tpp/IBOIS/TTool/assets/toolheads/spade_drill_bit_25_150/model.obj
+objectID: 1
+pose: 
+	0.985986 -0.0246229 0.165003 0.000500194
+	-0.161226 0.113568 0.980357 -5.01866e-05
+	-0.0428786 -0.993222 0.108004 0.141164
+	0 0 0 1
+objectID: 1
+pose: 
+	0.98606 -0.0193851 0.165256 0.000527938
+	-0.161848 0.118726 0.979643 -0.000157116
+	-0.0386109 -0.992735 0.113931 0.141731
+	0 0 0 1
+objectID: 1
+pose: 
+	0.98615 -0.00169704 0.165848 0.000757799
+	-0.164299 0.126725 0.978232 -0.000321611
+	-0.0226772 -0.991933 0.124689 0.14181
+	0 0 0 1
+objectID: 1
+pose: 
+	0.986119 0.00190434 0.166031 0.0006781
+	-0.164754 0.135546 0.976972 3.44939e-07
+	-0.0206444 -0.990766 0.133976 0.141961
+	0 0 0 1
+objectID: 1
+pose: 
+	0.986042 -0.00216793 0.166482 0.000580053
+	-0.164457 0.143328 0.975911 -9.29842e-05
+	-0.0259772 -0.98967 0.140969 0.142117
+	0 0 0 1
+objectID: 1
+pose: 
+	0.985652 -0.00148434 0.168784 0.000541997
+	-0.166566 0.153254 0.974043 -0.00022728
+	-0.0273127 -0.988182 0.150806 0.142386
+	0 0 0 1
+objectID: 1
+pose: 
+	0.98526 -0.00575901 0.170966 0.000453262
+	-0.167773 0.162541 0.972329 -0.000182094
+	-0.0333886 -0.986682 0.159176 0.142918
+	0 0 0 1
+objectID: 1
+pose: 
+	0.985677 -0.00650948 0.168516 0.000370604
+	-0.164932 0.171235 0.971322 -0.000309483
+	-0.0351787 -0.985205 0.167707 0.143133
+	0 0 0 1
+objectID: 1
+pose: 
+	0.985669 -0.00844493 0.168479 0.0003856
+	-0.164453 0.174345 0.97085 -0.000216361
+	-0.0375724 -0.984645 0.170455 0.143186
+	0 0 0 1
+objectID: 1
+pose: 
+	0.985789 -0.00718672 0.167836 0.000309522
+	-0.163587 0.186147 0.968803 -0.000293715
+	-0.0382047 -0.982492 0.182323 0.143559
+	0 0 0 1
+objectID: 1
+pose: 
+	0.985724 -0.00820841 0.168167 0.000342253
+	-0.163563 0.190193 0.968021 -9.28031e-05
+	-0.0399302 -0.981709 0.186133 0.143647
+	0 0 0 1
+objectID: 1
+pose: 
+	0.985869 -0.00527419 0.167432 0.000474108
+	-0.163049 0.199051 0.966325 0.000115494
+	-0.0384242 -0.979972 0.195376 0.143932
+	0 0 0 1
+objectID: 1
+pose: 
+	0.98578 -0.00865659 0.167818 0.000522051
+	-0.163034 0.19271 0.967612 -0.000182693
+	-0.0407166 -0.981214 0.188556 0.144101
+	0 0 0 1
