@@ -6,6 +6,8 @@ debug/**/*
 dataset/
 *.log
 
+deps/libtorch/
+
 # ignore all files in the root directory
 /*.mp4
 

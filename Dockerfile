@@ -14,6 +14,8 @@ RUN apt-get -y install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
 COPY . .
 WORKDIR .
 
+RUN git lfs pull -I assets/libtorch-cxx11-abi-shared-with-deps-2.0.1+cpu.zip
+
 # Clear CMakeCache for Docker (this line is mainly for VSCode dev container)
 RUN find . -name "CMakeCache.txt" -type f -delete
 
