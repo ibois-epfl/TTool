@@ -100,56 +100,74 @@ if __name__ == "__main__":
         df = pd.DataFrame({"Mean": train_means, "STD": train_stds})
         df.to_csv("train_means_stds.csv")
 
-        image_transform = transforms.Normalize(train_means, train_stds)
+        normalization_transform = transforms.Normalize(train_means, train_stds)
         network = models.ResNet(num_blocks=[2, 2, 2], num_classes=len(datasets.labels))
     elif MODEL_TYPE == "TransferResNet":
-        image_transform = torchvision.models.ResNet18_Weights.DEFAULT.transforms()
+        normalization_transform = (
+            torchvision.models.ResNet18_Weights.DEFAULT.transforms()
+        )
         network = models.TransferResNet(num_classes=len(datasets.labels))
     elif MODEL_TYPE == "TransferEfficientNet":
-        image_transform = (
+        normalization_transform = (
             torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
         )
         network = models.TransferEfficientNet(num_classes=len(datasets.labels))
 
     # Create train and validation datasets
+
+    transform = torchvision.transforms.Compose(
+        [datasets.augmentation_transforms, normalization_transform]
+    )
+
     tool_train_dataset = datasets.ToolDataset(
         img_dir / "train",
-        transform=image_transform,
+        transform=transform,
         target_transform=datasets.label_transform,
-        subsampling=20,
+        subsampling=5,
     )
     tool_val_dataset = datasets.ToolDataset(
         img_dir / "val",
-        transform=image_transform,
+        transform=normalization_transform,
         target_transform=datasets.label_transform,
-        subsampling=20,
+        # subsampling=20,
     )
     img_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images")
     fabrication_train_dataset = datasets.FabricationDataset(
         img_dir,
-        transform=image_transform,
+        transform=transform,
         target_transform=datasets.label_transform,
         # videos=[1, 2, 4, 20],
-        videos=[1, 2, 3, 4, 18, 19],
+        videos=[1, 3, 4, 5, 15, 16, 17, 18, 19],
         # subsampling=10,
         # subsampling=50,
-        subsampling=10,
+        subsampling=3,
     )
     fabrication_val_dataset = datasets.FabricationDataset(
         img_dir,
-        transform=image_transform,
+        transform=normalization_transform,
         target_transform=datasets.label_transform,
         # videos=[3, 18],
-        videos=[20],
+        videos=[2, 20],
         # subsampling=20,
     )
-    train_dataset = fabrication_train_dataset
-    val_dataset = fabrication_val_dataset
+    img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images")
+    test_train_dataset = datasets.ToolDataset(
+        img_dir / "train",
+        transform=transform,
+        target_transform=datasets.label_transform,
+    )
+    test_val_dataset = datasets.ToolDataset(
+        img_dir / "val",
+        transform=normalization_transform,
+        target_transform=datasets.label_transform,
+    )
+    # train_dataset = fabrication_train_dataset
+    # val_dataset = fabrication_val_dataset
     train_dataset = torch.utils.data.ConcatDataset(
-        [tool_train_dataset, fabrication_train_dataset]
+        [tool_train_dataset, fabrication_train_dataset, test_train_dataset]
     )
     val_dataset = torch.utils.data.ConcatDataset(
-        [tool_val_dataset, fabrication_val_dataset]
+        [tool_val_dataset, fabrication_val_dataset, test_val_dataset]
     )
 
     # Create data loaders

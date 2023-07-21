@@ -5,21 +5,34 @@ import torch
 import torchvision
 
 # List of all tools based on the first dataset
+# labels = [
+#     "auger_bit_24_400",
+#     "auger_drill_bit_20_450",
+#     "chain_saw_blade_f_250",
+#     "self_feeding_bit_50",
+#     "spade_drill_bit_35",
+#     "auger_drill_bit_20_235",
+#     "auger_drill_bit_30_400",
+#     "circular_saw_blade_makita_190",
+#     "self_feeding_drill_bit_30_90",
+#     "twist_drill_bit_32_90",
+#     "auger_drill_bit_20_400",
+#     "brad_point_drill_bit_20_150",
+#     "saber_saw_blade",
+#     "spade_drill_bit_25",
+# ]
+
+# List of tools in TTool
 labels = [
-    "auger_bit_24_400",
-    "auger_drill_bit_20_450",
-    "chain_saw_blade_f_250",
-    "self_feeding_bit_50",
-    "spade_drill_bit_35",
     "auger_drill_bit_20_235",
-    "auger_drill_bit_30_400",
-    "circular_saw_blade_makita_190",
-    "self_feeding_drill_bit_30_90",
-    "twist_drill_bit_32_90",
-    "auger_drill_bit_20_400",
     "brad_point_drill_bit_20_150",
+    "chain_saw_blade_f_250",
+    "circular_saw_blade_makita_190",
     "saber_saw_blade",
+    "self_feeding_bit_40",
+    "self_feeding_bit_50",
     "spade_drill_bit_25",
+    "twist_drill_bit_32_90",
 ]
 
 # Map used to homogenise the labels between the
@@ -39,12 +52,12 @@ mapping = {
     "drill_auger_bit_20_200": "auger_drill_bit_20_235",
     "drill_hinge_cutter_bit_50": "self_feeding_bit_50",
     "saber_saw_blade": "saber_saw_blade",
-    "saber_saw_blade_makita_t": "saber_saw_blade",  # check this
+    "saber_saw_blade_makita_t": "saber_saw_blade",
     "saber_sawblade_t1": "saber_saw_blade",
     "self_feeding_drill_bit_30_90": "self_feeding_drill_bit_30_90",
-    "self_feeding_bit_40_90": "self_feeding_drill_bit_30_90",  # check this
+    "self_feeding_bit_40_90": "self_feeding_bit_40",
     "self_feeding_bit_50": "self_feeding_bit_50",
-    "self_feeding_bit_50_90": "self_feeding_bit_50",  # check this
+    "self_feeding_bit_50_90": "self_feeding_bit_50",
     "spade_drill_bit_25": "spade_drill_bit_25",
     "spade_drill_bit_25_150": "spade_drill_bit_25",
     "spade_drill_bit_35": "spade_drill_bit_35",
@@ -53,7 +66,7 @@ mapping = {
     "st_screw_100": "NA",
     "st_screw_120": "NA",
     "twist_drill_bit_32_90": "twist_drill_bit_32_90",
-    "twist_drill_bit_32_165": "twist_drill_bit_32_90",  # check this
+    "twist_drill_bit_32_165": "twist_drill_bit_32_90",
 }
 
 
@@ -70,6 +83,16 @@ class ToolDataset(torch.utils.data.Dataset):
         self.img_paths = self.img_paths[::subsampling]
         self.transform = transform
         self.target_transform = target_transform
+        self.get_tool = lambda x: x.stem.split("__")[0]
+
+        # Remove tools that are not in labels
+        selected_img_paths = []
+        for img_path in self.img_paths:
+            new_name = mapping[self.get_tool(img_path)]
+            if new_name in labels:
+                selected_img_paths.append(img_path)
+
+        self.img_paths = selected_img_paths
 
     def __len__(self):
         return len(self.img_paths)
@@ -78,7 +101,7 @@ class ToolDataset(torch.utils.data.Dataset):
         img_path = self.img_paths[idx]
         image = torchvision.io.read_image(str(img_path))
         image = image.float() / 255
-        label = img_path.stem.split("__")[0]
+        label = self.get_tool(img_path)
         label = mapping[label]
         if self.transform:
             image = self.transform(image)
@@ -132,3 +155,13 @@ class FabricationDataset(torch.utils.data.Dataset):
 
 def label_transform(label):
     return labels.index(label)
+
+
+augmentation_transforms = torchvision.transforms.Compose(
+    [
+        torchvision.transforms.RandomRotation(degrees=10),
+        torchvision.transforms.RandomHorizontalFlip(),
+        torchvision.transforms.RandomVerticalFlip(),
+        torchvision.transforms.ColorJitter(),
+    ]
+)

@@ -20,7 +20,8 @@ torch.set_float32_matmul_precision("high")
 # model_type = "ResNet222"
 # model_type = "TransferResNet"
 # model_type = "TransferEfficientNet"
-model_type = "TransferEfficientNetNewSplit"
+# model_type = "TransferEfficientNetNewSplit"
+model_type = "TransferEfficientNetAugmentationTwoDataSets"
 
 if model_type == "ResNet":
     train_means_stds = pd.read_csv("train_means_stds.csv")
@@ -50,6 +51,10 @@ elif model_type == "TransferEfficientNetNewSplit":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
     ckpt = "./lightning_logs/version_61/checkpoints/epoch=45-step=28934.ckpt"
     network = models.TransferEfficientNet()
+elif model_type == "TransferEfficientNetAugmentationTwoDataSets":
+    image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
+    ckpt = "./lightning_logs/version_148/checkpoints/epoch=19-step=3840.ckpt"
+    network = models.TransferEfficientNet(num_classes=len(datasets.labels))
 
 # img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
 # val_dataset = datasets.ToolDataset(
@@ -64,7 +69,7 @@ elif model_type == "TransferEfficientNetNewSplit":
 #     target_transform=datasets.label_transform,
 #     subsampling=100,
 # )
-img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images")
+img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images/val")
 val_dataset = datasets.ToolDataset(
     img_dir,
     transform=image_transform,
