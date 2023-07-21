@@ -10,6 +10,7 @@
 #include "object3d.hh"
 #include "view.hh"
 #include "config.hh"
+#include "classifier.hh"
 
 namespace ttool
 {
@@ -21,6 +22,9 @@ namespace ttool
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
             m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
             m_CameraCalibFile = cameraCalibFile;
+
+            // Initialize the classifier
+            m_Classifier = std::make_unique<ttool::ML::Classifier>(m_ConfigPtr->GetConfigData().ClassifierModelPath);
             
             // Initialize the camera matrix from the camera calibration file, as well as the camera size (width and height)
             ReadCameraMatrix();
@@ -47,6 +51,9 @@ namespace ttool
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
             m_CameraCalibFile = cameraCalibFile;
             
+            // Initialize the classifier
+            m_Classifier = std::make_unique<ttool::ML::Classifier>(m_ConfigPtr->GetConfigData().ClassifierModelPath);
+
             // Initialize the camera matrix from the camera calibration file, as well as the camera size (width and height)
             ReadCameraMatrix();
             
@@ -73,7 +80,9 @@ namespace ttool
         {
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
             m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
-            
+
+            // Initialize the classifier
+            m_Classifier = std::make_unique<ttool::ML::Classifier>(m_ConfigPtr->GetConfigData().ClassifierModelPath);            
 
             CameraMatrix = cameraMatrix.clone();
             CamSize.height = cameraSize.height;
@@ -123,6 +132,12 @@ namespace ttool
             CheckObjectChange();
             m_ObjectTracker.UpdateHistogram(m_ModelManagerPtr->GetObject(), m_CurrentObjectID, frame);
             m_ObjectTracker.CallEstimatePose(m_ModelManagerPtr->GetObject(), m_CurrentObjectID, frame);
+        }
+
+        std::string Classify(cv::Mat frame)
+        {
+            int prediction = m_Classifier->Classify(frame);
+            return m_Classifier->GetLabel(prediction);
         }
 
         /**
@@ -188,6 +203,7 @@ namespace ttool
             CheckObjectChange();
             return m_ModelManagerPtr->GetObject();
         }
+
         /**
          * @brief Set the Object ID with its id
          * 
@@ -323,6 +339,8 @@ namespace ttool
         std::string m_CameraCalibFile;
 
         std::shared_ptr<ttool::DModelManager> m_ModelManagerPtr;
+
+        std::unique_ptr<ttool::ML::Classifier> m_Classifier;
 
         tslet::ObjectTracker m_ObjectTracker;
         ttool::InputModelManager m_Input;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <torch/script.h> 
+#include <torch/script.h>
 #include <opencv2/opencv.hpp>
 
 namespace ttool::ML
@@ -50,17 +50,17 @@ namespace ttool::ML
             "auger_bit_24_400",
             "auger_drill_bit_20_450",
             "chain_saw_blade_f_250",
-            "self_feeding_bit_50",
+            "self_feeding_bit_50_90",
             "spade_drill_bit_35",
             "auger_drill_bit_20_235",
             "auger_drill_bit_30_400",
             "circular_saw_blade_makita_190",
             "self_feeding_drill_bit_30_90",
-            "twist_drill_bit_32_90",
+            "twist_drill_bit_32_165",
             "auger_drill_bit_20_400",
             "brad_point_drill_bit_20_150",
-            "saber_saw_blade",
-            "spade_drill_bit_25"
+            "saber_saw_blade_makita_t",
+            "spade_drill_bit_25_150"
         };
     };
 }
