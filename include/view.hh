@@ -3,12 +3,13 @@
 #include <iostream>
 #include <vector>
 
-#include <QOpenGLContext>
-#include <QOffscreenSurface>
+#include <GL/glew.h>
 
-#include <QGLFramebufferObject>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLFunctions_3_3_Core>
+#include <GL/glut.h>
+#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
+
+#include "glm/glm.hpp"
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -16,7 +17,7 @@
 #include "transformations.hh"
 #include "model.hh"
 
-class View : public QOpenGLFunctions_3_3_Core
+class View
 {
 public:
 	enum FrameType
@@ -31,84 +32,143 @@ public:
 
 	~View(void);
 
+	/**
+	 * @brief Get the singleton instance of the View class
+	 * 
+	 * @return View* 
+	 */
 	static View *Instance(void)
 	{
-		if (instance == NULL)
-			instance = new View();
-		return instance;
+		if (m_Instance == NULL)
+			m_Instance = new View();
+		return m_Instance;
 	}
 
-	bool IsInFrame(cv::Point2f &pt)
-	{
-		return (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height);
-	}
+	/**
+	 * @brief Initialize the view
+	 * 
+	 * @param K 		 3x3 Camera matrix
+	 * @param width 	 Width of the view
+	 * @param height     Height of the view
+	 * @param zNear      Near clipping plane
+	 * @param zFar 	     Far clipping plane
+	 * @param numLevels  Number of levels of the view
+	 */
+	void Initialize(const cv::Matx33f &K, int width, int height, float zNear, float zFar, int numLevels);
 
-	void init(const cv::Matx33f &K, int width, int height, float zNear, float zFar, int numLevels);
+public: // Getters and setters
+	void SetLevel(int level);
+	int GetLevel();
 
-	void setLevel(int level);
-	int getLevel();
+	float GetZNear() { return m_Zn; };
+	float GetZFar() { return m_Zf; }
 
-	float getZNear();
-	float getZFar();
+	int GetWidth() { return m_FullWidth; }
+	int GetHeight() { return m_FullHeight; }
 
-	int GetWidth() { return fullWidth; }
-	int GetHeight() { return fullHeight; }
 	cv::Matx44f GetCalibrationMatrix();
 
-	void RenderSilhouette(std::shared_ptr<Model> model, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
-	void RenderSilhouette(std::vector<std::shared_ptr<Model>> models, GLenum polyonMode, bool invertDepth = false, const std::vector<cv::Point3f> &colors = std::vector<cv::Point3f>(), bool drawAll = false);
-	void RenderShaded(std::shared_ptr<Model> model, GLenum polyonMode, const cv::Point3f color = cv::Point3f(1.0, 0.5, 0.0), bool drawAll = false);
+public:
+	/**
+	 * @brief Render depth map of the model
+	 * 
+	 * @param model 		Model to be rendered
+	 * @param polygonMode 	Polygon rasterization mode
+	 * @param invertDepth   Whether to invert the depth map (so the model is black and the background is white)
+	 */
+	void RenderSilhouette(std::shared_ptr<Model> model, GLenum polygonMode, bool invertDepth = false);
 
+	/**
+	 * @brief Render phongblinn shaded model
+	 * 
+	 * @param model     	Model to be rendered
+	 * @param polygonMode 	Polygon rasterization mode
+	 * @param color 		The color of the model
+	 */
+	void RenderShaded(std::shared_ptr<Model> model, GLenum polygonMode, const cv::Point3f color = cv::Point3f(1.0, 0.5, 0.0));
+
+	/**
+	 * @brief Convert a mask to 0 and 255 values
+	 * If the mask is a 32F image, every non-zero value is converted to 255
+	 * If the mask is a depth map (representing multiple model instances by its id), the pixel with the given id is set to 255, all other pixels are set to 0
+	 * 
+	 * @param src_mask  Input mask
+	 * @param mask 		Output mask
+	 * @param oid      	Object id of the model
+	 */
 	void ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid);
 
+	/**
+	 * @brief Project the bounding box of the model to the view
+	 * 
+	 * @param model 	   Model to be projected
+	 * @param projections  Resulting projections of the bounding box
+	 * @param boundingRect Resulting bounding box
+	 */
 	void ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f>& projections, cv::Rect& boundingRect);
 
+	/**
+	 * @brief Download a frame from the view
+	 * 
+	 * @param type 		   Type of the frame
+	 * @return cv::Mat 
+	 */
 	cv::Mat DownloadFrame(View::FrameType type);
 
-	void destroy();
-
-protected:
-	void makeCurrent();
-	void doneCurrent();
+	void Destroy();
 
 private:
-	static View *instance;
+	/**
+	 * @brief Initialize the rendering buffers
+	 * 
+	 * @return true 
+	 * @return false 
+	 */
+	bool InitRenderingBuffers();
+
+private:
+	static View *m_Instance;
 	
 	bool m_IsInitialized = false;
 
-	int width;
-	int height;
+	int m_Width;
+	int m_Height;
 
-	int fullWidth;
-	int fullHeight;
+	int m_FullWidth;
+	int m_FullHeight;
 
-	float zn;
-	float zf;
+	float m_Zn;
+	float m_Zf;
 
-	int numLevels;
+	int m_NumLevels;
 
-	int currentLevel;
+	int m_CurrentLevel;
 
-	std::vector<cv::Matx44f> calibrationMatrices;
-	cv::Matx44f projectionMatrix;
-	cv::Matx44f lookAtMatrix;
+	std::vector<cv::Matx44f> m_CalibrationMatrices;
+	cv::Matx44f m_ProjectionMatrix;
+	cv::Matx44f m_LookAtMatrix;
 
-	QOffscreenSurface *surface;
-	QOpenGLContext *glContext;
+	GLuint m_FrameBufferID;
+	GLuint m_ColorTextureID;
+	GLuint m_DepthTextureID;
 
-	GLuint frameBufferID;
-	GLuint colorTextureID;
-	GLuint depthTextureID;
+	// Phongblinn shader
+	GLuint m_PhongblinnShaderProgram;
+	GLuint m_PhongblinnMVPMatrixID;
+	GLuint m_PhongblinnMVMatrixID;
+	GLuint m_PhongblinnNormalMatrixID;
+	GLuint m_PhongblinnLightPosition1ID;
+	GLuint m_PhongblinnLightPosition2ID;
+	GLuint m_PhongblinnLightPosition3ID;
+	GLuint m_PhongblinnShininessID;
+	GLuint m_PhongblinnAlphaID;
+	GLuint m_PhongblinnColorID;
 
-	int angle;
+	// Silhouette shader
+	GLuint m_SilhouetteShaderProgram;
+	GLuint m_SilhouetteMatrixId;
+	GLuint m_SilhouetteAlphaId;
+	GLuint m_SilhouetteColorId;
+	GLuint m_VAO;
 
-	cv::Vec3f lightPosition;
-
-	QString shaderFolder;
-	QOpenGLShaderProgram *silhouetteShaderProgram;
-	QOpenGLShaderProgram *phongblinnShaderProgram;
-	QOpenGLShaderProgram *normalsShaderProgram;
-
-	bool initRenderingBuffers();
-	bool initShaderProgramFromCode(QOpenGLShaderProgram *program, char *vertex_shader, char *fragment_shader);
 };

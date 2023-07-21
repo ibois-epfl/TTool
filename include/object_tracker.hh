@@ -7,81 +7,98 @@
 
 namespace tslet
 {
+    /**
+     * @brief This class is a wrapper around the tracker class. It is used to track a single object
+     * 
+     */
     struct ObjectTracker
     {
         public:
-        void Consume(int modelID, std::shared_ptr<Object3D> object, cv::Matx33f K)
+        /**
+         * @brief Set up a tracker for the given object
+         * This function is called to specify the object to be tracked
+         * 
+         * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
+         * @param object  the object to be tracked
+         * @param K       the camera matrix
+         */
+        void Consume(int modelID, std::shared_ptr<Object3D> object, cv::Matx33f K);
+
+        /**
+         * @brief Call the UpdateHistogram function of the tracker which update the TCLC histogram from the projected model on the frame
+         * 
+         * @param object  the object to be tracked
+         * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
+         * @param frame   the current frame from the camera
+         */
+        void UpdateHistogram(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame);
+
+        /**
+         * @brief Set the Pose object
+         * 
+         * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
+         * @param pose    the pose of the object to be tracked
+         */
+        void SetPose(int modelID, cv::Matx44f pose);
+
+        /**
+         * @brief Call the EstimatePose function of the tracker which estimate the pose of the object to be tracked
+         * 
+         * @param object  the object to be tracked
+         * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
+         * @param frame   the current frame from the camera
+         */
+        void CallEstimatePose(std::shared_ptr<Object3D>object, int modelID, cv::Mat frame);
+
+        /**
+         * @brief Get the Tracking Status from the tracker
+         * 
+         * @return std::string including Reset, Freezed and Tracking with the average of search line scores
+         */
+        std::string GetTrackingStatus()
         {
-            cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
-            if (!hasTracker(modelID))
-            {
-                if (hasPreviousTracker())
-                {
-                    trackerPtr->ToggleTracking(0, false);
-                    trackerPtr->reset(); // Go through the objects in the tracker and reset its histogram
-                    trackerPtr.reset();
-                }
-                std::vector<std::shared_ptr<Object3D>>objects = {object};
-                trackerPtr = std::shared_ptr<Tracker>(Tracker::GetTracker(1, K, distCoeffs, objects));
-                currentModelID = modelID;
-                trackerPtr->ToggleTracking(0, true);
-            }
-        }
-
-        void UpdateHistogram(int modelID, cv::Mat frame)
-        {
-            if (!hasTracker(modelID))
-            {
-                std::cout << "No tracker for model " << modelID << std::endl;
-                return;
-            }
-
-            trackerPtr->PostProcess(frame);
-        }
-
-        void SetPose(int modelID, cv::Matx44f pose)
-        {
-            if (!hasTracker(modelID))
-            {
-                std::cout << "No tracker for model " << modelID << std::endl;
-                return;
-            }
-
-            modelID2pose[modelID] = pose;
-        }
-
-        void CallEstimatePose(int modelID, cv::Mat frame)
-        {
-            if (!hasTracker(modelID) || !hasPose(modelID))
-            {
-                std::cout << "No tracker for model/pose " << modelID << std::endl;
-                return;
-            }
-
-            cv::Matx44f init_pose = modelID2pose[modelID];
-            // cv::imshow("What Tracker Sees", frame);
-            trackerPtr->EstimatePoses(init_pose, frame);
+            return m_TrackerPtr->GetTrackingStatus();
         }
 
         private:
-        bool hasTracker(int modelID)
+        /**
+         * @brief Check if the tracker is already set up for the given object
+         * 
+         * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
+         * @return true 
+         * @return false 
+         */
+        bool HasTracker(int modelID)
         {
-            return currentModelID == modelID;
+            return m_CurrentModelID == modelID;
         }
 
-        bool hasPreviousTracker()
+        /**
+         * @brief Check if there is a previous tracker that should be reset
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool HasPreviousTracker()
         {
-            return currentModelID != -1;
+            return m_CurrentModelID != -1;
         }
 
-        bool hasPose(int modelID)
+        /**
+         * @brief Check if the pose of the object to be tracked is already set
+         * 
+         * @param modelID 
+         * @return true 
+         * @return false 
+         */
+        bool HasPose(int modelID)
         {
-            return modelID2pose.find(modelID) != modelID2pose.end();
+            return m_ModelID2pose.find(modelID) != m_ModelID2pose.end();
         }
 
         private:
-        std::shared_ptr<Tracker> trackerPtr;
-        int currentModelID = -1;
-        std::map<int, cv::Matx44f> modelID2pose;
+        std::shared_ptr<Tracker> m_TrackerPtr;
+        int m_CurrentModelID = -1;
+        std::map<int, cv::Matx44f> m_ModelID2pose;
     };
 }

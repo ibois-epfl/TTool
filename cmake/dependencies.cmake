@@ -8,6 +8,12 @@ if(NOT Threads_FOUND)
     message(FATAL_ERROR "Threads not found")
 endif()
 
+find_package(glfw3 3.3 REQUIRED)
+find_package(GLEW REQUIRED)
+if(NOT GLEW_FOUND)
+    message(FATAL_ERROR "GLEW not found")
+endif()
+
 if (OPT_WITH_CGAL)
     # use local eigen
     find_package(Eigen3 3.3 REQUIRED NO_MODULE)
@@ -21,6 +27,18 @@ if (OPT_WITH_CGAL)
         ${CMAKE_CURRENT_SOURCE_DIR}/deps/CGAL/include
     )
 endif()
+
+# libtorch
+if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/libtorch")
+    set(EXTRACT_LIBTORCH_CMD "${PROJECT_SOURCE_DIR}/util/extract_libtorch.sh")
+    execute_process(
+        COMMAND chmod +x ${EXTRACT_LIBTORCH_CMD}
+        COMMAND ${EXTRACT_LIBTORCH_CMD} ${PROJECT_SOURCE_DIR}
+    )
+endif()
+
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/deps/libtorch")
+find_package(Torch REQUIRED)
 
 if (OPT_BUILD_TTOOL_EXE)
     find_package(assimp REQUIRED)
@@ -37,7 +55,7 @@ if (OPT_BUILD_TTOOL_EXE)
     if(NOT OpenGL_FOUND)
         message(FATAL_ERROR "OpenGL not found")
     endif()
-
-    find_package(Qt5Widgets REQUIRED)
-    find_package(Qt5OpenGL REQUIRED)
 endif()
+
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/glmT)
+set(GLM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/deps/glmT)

@@ -1,11 +1,9 @@
-// #include <memory>
 #include <iostream>
-#include <QApplication>
-#include <QThread>
 
 #include "camera.hh"
 #include "ttool.hh"
 #include "util.hh"
+#include "classifier.hh"
 
 #include "pose_writer.hh"
 
@@ -90,11 +88,11 @@ int main(int argc, char **argv)
         }
     }
 
-    // Qt
-    QApplication a(argc, argv);
+    // Intiailizing GLFW
+    auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
 
     // ttool setup
-    std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(__TTOOL_CONFIG_PATH__, calibFilePath);
+    std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(__TTOOL_ROOT_PATH__, __TTOOL_CONFIG_PATH__, calibFilePath);
 
     std::shared_ptr<ttool::Config> configPtr = ttool->GetConfig();
 
@@ -113,6 +111,7 @@ int main(int argc, char **argv)
 
     PoseWriter poseWriter = PoseWriter("trackingPose.log", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
 
+    ttool::ML::Classifier classifier(configPtr->GetConfigData().ClassifierModelPath);
     // main thread
     bool exit = false;
     if (isVideoRecording) {visualizerPtr->ToggleSavingImages();}
@@ -142,6 +141,13 @@ int main(int argc, char **argv)
             ttool->ManipulateModel(key);
             inputVisualizer.ConsumeKey(key);
             visualizerPtr->SetModels();
+
+            if ('f' == key)
+            {
+                int prediction = classifier.Classify(cameraPtr->Image());
+                std::string label = classifier.GetLabel(prediction);
+                std::cout << "Prediction: " << label << std::endl;
+            }
         }
 
         // 3 Pose refiner
@@ -163,7 +169,7 @@ int main(int argc, char **argv)
 
             auto ti = cv::getTickCount();
 
-            ttool->RunOnAFrame(cameraPtr->image());
+            ttool->RunOnAFrame(cameraPtr->Image());
 
             auto tf = cv::getTickCount();
             auto t = (tf - ti) / cv::getTickFrequency();
@@ -183,4 +189,7 @@ int main(int argc, char **argv)
     cv::destroyAllWindows();
     if (isVideoRecording) {ttool::standaloneUtils::makeVideoFromAllSavedImages(saveImagePath);}
 
+    // Terminate GLFW
+    ttool::standaloneUtils::TerminateStandalone(GLFWWindow);
+    return 0;
 }

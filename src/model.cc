@@ -44,17 +44,7 @@ void Model::Init(const std::string modelFilename, const cv::Matx44f& Ti, float s
     
 	hasNormals = false;
     
-	vertexBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-	normalBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-	indexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
-    
   loadModel(modelFilename);
-  
-  //if (tk::IsFileExist(modelFilename + 's')) {
-  //  loadSimpleModel(modelFilename + 's');
-  //} else {
-  //  svertices = vertices;
-  //}
 }
 
 Model::~Model()
@@ -64,36 +54,22 @@ Model::~Model()
     
     indices.clear();
     offsets.clear();
-    
-    if(buffersInitialsed)
-    {
-        vertexBuffer.release();
-        vertexBuffer.destroy();
-        normalBuffer.release();
-        normalBuffer.destroy();
-        
-        indexBuffer.release();
-        indexBuffer.destroy();
-    }
 }
 
 void Model::initBuffers()
 {
-    vertexBuffer.create();
-    vertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    vertexBuffer.bind();
-    vertexBuffer.allocate(vertices.data(), (int)vertices.size() * sizeof(Vec3f));
-    
-    normalBuffer.create();
-    normalBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    normalBuffer.bind();
-    normalBuffer.allocate(normals.data(), (int)normals.size() * sizeof(Vec3f));
-    
-    indexBuffer.create();
-    indexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    indexBuffer.bind();
-    indexBuffer.allocate(indices.data(), (int)indices.size() * sizeof(int));
-    
+  	glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &normalBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &indexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+
     buffersInitialsed = true;
 }
 
@@ -110,21 +86,24 @@ bool Model::isInitialized()
 }
 
 
-void Model::draw(QOpenGLShaderProgram *program, GLint primitives)
+void Model::draw(GLint program, GLint primitives)
 {
-    vertexBuffer.bind();
-    program->enableAttributeArray("aPosition");
-    program->setAttributeBuffer("aPosition", GL_FLOAT, 0, 3, sizeof(Vec3f));
+    auto aPosition = glGetAttribLocation(program, "aPosition");
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glVertexAttribPointer(aPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(aPosition);
+
+    auto aNormal = glGetAttribLocation(program, "aNormal");
+    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+    glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(aNormal);
     
-    normalBuffer.bind();
-    program->enableAttributeArray("aNormal");
-    program->setAttributeBuffer("aNormal", GL_FLOAT, 0, 3, sizeof(Vec3f));
+    auto aColor = glGetAttribLocation(program, "aColor");
+    glVertexAttribPointer(aColor, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+    glEnableVertexAttribArray(aColor);
     
-    program->enableAttributeArray("aColor");
-    program->setAttributeBuffer("aColor", GL_UNSIGNED_BYTE, 0, 3, sizeof(Vec3b));
-    
-    indexBuffer.bind();
-    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+
     for (uint i = 0; i < offsets.size() - 1; i++) {
         GLuint size = offsets.at(i + 1) - offsets.at(i);
         GLuint offset = offsets.at(i);
@@ -181,12 +160,12 @@ float Model::getScaling() {
 }
 
 
-vector<Vec3f> Model::getVertices()
+vector<glm::vec3> Model::getVertices()
 {
     return vertices;
 }
 
-vector<Vec3f> Model::getSimpleVertices()
+vector<glm::vec3> Model::getSimpleVertices()
 {
     return svertices;
 }
@@ -253,8 +232,8 @@ void Model::loadModel(const string modelFilename)
     hasNormals = mesh->HasNormals();
     
     float inf = numeric_limits<float>::infinity();
-    lbn = Vec3f(inf, inf, inf);
-    rtf = Vec3f(-inf, -inf, -inf);
+    lbn = cv::Vec3f(inf, inf, inf);
+    rtf = cv::Vec3f(-inf, -inf, -inf);
     
     for(int i = 0; i < mesh->mNumFaces; i++)
     {
@@ -269,7 +248,7 @@ void Model::loadModel(const string modelFilename)
     {
         aiVector3D v = mesh->mVertices[i];
         
-        Vec3f p(v.x, v.y, v.z);
+        glm::vec3 p(v.x, v.y, v.z);
         
         // compute the 3D bounding box of the model
         if (p[0] < lbn[0]) lbn[0] = p[0];
@@ -288,7 +267,7 @@ void Model::loadModel(const string modelFilename)
         {
             aiVector3D n = mesh->mNormals[i];
             
-            Vec3f vn = Vec3f(n.x, n.y, n.z);
+            glm::vec3 vn = glm::vec3(n.x, n.y, n.z);
             
             normals.push_back(vn);
         }
@@ -298,7 +277,7 @@ void Model::loadModel(const string modelFilename)
     offsets.push_back(mesh->mNumFaces*3);
     
     // the center of the 3d bounding box
-    Vec3f bbCenter = (rtf + lbn) / 2;
+    cv::Vec3f bbCenter = (rtf + lbn) / 2.0f;
     // compute a normalization transform that moves the object to the center of its bounding box and scales it according to the prescribed factor
     T_n = Transformations::scaleMatrix(scaling)*Transformations::translationMatrix(-bbCenter[0], -bbCenter[1], -bbCenter[2]);
 
@@ -355,7 +334,7 @@ void Model::loadModel(const string modelFilename)
       int si = setv.size();
 
       for (auto vert : setv) {
-        svertices.push_back(Vec3f(vert.x, vert.y, vert.z));
+        svertices.push_back(glm::vec3(vert.x, vert.y, vert.z));
       }
     }
 #endif
@@ -368,7 +347,7 @@ void Model::loadSimpleModel(const string modelFilename) {
    
   for(int i = 0; i < mesh->mNumVertices; i++) {
     aiVector3D v = mesh->mVertices[i];
-    Vec3f p(v.x, v.y, v.z);
+    glm::vec3 p(v.x, v.y, v.z);
     svertices.push_back(p);
   }
 }

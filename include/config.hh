@@ -20,22 +20,25 @@ namespace ttool
         public:
             // Model
             std::vector<std::string> ModelFiles;
+            std::vector<std::string> AcitFiles;
             std::vector<std::vector<float>> GroundTruthPoses;
 
             // Histogram
             int HistOffset;
             int HistRad;
             int SearchRad;
-            float AlphaForeground;
-            float AlphaBackground;
 
             // Visualizer
             float Zn;
             float Zf;
 
+            // ML
+            std::string ClassifierModelPath;
+
             // Unordered maps are used to help Setters more dynamic typed
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::string>>> stringVectorMembers = {
-                {"modelFiles", std::ref(ModelFiles)}
+                {"modelFiles", std::ref(ModelFiles)},
+                {"acitFiles", std::ref(AcitFiles)}
             };
 
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::vector<float>>>> floatVectorVectorMembers = {
@@ -49,10 +52,12 @@ namespace ttool
             };
 
             std::unordered_map<std::string, std::reference_wrapper<float>> floatMembers = {
-                {"alphaForeground", std::ref(AlphaForeground)},
-                {"alphaBackground", std::ref(AlphaBackground)},
                 {"zn", std::ref(Zn)},
                 {"zf", std::ref(Zf)}
+            };
+
+            std::unordered_map<std::string, std::reference_wrapper<std::string>> stringMembers = {
+                {"classifierModelPath", std::ref(ClassifierModelPath)}
             };
 
             /**
@@ -120,6 +125,22 @@ namespace ttool
                     it->second.get() = value;
                 }
             }
+
+            /**
+             * @brief Set the Value object
+             * 
+             * @param key key of the value to set
+             * @param value value to set
+             */
+            void setValue(std::string key, std::string value)
+            {
+                SET_UNORDERED_MAP_VALUE(stringMembers, key, value);
+                return;
+                if (auto it = stringMembers.find(key); it != stringMembers.end())
+                {
+                    it->second.get() = value;
+                }
+            }
     };
 
     class Config
@@ -144,6 +165,10 @@ namespace ttool
                 fs["modelFiles"] >> modelFiles;
                 m_ConfigData.setValue("modelFiles", modelFiles);
 
+                std::vector<std::string> acitFiles;
+                fs["acitFiles"] >> acitFiles;
+                m_ConfigData.setValue("acitFiles", acitFiles);
+
                 std::vector<std::vector<float>> groundTruthPoses;
                 fs["groundTruthPoses"] >> groundTruthPoses;
                 m_ConfigData.setValue("groundTruthPoses", groundTruthPoses);
@@ -151,11 +176,11 @@ namespace ttool
                 m_ConfigData.setValue("histOffset", (int)fs["histOffset"]);
                 m_ConfigData.setValue("histRad", (int)fs["histRad"]);
                 m_ConfigData.setValue("searchRad", (int)fs["searchRad"]);
-                m_ConfigData.setValue("alphaForeground", (float)fs["alphaForeground"]);
-                m_ConfigData.setValue("alphaBackground", (float)fs["alphaBackground"]);
 
                 m_ConfigData.setValue("zn", (float)fs["zn"]);
-                m_ConfigData.setValue("zf", (float)fs["zf"]);           
+                m_ConfigData.setValue("zf", (float)fs["zf"]);
+
+                m_ConfigData.setValue("classifierModelPath", (std::string)fs["classifierModelPath"]);      
 
                 return fs.release();
             }
@@ -171,7 +196,14 @@ namespace ttool
                 for (auto& modelFile : m_ConfigData.ModelFiles)
                 {
                     std::cout << "\t" << modelFile << std::endl;
-                }   
+                }
+
+                std::cout << "ACIT files: " << std::endl;
+                for (auto& acitFile : m_ConfigData.AcitFiles)
+                {
+                    std::cout << "\t" << acitFile << std::endl;
+                }
+
                 std::cout << "Ground truth poses: " << std::endl;
                 for (auto& groundTruthPose : m_ConfigData.GroundTruthPoses)
                 {
@@ -185,10 +217,9 @@ namespace ttool
                 std::cout << "Hist offset: " << m_ConfigData.HistOffset << std::endl;
                 std::cout << "Hist rad: " << m_ConfigData.HistRad << std::endl;
                 std::cout << "Search rad: " << m_ConfigData.SearchRad << std::endl;
-                std::cout << "Alpha foreground: " << m_ConfigData.AlphaForeground << std::endl;
-                std::cout << "Alpha background: " << m_ConfigData.AlphaBackground << std::endl;
                 std::cout << "Zn: " << m_ConfigData.Zn << std::endl;
                 std::cout << "Zf: " << m_ConfigData.Zf << std::endl;
+                std::cout << "Classifier model path: " << m_ConfigData.ClassifierModelPath << std::endl;
             }
 
             /**
@@ -199,19 +230,19 @@ namespace ttool
             {
                 cv::FileStorage fs(m_ConfigFile, cv::FileStorage::WRITE);
                 if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__) + " could not open file:" + m_ConfigFile);
-
-                fs << "alphaForeground" << m_ConfigData.AlphaForeground;
-                fs << "alphaBackground" << m_ConfigData.AlphaBackground;
-
                 fs << "zn" << m_ConfigData.Zn;
                 fs << "zf" << m_ConfigData.Zf;
 
                 fs << "histOffset" << m_ConfigData.HistOffset;
                 fs << "histRad" << m_ConfigData.HistRad;
                 fs << "searchRad" << m_ConfigData.SearchRad;
-                
+
+                fs << "classifierModelPath" << m_ConfigData.ClassifierModelPath;
+
                 fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;
                 fs << "modelFiles" << m_ConfigData.ModelFiles;
+
+                fs << "acitFiles" << m_ConfigData.AcitFiles;
 
                 fs.release();
             }
@@ -220,11 +251,36 @@ namespace ttool
              * @brief Get the Config Data object. This object is const meaning that it cannot be modified. To modify the config file, use the write function.
              * 
              * 
-             * @return const ConfigData& 
+             * @return ConfigData
              */
-            const ConfigData& GetConfigData() const
+            ConfigData GetConfigData()
             {
-                return m_ConfigData;
+                // Create a copy of the ConfigData object
+                ConfigData configData = this->m_ConfigData;
+                // Prefix the model files with the m_TToolRootPath
+                for (auto& modelFile : configData.ModelFiles)
+                {
+                    modelFile = std::string(m_TToolRootPath) + "/" + modelFile;
+                }
+                // Prefix the acit files with the m_TToolRootPath
+                for (auto& acitFile : configData.AcitFiles)
+                {
+                    acitFile = std::string(m_TToolRootPath) + "/" + acitFile;
+                }
+                // Prefix the classifier model path with the m_TToolRootPath
+                configData.ClassifierModelPath = std::string(m_TToolRootPath) + "/" + configData.ClassifierModelPath;
+                return configData;
+            }
+
+            /**
+             * @brief Set the TToolRootPath
+             * TToolRootPath is the path to the root of the ttool folder. It is used to prefix the model files, acit files and classifier model path.
+             * 
+             * @return std::string 
+             */
+            void SetTToolRootPath(std::string ttoolRootPath)
+            {
+                m_TToolRootPath = ttoolRootPath;
             }
 
             /**
@@ -245,5 +301,6 @@ namespace ttool
         private:
             std::string m_ConfigFile;
             ConfigData m_ConfigData;
+            std::string m_TToolRootPath = "";
     };
 }

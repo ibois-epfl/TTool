@@ -16,11 +16,14 @@ namespace ttool
     class TTOOL_API TTool
     {
     public:
-        TTool(std::string configFile, std::string cameraCalibFile)
+        TTool(std::string ttoolRootPath, std::string configFile, std::string cameraCalibFile)
         {
-            std::cout << "ttool constructor cmd calib file: " << cameraCalibFile << std::endl;
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
             m_CameraCalibFile = cameraCalibFile;
+            
+            // Initialize the camera matrix from the camera calibration file, as well as the camera size (width and height)
+            ReadCameraMatrix();
             
             InitializeView();
 
@@ -33,7 +36,63 @@ namespace ttool
 
             m_Input = ttool::InputModelManager(m_ModelManagerPtr);
             InitializeObjectTracker();
+
+            // dry run to initialize silouhette drawing
+            cv::Mat emptyMat = cv::Mat::zeros(480, 640, CV_8UC3);
+            RunOnAFrame(emptyMat);
+        }
+
+        TTool(std::string configFile, std::string cameraCalibFile)
+        {
+            m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            m_CameraCalibFile = cameraCalibFile;
+            
+            // Initialize the camera matrix from the camera calibration file, as well as the camera size (width and height)
+            ReadCameraMatrix();
+            
+            InitializeView();
+
+            std::vector<cv::Matx44f> preprocessedGroundTruthPoses = PreprocessGroundTruthPoses(m_ConfigPtr->GetConfigData().GroundTruthPoses);
+
+            m_ModelManagerPtr = std::make_shared<ttool::DModelManager>(
+                m_ConfigPtr->GetConfigData().ModelFiles,
+                preprocessedGroundTruthPoses,
+                m_ConfigPtr);
+
+            m_Input = ttool::InputModelManager(m_ModelManagerPtr);
+            InitializeObjectTracker();
+
+            // dry run to initialize silouhette drawing
+            cv::Mat emptyMat = cv::Mat::zeros(480, 640, CV_8UC3);
+            RunOnAFrame(emptyMat);
+            // DrawSilhouette(emptyMat);
+            CheckObjectChange();
         };
+
+        TTool(std::string ttoolRootPath, std::string configFile, cv::Mat cameraMatrix, cv::Size cameraSize)
+        {
+            m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
+            
+
+            CameraMatrix = cameraMatrix.clone();
+            CamSize.height = cameraSize.height;
+            CamSize.width = cameraSize.width;
+
+            InitializeView();
+
+            std::vector<cv::Matx44f> preprocessedGroundTruthPoses = PreprocessGroundTruthPoses(m_ConfigPtr->GetConfigData().GroundTruthPoses);
+
+            m_ModelManagerPtr = std::make_shared<ttool::DModelManager>(
+                m_ConfigPtr->GetConfigData().ModelFiles,
+                preprocessedGroundTruthPoses,
+                m_ConfigPtr);
+
+            m_Input = ttool::InputModelManager(m_ModelManagerPtr);
+            InitializeObjectTracker();
+            CheckObjectChange();
+        };
+
         ~TTool(){};
 
         /**
@@ -62,8 +121,51 @@ namespace ttool
         void RunOnAFrame(cv::Mat frame)
         {
             CheckObjectChange();
-            m_ObjectTracker.UpdateHistogram(m_CurrentObjectID, frame);
-            m_ObjectTracker.CallEstimatePose(m_CurrentObjectID, frame);
+            m_ObjectTracker.UpdateHistogram(m_ModelManagerPtr->GetObject(), m_CurrentObjectID, frame);
+            m_ObjectTracker.CallEstimatePose(m_ModelManagerPtr->GetObject(), m_CurrentObjectID, frame);
+        }
+
+        /**
+         * @brief Draw the silhouette of the model on the camera frame
+         * 
+         * @param frame camera frame
+         * @param clr color of the silhouette
+         */
+        void DrawSilhouette(cv::Mat& frame, glm::vec3 clr = glm::vec3(97.0f, 48.0f, 225.0f))
+        {
+            View *view = View::Instance();
+
+            view->RenderSilhouette(m_ModelManagerPtr->GetObject(), GL_FILL);
+
+            cv::Mat depth = view->DownloadFrame(View::DEPTH); // This is the depth map of the model 0.0f and 1.0f are the min and max depth
+
+            float alpha = 0.5f;
+            for (int y = 0; y < frame.rows; y++)
+            {
+                for (int x = 0; x < frame.cols; x++)
+                {
+                    cv::Vec3b color = cv::Vec3b(clr.x, clr.y, clr.z);
+                    if (depth.at<float>(y, x) != 0.0f)
+                    {
+                        frame.at<cv::Vec3b>(y, x) = alpha * color + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x);
+                    }
+                }
+            }
+
+            cv::Mat maskCvt;
+            view->ConvertMask(depth, maskCvt, m_ModelManagerPtr->GetObject()->getModelID());
+            std::vector<std::vector<cv::Point>> contours;
+            cv::findContours(maskCvt, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+            cv::Vec3b color = cv::Vec3b(30, 255, 0);
+            for (int i = 0; i < contours.size(); i++)
+                cv::drawContours(frame, contours, i, color, 2);
+        }
+
+        /// @brief Destroy the View object
+        void DestrolView()
+        {
+            View *view = View::Instance();
+            view->Destroy();
         }
 
         /**
@@ -76,7 +178,6 @@ namespace ttool
             CheckObjectChange();
             return m_ModelManagerPtr->GetObject()->getPose();
         }
-
         /**
          * @brief Get the Model object
          * 
@@ -87,12 +188,10 @@ namespace ttool
             CheckObjectChange();
             return m_ModelManagerPtr->GetObject();
         }
-
-
         /**
-         * @brief Set the Object ID
+         * @brief Set the Object ID with its id
          * 
-         * @param objectID 
+         * @param objectID the id of the object given by the index of its position in the config ttool file
          */
         void SetObjectID(int objectID)
         {
@@ -100,21 +199,44 @@ namespace ttool
             m_ModelManagerPtr->SetObjectID(objectID);
             InitializeObjectTracker();
         }
+        // /**
+        //  * @brief Set the Object ID with its name
+        //  * 
+        //  * @param objectName the name of the object given by the name of its position in the config ttool file
+        //  */
+        // void SetObjectName(std::string objectName)
+        // {
+        //     m_CurrentObjectID = m_ConfigPtr->GetConfigData().ObjectIDMap[objectName];
+        //     m_ModelManagerPtr->SetObjectID(m_CurrentObjectID);
+        //     InitializeObjectTracker();
+        // }
 
+        /// @brief Start the object tracker
+        void InitializeObjectTracker()
+        {
+            m_ObjectTracker.Consume(m_ModelManagerPtr->GetObject()->getModelID(), m_ModelManagerPtr->GetObject(), CameraMatrix);
+        }
+        /// @brief Initialize the view
+        void InitializeView()
+        {
+            // Initialize the view
+            View* view = View::Instance();
+            float zn = m_ConfigPtr->GetConfigData().Zn;
+            float zf = m_ConfigPtr->GetConfigData().Zf;
+            view->Initialize(CameraMatrix, CamSize.width, CamSize.height, zn, zf, 4);
+        }
+
+        std::string GetTrackingStatus()
+        {
+            return m_ObjectTracker.GetTrackingStatus();
+        }
 
     public:
         std::shared_ptr<ttool::Config> GetConfig() { return m_ConfigPtr; };
         std::shared_ptr<ttool::DModelManager> GetModelManager() { return m_ModelManagerPtr; };
         int GetCurrentObjectID() { return m_CurrentObjectID; };
 
-
     private:
-        void InitializeObjectTracker()
-        {
-            cv::Mat cameraMatrix = ReadCameraMatrix();
-            m_ObjectTracker.Consume(m_ModelManagerPtr->GetObject()->getModelID(), m_ModelManagerPtr->GetObject(), cameraMatrix);
-        }
-
         void CheckObjectChange()
         {
             if (m_ModelManagerPtr->GetObject()->getModelID() != m_CurrentObjectID)
@@ -124,53 +246,46 @@ namespace ttool
             }
         }
     
-        cv::Mat ReadCameraMatrix()
+        /**
+         * @brief Initialize the camera matrix and the camera size (width and height)
+         * This function should be run before initializing the view, and before initializing the object tracker
+         * 
+        */
+        void ReadCameraMatrix()
         {
             cv::FileStorage fs(m_CameraCalibFile, cv::FileStorage::READ);
             if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file: " + m_CameraCalibFile);
 
-            cv::Mat MCamera;
-            fs["camera_matrix"] >> MCamera;
-            
-            fs.release();
-            return MCamera;
-        }
+            int width = -1, height = -1;
+            cv::Mat cameraMatrix;
+            fs["camera_matrix"] >> cameraMatrix;
+            fs["image_width"] >> width;
+            fs["image_height"] >> height;
 
-        void InitializeView()
-        {
-            cv::FileStorage fs(m_CameraCalibFile, cv::FileStorage::READ);
-            if(!fs.isOpened()) throw std::runtime_error(std::string(__FILE__)+" could not open file:"+m_CameraCalibFile);
-
-            int w = -1, h = -1;
-            cv::Mat MCamera;
-            fs["image_width"] >> w;
-            fs["image_height"] >> h;
-            fs["camera_matrix"] >> MCamera;
-
-            if (MCamera.cols == 0 || MCamera.rows == 0){
-                fs["Camera_Matrix"] >> MCamera;
-                if (MCamera.cols == 0 || MCamera.rows == 0)
+            if (cameraMatrix.cols == 0 || cameraMatrix.rows == 0){
+                if (cameraMatrix.cols == 0 || cameraMatrix.rows == 0)
                     throw std::runtime_error(std::string(__FILE__)+" File :" + m_CameraCalibFile + " does not contains valid camera matrix");
             }
 
-            if (w == -1 || h == 0){
-                fs["image_Width"] >> w;
-                fs["image_Height"] >> h;
-                if (w == -1 || h == 0)
+            if (width == -1 || height == 0){
                 throw std::runtime_error(std::string(__FILE__)+  "File :" + m_CameraCalibFile + " does not contains valid camera dimensions");
             }
-            if (MCamera.type() != CV_32FC1)
-                MCamera.convertTo(MCamera, CV_32FC1);
 
-            // Initialize the view
-            View* view = View::Instance();
-            float zn = m_ConfigPtr->GetConfigData().Zn;
-            float zf = m_ConfigPtr->GetConfigData().Zf;
-            view->init(MCamera, w, h, zn, zf, 4);
+            if (cameraMatrix.type() != CV_32FC1)
+                cameraMatrix.convertTo(cameraMatrix, CV_32FC1);
 
+            CameraMatrix = cameraMatrix.clone();
+            CamSize.height = height;
+            CamSize.width = width;
             fs.release();
         }
 
+        /**
+         * @brief 
+         * 
+         * @param groundTruthPoses 
+         * @return std::vector<cv::Matx44f> 
+         */
         std::vector<cv::Matx44f> PreprocessGroundTruthPoses(std::vector<std::vector<float>> groundTruthPoses)
         {
             std::vector<cv::Matx44f> preprocessedGroundTruthPoses;
@@ -199,6 +314,10 @@ namespace ttool
             return preprocessedGroundTruthPoses;
         }
 
+    public:
+        cv::Mat CameraMatrix;
+        cv::Size CamSize;
+    
     private:
         std::shared_ptr<ttool::Config> m_ConfigPtr;
         std::string m_CameraCalibFile;

@@ -11,16 +11,16 @@ TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float 
     
     view = View::Instance();
     
-    view->setLevel(0);
-    view->RenderSilhouette(object, GL_FILL, false, {cv::Point3f(1.0f, 1.0f, 1.0f)}, true);
+    view->SetLevel(0);
+    view->RenderSilhouette(object, GL_FILL, false);
     
     Mat mask0 = view->DownloadFrame(View::MASK);
     Mat depth0 = view->DownloadFrame(View::DEPTH);
     
     Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
     
-    float zNear = view->getZNear();
-    float zFar = view->getZFar();
+    float zNear = view->GetZNear();
+    float zFar = view->GetZFar();
     
     std::cout << "template_view" << std::endl;
     std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
@@ -63,8 +63,8 @@ TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float 
         
         roiPyramid[level] = roi;
     
-        view->setLevel(level);
-        view->RenderSilhouette(object, GL_FILL, false, {cv::Point3f(1.0f, 1.0f, 1.0f)}, true);
+        view->SetLevel(level);
+        view->RenderSilhouette(object, GL_FILL, false);
         
         Mat mask = view->DownloadFrame(View::MASK);
         mask = mask(roi).clone();
