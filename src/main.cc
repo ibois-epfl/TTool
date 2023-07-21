@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
 
     // ttool setup
-    std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(__TTOOL_CONFIG_PATH__, calibFilePath);
+    std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(__TTOOL_ROOT_PATH__, __TTOOL_CONFIG_PATH__, calibFilePath);
 
     std::shared_ptr<ttool::Config> configPtr = ttool->GetConfig();
 

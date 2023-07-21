@@ -257,19 +257,30 @@ namespace ttool
             {
                 // Create a copy of the ConfigData object
                 ConfigData configData = this->m_ConfigData;
-                // Prefix the model files with the __TTOOL_ROOT_PATH__ macro
+                // Prefix the model files with the m_TToolRootPath
                 for (auto& modelFile : configData.ModelFiles)
                 {
-                    modelFile = std::string(__TTOOL_ROOT_PATH__) + "/" + modelFile;
+                    modelFile = std::string(m_TToolRootPath) + "/" + modelFile;
                 }
-                // Prefix the acit files with the __TTOOL_ROOT_PATH__ macro
+                // Prefix the acit files with the m_TToolRootPath
                 for (auto& acitFile : configData.AcitFiles)
                 {
-                    acitFile = std::string(__TTOOL_ROOT_PATH__) + "/" + acitFile;
+                    acitFile = std::string(m_TToolRootPath) + "/" + acitFile;
                 }
-                // Prefix the classifier model path with the __TTOOL_ROOT_PATH__ macro
-                configData.ClassifierModelPath = std::string(__TTOOL_ROOT_PATH__) + "/" + configData.ClassifierModelPath;
+                // Prefix the classifier model path with the m_TToolRootPath
+                configData.ClassifierModelPath = std::string(m_TToolRootPath) + "/" + configData.ClassifierModelPath;
                 return configData;
+            }
+
+            /**
+             * @brief Set the TToolRootPath
+             * TToolRootPath is the path to the root of the ttool folder. It is used to prefix the model files, acit files and classifier model path.
+             * 
+             * @return std::string 
+             */
+            void SetTToolRootPath(std::string ttoolRootPath)
+            {
+                m_TToolRootPath = ttoolRootPath;
             }
 
             /**
@@ -290,5 +301,6 @@ namespace ttool
         private:
             std::string m_ConfigFile;
             ConfigData m_ConfigData;
+            std::string m_TToolRootPath = "";
     };
 }
