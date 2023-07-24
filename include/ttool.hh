@@ -19,12 +19,11 @@ namespace ttool
     public:
         TTool(std::string ttoolRootPath, std::string configFile, std::string cameraCalibFile)
         {
-            m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
-            m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
+            InitializeConfig(ttoolRootPath, configFile);
+
             m_CameraCalibFile = cameraCalibFile;
 
-            // Initialize the classifier
-            m_Classifier = std::make_unique<ttool::ML::Classifier>(m_ConfigPtr->GetConfigData().ClassifierModelPath);
+            InitializeClassifier();
             
             // Initialize the camera matrix from the camera calibration file, as well as the camera size (width and height)
             ReadCameraMatrix();
@@ -48,11 +47,11 @@ namespace ttool
 
         TTool(std::string configFile, std::string cameraCalibFile)
         {
-            m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            InitializeConfig("", configFile);
+
             m_CameraCalibFile = cameraCalibFile;
             
-            // Initialize the classifier
-            m_Classifier = std::make_unique<ttool::ML::Classifier>(m_ConfigPtr->GetConfigData().ClassifierModelPath);
+            InitializeClassifier();
 
             // Initialize the camera matrix from the camera calibration file, as well as the camera size (width and height)
             ReadCameraMatrix();
@@ -78,11 +77,9 @@ namespace ttool
 
         TTool(std::string ttoolRootPath, std::string configFile, cv::Mat cameraMatrix, cv::Size cameraSize)
         {
-            m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
-            m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
+            InitializeConfig(ttoolRootPath, configFile);
 
-            // Initialize the classifier
-            m_Classifier = std::make_unique<ttool::ML::Classifier>(m_ConfigPtr->GetConfigData().ClassifierModelPath);            
+            InitializeClassifier();
 
             CameraMatrix = cameraMatrix.clone();
             CamSize.height = cameraSize.height;
@@ -253,6 +250,22 @@ namespace ttool
         int GetCurrentObjectID() { return m_CurrentObjectID; };
 
     private:
+        void InitializeConfig(std::string ttoolRootPath, std::string configFile)
+        {
+            m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
+            m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
+        }
+
+        void InitializeClassifier()
+        {
+            m_Classifier = std::make_unique<ttool::ML::Classifier>(m_ConfigPtr->GetConfigData().ClassifierModelPath,
+                                                                   m_ConfigPtr->GetConfigData().ClassifierImageSize,
+                                                                   m_ConfigPtr->GetConfigData().ClassifierImageChannels,
+                                                                   m_ConfigPtr->GetConfigData().ClassifierLabels,
+                                                                   m_ConfigPtr->GetConfigData().ClassifierMean,
+                                                                   m_ConfigPtr->GetConfigData().ClassifierStd);
+        }
+
         void CheckObjectChange()
         {
             if (m_ModelManagerPtr->GetObject()->getModelID() != m_CurrentObjectID)

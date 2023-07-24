@@ -5,10 +5,6 @@
 
 namespace ttool::ML
 {
-    #define IMAGE_SIZE 480
-    #define IMAGE_CHANNEL 3
-    #define NUM_CLASSES 14
-
     class Classifier
     {
         public:
@@ -17,7 +13,12 @@ namespace ttool::ML
          * 
          * @param modelPath path to the model file
          */
-        Classifier(std::string modelPath);
+        Classifier(std::string modelPath,
+                   int imageSize,
+                   int imageChannel,
+                   std::vector<std::string> pred2Label,
+                   std::vector<float> mean,
+                   std::vector<float> std);
 
         /**
          * @brief Classify the image
@@ -46,21 +47,10 @@ namespace ttool::ML
 
         private:
         torch::jit::script::Module m_Module;
-        std::string m_Pred2Label[NUM_CLASSES] = {
-            "auger_bit_24_400",
-            "auger_drill_bit_20_450",
-            "chain_saw_blade_f_250",
-            "self_feeding_bit_50_90",
-            "spade_drill_bit_35",
-            "auger_drill_bit_20_235",
-            "auger_drill_bit_30_400",
-            "circular_saw_blade_makita_190",
-            "self_feeding_drill_bit_30_90",
-            "twist_drill_bit_32_165",
-            "auger_drill_bit_20_400",
-            "brad_point_drill_bit_20_150",
-            "saber_saw_blade_makita_t",
-            "spade_drill_bit_25_150"
-        };
+        std::vector<std::string> m_Pred2Label;
+        int IMAGE_SIZE;
+        int IMAGE_CHANNEL;
+        std::vector<float> m_Mean;
+        std::vector<float> m_Std;
     };
 }

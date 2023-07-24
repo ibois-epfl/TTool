@@ -6,6 +6,31 @@ histOffset: 100
 histRad: 40
 searchRad: 25
 classifierModelPath: "ai/torchscripts/efficientnet.pt"
+classifierLabels:
+   - "auger_bit_24_400"
+   - "auger_drill_bit_20_450"
+   - "chain_saw_blade_f_250"
+   - "self_feeding_bit_50_90"
+   - "spade_drill_bit_35"
+   - "auger_drill_bit_20_235"
+   - "auger_drill_bit_30_400"
+   - "circular_saw_blade_makita_190"
+   - "self_feeding_drill_bit_30_90"
+   - "twist_drill_bit_32_165"
+   - "auger_drill_bit_20_400"
+   - "brad_point_drill_bit_20_150"
+   - "saber_saw_blade_makita_t"
+   - "spade_drill_bit_25_150"
+classifierImageSize: 480
+classifierImageChannels: 3
+classifierMean:
+   - 0.485
+   - 0.456
+   - 0.406
+classifierStd:
+    - 0.229
+    - 0.224
+    - 0.225
 groundTruthPoses:
    - [ 9.84866619e-01, -4.03894819e-02, 1.68541461e-01, -1.62771076e-01,
        1.18437737e-01, 9.79524612e-01, -5.95245212e-02, -9.92136419e-01,

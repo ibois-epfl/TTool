@@ -34,11 +34,22 @@ namespace ttool
 
             // ML
             std::string ClassifierModelPath;
+            std::vector<std::string> ClassifierLabels;
+            int ClassifierImageSize;
+            int ClassifierImageChannels;
+            std::vector<float> ClassifierMean;
+            std::vector<float> ClassifierStd;
 
             // Unordered maps are used to help Setters more dynamic typed
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::string>>> stringVectorMembers = {
                 {"modelFiles", std::ref(ModelFiles)},
-                {"acitFiles", std::ref(AcitFiles)}
+                {"acitFiles", std::ref(AcitFiles)},
+                {"classifierLabels", std::ref(ClassifierLabels)}
+            };
+
+            std::unordered_map<std::string, std::reference_wrapper<std::vector<float>>> floatVectorMembers = {
+                {"classifierMean", std::ref(ClassifierMean)},
+                {"classifierStd", std::ref(ClassifierStd)}
             };
 
             std::unordered_map<std::string, std::reference_wrapper<std::vector<std::vector<float>>>> floatVectorVectorMembers = {
@@ -48,7 +59,9 @@ namespace ttool
             std::unordered_map<std::string, std::reference_wrapper<int>> intMembers = {
                 {"histOffset", std::ref(HistOffset)},
                 {"histRad", std::ref(HistRad)},
-                {"searchRad", std::ref(SearchRad)}
+                {"searchRad", std::ref(SearchRad)},
+                {"classifierImageSize", std::ref(ClassifierImageSize)},
+                {"classifierImageChannels", std::ref(ClassifierImageChannels)}
             };
 
             std::unordered_map<std::string, std::reference_wrapper<float>> floatMembers = {
@@ -71,6 +84,17 @@ namespace ttool
                 SET_UNORDERED_MAP_VALUE(stringVectorMembers, key, value);
                 return;
                 if (auto it = stringVectorMembers.find(key); it != stringVectorMembers.end())
+                {
+                    it->second.get().clear();
+                    it->second.get() = value;
+                }
+            }
+
+            void setValue(std::string key, std::vector<float> value)
+            {
+                SET_UNORDERED_MAP_VALUE(floatVectorMembers, key, value);
+                return;
+                if (auto it = floatVectorMembers.find(key); it != floatVectorMembers.end())
                 {
                     it->second.get().clear();
                     it->second.get() = value;
@@ -180,7 +204,19 @@ namespace ttool
                 m_ConfigData.setValue("zn", (float)fs["zn"]);
                 m_ConfigData.setValue("zf", (float)fs["zf"]);
 
-                m_ConfigData.setValue("classifierModelPath", (std::string)fs["classifierModelPath"]);      
+                m_ConfigData.setValue("classifierModelPath", (std::string)fs["classifierModelPath"]);
+                
+                std::vector<std::string> classifierLabels;
+                fs["classifierLabels"] >> classifierLabels;
+                m_ConfigData.setValue("classifierLabels", classifierLabels);
+                m_ConfigData.setValue("classifierImageSize", (int)fs["classifierImageSize"]);
+                m_ConfigData.setValue("classifierImageChannels", (int)fs["classifierImageChannels"]);
+                
+                std::vector<float> classifierMean, classifierStd;
+                fs["classifierMean"] >> classifierMean;
+                fs["classifierStd"] >> classifierStd;
+                m_ConfigData.setValue("classifierMean",classifierMean);
+                m_ConfigData.setValue("classifierStd", classifierStd);
 
                 return fs.release();
             }
@@ -219,7 +255,25 @@ namespace ttool
                 std::cout << "Search rad: " << m_ConfigData.SearchRad << std::endl;
                 std::cout << "Zn: " << m_ConfigData.Zn << std::endl;
                 std::cout << "Zf: " << m_ConfigData.Zf << std::endl;
+
                 std::cout << "Classifier model path: " << m_ConfigData.ClassifierModelPath << std::endl;
+                std::cout << "Classifier labels: " << std::endl;
+                for (auto& classifierLabel : m_ConfigData.ClassifierLabels)
+                {
+                    std::cout << "\t" << classifierLabel << std::endl;
+                }
+                std::cout << "Classifier image size: " << m_ConfigData.ClassifierImageSize << std::endl;
+                std::cout << "Classifier image channels: " << m_ConfigData.ClassifierImageChannels << std::endl;
+                std::cout << "Classifier mean: " << std::endl;
+                for (auto& classifierMean : m_ConfigData.ClassifierMean)
+                {
+                    std::cout << "\t" << classifierMean << std::endl;
+                }
+                std::cout << "Classifier std: " << std::endl;
+                for (auto& classifierStd : m_ConfigData.ClassifierStd)
+                {
+                    std::cout << "\t" << classifierStd << std::endl;
+                }
             }
 
             /**
@@ -238,6 +292,11 @@ namespace ttool
                 fs << "searchRad" << m_ConfigData.SearchRad;
 
                 fs << "classifierModelPath" << m_ConfigData.ClassifierModelPath;
+                fs << "classifierLabels" << m_ConfigData.ClassifierLabels;
+                fs << "classifierImageSize" << m_ConfigData.ClassifierImageSize;
+                fs << "classifierImageChannels" << m_ConfigData.ClassifierImageChannels;
+                fs << "classifierMean" << m_ConfigData.ClassifierMean;
+                fs << "classifierStd" << m_ConfigData.ClassifierStd;
 
                 fs << "groundTruthPoses" << m_ConfigData.GroundTruthPoses;
                 fs << "modelFiles" << m_ConfigData.ModelFiles;

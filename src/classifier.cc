@@ -1,6 +1,12 @@
 #include "classifier.hh"
 
-ttool::ML::Classifier::Classifier(std::string modelPath)
+ttool::ML::Classifier::Classifier(std::string modelPath,
+                                  int imageSize,
+                                  int imageChannel,
+                                  std::vector<std::string> pred2Label,
+                                  std::vector<float> mean,
+                                  std::vector<float> std)
+: IMAGE_SIZE(imageSize), IMAGE_CHANNEL(imageChannel), m_Pred2Label(pred2Label), m_Mean(mean), m_Std(std)
 {
     m_Module = torch::jit::load(modelPath);
 }
@@ -31,8 +37,7 @@ void ttool::ML::Classifier::Transform(cv::Mat image, torch::Tensor& tensor)
     tensor = torch::from_blob(image.data, {1, IMAGE_SIZE, IMAGE_SIZE, IMAGE_CHANNEL});
     tensor = tensor.permute({0, 3, 1, 2}); // convert to CxHxW
 
-    // According to https://pytorch.org/vision/main/models/generated/torchvision.models.efficientnet_v2_m.html
-    tensor[0][0] = tensor[0][0].sub_(0.485).div_(0.229);
-    tensor[0][1] = tensor[0][1].sub_(0.456).div_(0.224);
-    tensor[0][2] = tensor[0][2].sub_(0.406).div_(0.225);
+    tensor[0][0] = tensor[0][0].sub_(m_Mean[0]).div_(m_Std[0]);
+    tensor[0][1] = tensor[0][1].sub_(m_Mean[1]).div_(m_Std[1]);
+    tensor[0][2] = tensor[0][2].sub_(m_Mean[2]).div_(m_Std[2]);
 }
