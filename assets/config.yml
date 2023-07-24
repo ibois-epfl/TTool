@@ -16,7 +16,7 @@ classifierLabels:
    - "self_feeding_bit_50_90"
    - "spade_drill_bit_25_150"
    - "twist_drill_bit_32_165"
-classifierImageSize: 480
+classifierImageSize: 384
 classifierImageChannels: 3
 classifierMean:
    - 0.485

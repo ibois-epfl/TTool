@@ -19,6 +19,17 @@ ttool::ML::Classifier::Classifier(std::string modelPath,
 
 int ttool::ML::Classifier::Classify(cv::Mat image)
 {
+    if (!m_IsInitialized)
+    {
+        cv::Mat imageFirstRun;
+        image.copyTo(imageFirstRun);
+        cv::cvtColor(imageFirstRun, imageFirstRun, cv::COLOR_BGR2RGB);
+        torch::Tensor tensor;
+        Transform(imageFirstRun, tensor);
+        m_Module.forward({tensor}).toTensor();
+        m_IsInitialized = true;
+    }
+
     torch::Tensor tensor;
     cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
     Transform(image, tensor);

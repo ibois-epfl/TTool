@@ -22,6 +22,7 @@ namespace ttool::ML
 
         /**
          * @brief Classify the image
+         * Image should be in BGR format
          * 
          * @param image 
          * @return int 
@@ -55,5 +56,7 @@ namespace ttool::ML
         int IMAGE_CHANNEL;
         std::vector<float> m_Mean;
         std::vector<float> m_Std;
+
+        bool m_IsInitialized = false;
     };
 }
