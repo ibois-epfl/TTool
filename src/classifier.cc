@@ -9,6 +9,12 @@ ttool::ML::Classifier::Classifier(std::string modelPath,
 : IMAGE_SIZE(imageSize), IMAGE_CHANNEL(imageChannel), m_Pred2Label(pred2Label), m_Mean(mean), m_Std(std)
 {
     m_Module = torch::jit::load(modelPath);
+
+    // Dry run to initialize the model
+    cv::Mat image = cv::Mat::zeros(IMAGE_SIZE, IMAGE_SIZE, CV_8UC3);
+    torch::Tensor tensor;
+    Transform(image, tensor);
+    m_Module.forward({tensor}).toTensor();
 }
 
 int ttool::ML::Classifier::Classify(cv::Mat image)
