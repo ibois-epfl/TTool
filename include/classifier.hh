@@ -45,6 +45,9 @@ namespace ttool::ML
          */
         void Transform(cv::Mat image, torch::Tensor& tensor);
 
+        public:
+        std::stringstream ClassifierLog;
+
         private:
         torch::jit::script::Module m_Module;
         std::vector<std::string> m_Pred2Label;

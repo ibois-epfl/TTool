@@ -137,6 +137,11 @@ namespace ttool
             return m_Classifier->GetLabel(prediction);
         }
 
+        std::string GetClassifierLog()
+        {
+            return m_Classifier->ClassifierLog.str();
+        }
+
         /**
          * @brief Draw the silhouette of the model on the camera frame
          * 
