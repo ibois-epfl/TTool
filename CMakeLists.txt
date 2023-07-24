@@ -17,13 +17,6 @@ list(REMOVE_ITEM TTool_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc)
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
-#GLFW
-find_package(glfw3 3.3 REQUIRED)
-find_package(GLEW REQUIRED)
-if(NOT GLEW_FOUND)
-    message(FATAL_ERROR "GLEW not found!")
-endif()
-
 add_library(TTool SHARED ${TTool_SOURCES} ${glsl_SOURCES})
 target_include_directories(TTool PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -68,8 +61,5 @@ if (OPT_BUILD_TTOOL_EXE)
     add_executable(ttoolexec src/main.cc)
     target_link_libraries(ttoolexec
                           TTool
-                          glfw
-                          ${GLFW_LIBRARIES}
-                          GLEW
                           )
 endif()
