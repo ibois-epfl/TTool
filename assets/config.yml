@@ -19,7 +19,7 @@ classifierLabels:
    - "twist_drill_bit_32_165"
    - "auger_drill_bit_20_400"
    - "brad_point_drill_bit_20_150"
-   - "saber_saw_blade_makita_t"
+   - "saber_saw_blade_makita_t_300"
    - "spade_drill_bit_25_150"
 classifierImageSize: 480
 classifierImageChannels: 3
