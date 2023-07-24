@@ -212,6 +212,7 @@ namespace ttool
             m_ModelManagerPtr->SetObjectID(objectID);
             InitializeObjectTracker();
         }
+
         // /**
         //  * @brief Set the Object ID with its name
         //  * 

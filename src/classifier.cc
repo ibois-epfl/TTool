@@ -14,17 +14,16 @@ ttool::ML::Classifier::Classifier(std::string modelPath,
 int ttool::ML::Classifier::Classify(cv::Mat image)
 {
     torch::Tensor tensor;
-    cv::imshow("What classifier sees", image);
     cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
     Transform(image, tensor);
 
     torch::Tensor output = m_Module.forward({tensor}).toTensor();
     output = output.softmax(1);
     auto topk = torch::topk(output, 3, 1); // (values, indices)
-    for (int i = 0; i < 3; ++i)
-    {
-        std::cout << "Top " << i << ": " << std::get<0>(topk)[0][i].item<float>() << " and " << GetLabel(std::get<1>(topk)[0][i].item<int>()) << std::endl;
-    }
+    // for (int i = 0; i < 3; ++i)
+    // {
+    //     std::cout << "Top " << i << ": " << std::get<0>(topk)[0][i].item<float>() << " and " << GetLabel(std::get<1>(topk)[0][i].item<int>()) << std::endl;
+    // }
     int pred = output.argmax(1).item<int>();
 
     return pred;

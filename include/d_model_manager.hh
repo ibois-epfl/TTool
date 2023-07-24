@@ -80,6 +80,14 @@ namespace ttool
          */
         void SavePosesToConfig();
 
+        /**
+         * @brief Get the Object ID object from the model name according to the folder name in the config file
+         * 
+         * @param modelName 
+         * @return int 
+         */
+        int GetObjectID(std::string modelName);
+
         private:
         /**
          * @brief Convert a vector to a map with ID as key
@@ -93,6 +101,14 @@ namespace ttool
         std::map<int, T> ConvertVectorToMapID(std::vector<T> someVector);
 
         /**
+         * @brief Convert a vector to a map with string as key and model ID as value
+         * 
+         * @param someVector
+         * @return std::map<std::string, int> map with string as key and model ID as value
+        */
+        std::map<std::string, int> ConvertVectorToMapString(std::vector<cv::String> someVector);
+
+        /**
          * @brief Set the Current Object Ptr object to the current ID and initialize it
          * 
          */
@@ -102,6 +118,8 @@ namespace ttool
         std::map<int, std::string> m_ModelID2ModelFiles;
         std::map<int, cv::Matx44f> m_ModelID2InitialPoses;
         std::map<int, cv::Matx44f> m_ModelID2ModelPoses;
+
+        std::map<std::string, int> m_ModelName2ModelID;
 
         std::shared_ptr<Config> m_ConfigPtr;
 

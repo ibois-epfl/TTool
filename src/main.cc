@@ -3,7 +3,6 @@
 #include "camera.hh"
 #include "ttool.hh"
 #include "util.hh"
-#include "classifier.hh"
 
 #include "pose_writer.hh"
 
@@ -111,7 +110,6 @@ int main(int argc, char **argv)
 
     PoseWriter poseWriter = PoseWriter("trackingPose.log", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
 
-    ttool::ML::Classifier classifier(configPtr->GetConfigData().ClassifierModelPath);
     // main thread
     bool exit = false;
     if (isVideoRecording) {visualizerPtr->ToggleSavingImages();}
@@ -142,10 +140,17 @@ int main(int argc, char **argv)
             inputVisualizer.ConsumeKey(key);
             visualizerPtr->SetModels();
 
+            // Classify the object and set the object ID
             if ('f' == key)
             {
-                int prediction = classifier.Classify(cameraPtr->Image());
-                std::string label = classifier.GetLabel(prediction);
+                std::string label = ttool->Classify(cameraPtr->Image());
+                int modelID = ttool->GetModelManager()->GetObjectID(label);
+                if (modelID == -1)
+                {
+                    std::cout << "Model not found: " << label << std::endl;
+                    continue;
+                }
+                ttool->GetModelManager()->SetObjectID(modelID);
                 std::cout << "Prediction: " << label << std::endl;
             }
         }

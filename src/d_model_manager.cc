@@ -8,6 +8,7 @@ DModelManager::DModelManager(std::vector<cv::String> modelFiles, std::vector<cv:
     m_ModelID2ModelFiles = ConvertVectorToMapID(modelFiles);
     m_ModelID2InitialPoses = ConvertVectorToMapID(gtPoses);
     m_ModelID2ModelPoses = ConvertVectorToMapID(gtPoses);
+    m_ModelName2ModelID = ConvertVectorToMapString(modelFiles);
 
     SetCurrentObjectPtr();
 
@@ -94,6 +95,13 @@ void DModelManager::SavePosesToConfig()
     m_ConfigPtr->write("groundTruthPoses", poses);
 }
 
+int DModelManager::GetObjectID(std::string modelName)
+{ 
+    if (m_ModelName2ModelID.find(modelName) != m_ModelName2ModelID.end())
+        return m_ModelName2ModelID[modelName]; 
+    return -1;
+}
+
 template <typename T>
 std::map<int, T> DModelManager::ConvertVectorToMapID(std::vector<T> someVector)
 {
@@ -103,6 +111,21 @@ std::map<int, T> DModelManager::ConvertVectorToMapID(std::vector<T> someVector)
         mapID2Value[i + 1] = someVector[i];
     }
     return mapID2Value;
+}
+
+std::map<std::string, int> DModelManager::ConvertVectorToMapString(std::vector<cv::String> someVector)
+{
+    std::map<std::string, int> mapString2ID;
+    for (int i = 0; i < someVector.size(); ++i)
+    {
+        std::string fullpath = someVector[i];
+
+        std::string folderName = fullpath.substr(0, fullpath.find_last_of("/\\"));
+        std::string modelName = folderName.substr(folderName.find_last_of("/\\") + 1);
+        std::cout << modelName << std::endl;
+        mapString2ID[modelName] = i + 1;
+    }
+    return mapString2ID;
 }
 
 /**
