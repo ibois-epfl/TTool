@@ -22,7 +22,7 @@ TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float 
     float zNear = view->GetZNear();
     float zFar = view->GetZFar();
     
-    std::cout << "template_view" << std::endl;
+    // std::cout << "template_view" << std::endl;
     std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
     
     int m_id = object->getModelID();

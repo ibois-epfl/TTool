@@ -122,7 +122,7 @@ std::map<std::string, int> DModelManager::ConvertVectorToMapString(std::vector<c
 
         std::string folderName = fullpath.substr(0, fullpath.find_last_of("/\\"));
         std::string modelName = folderName.substr(folderName.find_last_of("/\\") + 1);
-        std::cout << modelName << std::endl;
+        // std::cout << modelName << std::endl;
         mapString2ID[modelName] = i + 1;
     }
     return mapString2ID;

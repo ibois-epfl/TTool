@@ -75,13 +75,13 @@ void View::Initialize(const Matx33f &K, int width, int height, float zNear, floa
 
 	m_ProjectionMatrix = Transformations::perspectiveMatrix(K, width, height, this->m_Zn, this->m_Zf, true);
 
-	LOG(INFO) << "Projection matrix: " << endl
-			  << m_ProjectionMatrix;
-	LOG(INFO) << "Generating VAO..." << endl;
+	// LOG(INFO) << "Projection matrix: " << endl
+	// 		  << m_ProjectionMatrix;
+	// LOG(INFO) << "Generating VAO..." << endl;
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
 
-	LOG(INFO) << "Generating VAO... DONE" << endl;
+	// LOG(INFO) << "Generating VAO... DONE" << endl;
 	
 	m_CalibrationMatrices.clear();
 

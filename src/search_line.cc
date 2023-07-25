@@ -16,7 +16,7 @@ void SearchLine::FindContours(const cv::Mat& projection_mask, int seg, bool all_
 }
 
 void SearchLine::DrawContours(cv::Mat& buf) const {
-	std::cout << "contour size: " << contours.size() << std::endl;
+	// std::cout << "contour size: " << contours.size() << std::endl;
 
 	CHECK(!buf.empty());
 	static std::vector<cv::Vec3b> colors{
