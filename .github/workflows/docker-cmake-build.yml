@@ -14,7 +14,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-
+      with:
+        lfs: true
+    - run:  git lfs pull
     # this allows to run the submodule checkouts from the docker commands by using a PAT (Personal Access Token)
     # for each collaborator a CI_PAT is needed
     - name: Checkout submodules using a PAT

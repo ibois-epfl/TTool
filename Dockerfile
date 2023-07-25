@@ -22,7 +22,6 @@ RUN  apt-get update \
 COPY . .
 WORKDIR .
 
-RUN git lfs pull -I assets/libtorch-cxx11-abi-shared-with-deps-2.0.1+cpu.zip
 
 # Clear CMakeCache for Docker (this line is mainly for VSCode dev container)
 RUN find . -name "CMakeCache.txt" -type f -delete
