@@ -11,7 +11,6 @@ if (TTOOL_BUILD_TTOOL_EXE)
     find_package(glfw3 3.3 REQUIRED)
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/glmT)
-list(APPEND TTOOL_INSTALL_TARGETS glm)
 
-add_external_package(Torch THIRD_PARTY_DIR deps)
+add_external_package(glm)
+add_external_package(Torch)

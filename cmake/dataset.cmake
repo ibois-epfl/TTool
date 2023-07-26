@@ -13,7 +13,9 @@ if(UNIX AND NOT APPLE)
     set(DOWNLOAD_CMD "${PROJECT_SOURCE_DIR}/util/download_dataset.sh")
     execute_process(
         COMMAND chmod +x ${DOWNLOAD_CMD}
-        COMMAND ${DOWNLOAD_CMD} ${__DSET_DOI__} ${PROJECT_SOURCE_DIR}/assets/toolheads RESULT_VARIABLE ret
+        COMMAND ${DOWNLOAD_CMD} ${__DSET_DOI__} ${PROJECT_SOURCE_DIR}/assets/toolheads
+        RESULT_VARIABLE ret
+        OUTPUT_QUIET
     )
     # B. load dataset data to config ttool
     if(ret EQUAL 0)

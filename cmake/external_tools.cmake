@@ -36,7 +36,7 @@ function(download_external_project project_name)
 
 
   if (NOT _dep_args_THIRD_PARTY_DIR)
-    set(_dep_args_THIRD_PARTY_DIR third-party)
+    set(_dep_args_THIRD_PARTY_DIR deps)
   endif()
 
   if (_dep_args_PATCH)
@@ -132,7 +132,7 @@ function(add_external_package package)
   endif()
 
   if (NOT _aep_args_THIRD_PARTY_DIR)
-    set(_aep_args_THIRD_PARTY_DIR third-party)
+    set(_aep_args_THIRD_PARTY_DIR deps)
   endif()
 
 
