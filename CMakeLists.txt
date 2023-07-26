@@ -26,15 +26,12 @@ add_library(ttool_lib SHARED
 add_library(TTool::ttool ALIAS ttool_lib)
 
 target_link_libraries(ttool_lib
-    #        ${CMAKE_THREAD_LIBS_INIT}
     PUBLIC
       ${OpenCV_LIBS}
       glm::glm
       glog::glog
       assimp
-      GLEW::GLEW
-      OpenGL::GL
-    #        ${CMAKE_DL_LIBS}
+      torch
 )
 
 set_property(TARGET ttool_lib PROPERTY PUBLIC_HEADER ${TTOOL_PUBLIC_HDRS})
@@ -48,8 +45,10 @@ if (TTOOL_BUILD_TTOOL_EXE)
     add_executable(ttoolexec src/main.cc)
     target_link_libraries(ttoolexec
         ttool_lib
-        glfw
+        GLEW::GLEW
+        OpenGL::GL
         OpenGL::GLU
+        glfw
     )
     list(APPEND TTOOL_INSTALL_TARGETS ttoolexec)
 endif()
