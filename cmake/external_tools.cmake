@@ -8,6 +8,7 @@ function(download_external_project project_name)
     TAG
     BACKEND
     THIRD_PARTY_DIR
+    PATCH
     )
 
   set(_dep_multi_variables)
@@ -26,7 +27,7 @@ function(download_external_project project_name)
   if(_dep_args_BACKEND)
     set(_ep_backend ${dep_args_BACKEND}_REPOSITORY ${_dep_args_URL})
   else()
-    set(_ep_backend URL ${_dep_args_URL})
+    set(_ep_backend URL ${_dep_args_URL} DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
   endif()
 
   if(_dep_args_TAG)
@@ -36,6 +37,11 @@ function(download_external_project project_name)
 
   if (NOT _dep_args_THIRD_PARTY_DIR)
     set(_dep_args_THIRD_PARTY_DIR third-party)
+  endif()
+
+  if (_dep_args_PATCH)
+    find_program(PATCH_EXECUTABLE patch REQUIRED)
+    set(_patch_cmd PATCH_COMMAND ${PATCH_EXECUTABLE} -p1 < "${PROJECT_SOURCE_DIR}/${_dep_args_THIRD_PARTY_DIR}/${_dep_args_PATCH}")
   endif()
 
   set(_src_dir ${PROJECT_SOURCE_DIR}/${_dep_args_THIRD_PARTY_DIR}/${project_name})
@@ -57,7 +63,8 @@ function(download_external_project project_name)
   file(APPEND ${_cmake_lists} "    BUILD_COMMAND     \"\"\n")
   file(APPEND ${_cmake_lists} "    INSTALL_COMMAND   \"\"\n")
   file(APPEND ${_cmake_lists} "    TEST_COMMAND      \"\"\n")
-  file(APPEND ${_cmake_lists} ")")
+  file(APPEND ${_cmake_lists} "    ${_patch_cmd}\n")
+  file(APPEND ${_cmake_lists} "LOG_BUILD 1)")
 
   message(STATUS "Downloading ${project_name} ${_dep_args_GIT_TAG}")
   execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .

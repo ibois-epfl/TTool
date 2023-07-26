@@ -1,0 +1,46 @@
+diff --color -Naur a/include/ATen/DeviceGuard.h b/include/ATen/DeviceGuard.h
+--- a/include/ATen/DeviceGuard.h	2023-04-24 16:05:30.000000000 +0200
++++ b/include/ATen/DeviceGuard.h	2023-07-21 16:26:49.000000000 +0200
+@@ -24,7 +24,7 @@
+ }
+ 
+ inline c10::optional<Device> device_of(const c10::optional<Tensor>& t) {
+-  return t.has_value() ? device_of(t.value()) : nullopt;
++  return t.has_value() ? device_of(t.value()) : c10::nullopt;
+ }
+ 
+ /// Return the Device of a TensorList, if the list is non-empty and
+diff --color -Naur a/libtorch/include/ATen/ops/from_blob.h b/include/ATen/ops/from_blob.h
+--- a/include/ATen/ops/from_blob.h	2023-04-24 16:05:30.000000000 +0200
++++ b/include/ATen/ops/from_blob.h	2023-07-21 16:24:47.000000000 +0200
+@@ -32,7 +32,7 @@
+     return *this;
+   }
+ 
+-  TensorMaker& storage_offset(optional<int64_t> value) noexcept {
++  TensorMaker& storage_offset(c10::optional<int64_t> value) noexcept {
+     storage_offset_ = value;
+ 
+     return *this;
+@@ -51,7 +51,7 @@
+     return *this;
+   }
+ 
+-  TensorMaker& target_device(optional<Device> value) noexcept {
++  TensorMaker& target_device(c10::optional<Device> value) noexcept {
+     device_ = value;
+ 
+     return *this;
+@@ -80,10 +80,10 @@
+   void* data_;
+   IntArrayRef sizes_;
+   OptionalIntArrayRef strides_{};
+-  optional<int64_t> storage_offset_{};
++  c10::optional<int64_t> storage_offset_{};
+   std::function<void(void*)> deleter_{};
+   std::unique_ptr<void, ContextDeleter> ctx_{nullptr, detail::noopDelete};
+-  optional<Device> device_{};
++  c10::optional<Device> device_{};
+   TensorOptions opts_{};
+ };
+ 

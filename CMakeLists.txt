@@ -28,9 +28,10 @@ add_library(TTool::ttool ALIAS ttool_lib)
 target_link_libraries(ttool_lib
     PUBLIC
       ${OpenCV_LIBS}
+      GLEW::GLEW
+      assimp
       glm::glm
       glog::glog
-      assimp
       torch
 )
 
@@ -45,7 +46,6 @@ if (TTOOL_BUILD_TTOOL_EXE)
     add_executable(ttoolexec src/main.cc)
     target_link_libraries(ttoolexec
         ttool_lib
-        GLEW::GLEW
         OpenGL::GL
         OpenGL::GLU
         glfw
