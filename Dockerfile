@@ -4,7 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive # ignore user input required
 
 # install required dependencies
 RUN apt-get -y update && apt-get install -y
-RUN apt-get -y install g++ cmake git
+RUN apt-get -y install g++ cmake git git-lfs
 RUN apt-get -y install libopencv-dev=4.5.4+dfsg-9ubuntu4
 RUN apt-get -y install libassimp-dev
 RUN apt-get -y install libgoogle-glog-dev
