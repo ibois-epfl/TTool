@@ -1,12 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(TTool VERSION "0.1.0" LANGUAGES CXX)
-include(${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in ${PROJECT_NAME}Config.cmake @ONLY)
-install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake" DESTINATION share/${PROJECT_NAME} )
 
-set(CMAKE_CXX_STANDARD 17)
-
+# zenodo direct doi link (to change if dataset us updated)
+set(TTOOL_DSET_DOI "https://zenodo.org/record/8186077" CACHE INTERNAL "")
 include(cmake/dataset.cmake)
 
 file(GLOB glsl_SOURCES src/shader/*.glsl)
@@ -14,6 +11,8 @@ source_group("shader" FILES ${glsl_SOURCES})
 
 file(GLOB TTool_SOURCES src/*.cc)
 list(REMOVE_ITEM TTool_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc)
+
+file(GLOB TTOOL_PUBLIC_HDRS include/*.hh)
 
 set(TTOOL_INSTALL_TARGETS ttool_lib)
 
@@ -25,6 +24,7 @@ add_library(ttool_lib SHARED
 
 add_library(TTool::ttool ALIAS ttool_lib)
 
+target_compile_features(ttool_lib PUBLIC cxx_std_17)
 target_link_libraries(ttool_lib
     PUBLIC
       ${OpenCV_LIBS}
@@ -41,6 +41,10 @@ target_include_directories(ttool_lib
     INTERFACE $<INSTALL_INTERFACE:include/TTool>
 )
 
+# Not sur it is a good idea, it will fail on installed version (NR)
+set(__TTOOL_CONFIG_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.yml")
+set(__TTOOL_ROOT_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}")
+
 # # create TTool executable
 if (TTOOL_BUILD_TTOOL_EXE)
     add_executable(ttoolexec src/main.cc)
@@ -51,6 +55,10 @@ if (TTOOL_BUILD_TTOOL_EXE)
         glfw
     )
     list(APPEND TTOOL_INSTALL_TARGETS ttoolexec)
+
+    target_compile_definitions(ttoolexec PRIVATE
+      __TTOOL_CONFIG_PATH__="${__TTOOL_CONFIG_PATH__}"
+      __TTOOL_ROOT_PATH__="${__TTOOL_ROOT_PATH__}")
 endif()
 
 if(NOT TTOOL_TARGETS_EXPORT)
@@ -82,3 +90,29 @@ install(EXPORT ${TTOOL_TARGETS_EXPORT}
 # Export for build tree
 export(EXPORT ${TTOOL_TARGETS_EXPORT}
     FILE "${CMAKE_CURRENT_BINARY_DIR}/${TTOOL_TARGETS_EXPORT}.cmake")
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(cmake/${PROJECT_NAME}Config.cmake.in
+  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+  )
+
+write_basic_package_version_file(${PROJECT_BINARY_DIR}/TToolConfigVersion.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion)
+
+install(
+  FILES
+    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+if(TTOOL_LIBTORCH_DEPS)
+  install(IMPORTED_RUNTIME_ARTIFACTS torch
+    RUNTIME_DEPENDENCY_SET torch-set)
+  install(RUNTIME_DEPENDENCY_SET torch-set)
+  install(DIRECTORY deps/libtorch/include deps/libtorch/share
+    DESTINATION ${CMAKE_INSTALL_PREFIX}
+    COMPONENT Developpment)
+endif()

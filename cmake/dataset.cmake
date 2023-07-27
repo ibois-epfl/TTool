@@ -13,7 +13,7 @@ if(UNIX AND NOT APPLE)
     set(DOWNLOAD_CMD "${PROJECT_SOURCE_DIR}/util/download_dataset.sh")
     execute_process(
         COMMAND chmod +x ${DOWNLOAD_CMD}
-        COMMAND ${DOWNLOAD_CMD} ${__DSET_DOI__} ${PROJECT_SOURCE_DIR}/assets/toolheads
+        COMMAND ${DOWNLOAD_CMD} ${TTOOL_DSET_DOI} ${PROJECT_SOURCE_DIR}/assets/toolheads
         RESULT_VARIABLE ret
         OUTPUT_QUIET
     )
