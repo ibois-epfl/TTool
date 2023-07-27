@@ -74,11 +74,11 @@ function(download_external_project project_name)
     ERROR_FILE ${_working_dir}/download-error.log)
 
   if(_result)
-    message(FATAL_ERROR "Something went wrong (${_result}) during the download"
+    message(SEND_ERROR "Something went wrong (${_result}) during the download"
       " process of ${project_name} check the file"
       " ${_working_dir}/download-error.log for more details:")
     file(STRINGS "${_working_dir}/download-error.log" ERROR_MSG)
-    message("${ERROR_MSG}")
+    message(FATAL_ERROR "${ERROR_MSG}")
   endif()
 
   execute_process(COMMAND "${CMAKE_COMMAND}" --build .
@@ -88,9 +88,11 @@ function(download_external_project project_name)
     ERROR_FILE ${_working_dir}/build-error.log)
 
   if(_result)
-    message(FATAL_ERROR "Something went wrong (${_result}) during the download"
+    message("Something went wrong (${_result}) during the download"
       " process of ${project_name} check the file"
       " ${_working_dir}/build-error.log for more details")
+    file(STRINGS "${_working_dir}/build-error.log" ERROR_MSG)
+    message(FATAL_ERROR "${ERROR_MSG}")
   endif()
 
   file(WRITE ${_src_dir}/.DOWNLOAD_SUCCESS "")
