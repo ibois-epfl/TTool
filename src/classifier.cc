@@ -49,6 +49,12 @@ int ttool::ML::Classifier::Classify(cv::Mat image)
 
 void ttool::ML::Classifier::Transform(cv::Mat image, torch::Tensor& tensor)
 {
+    int side = std::min(image.cols, image.rows);
+    int x = (image.cols - side) / 2;
+    int y = (image.rows - side) / 2;
+    cv::Rect roi(x, y, side, side);
+    image = image(roi);
+
     cv::resize(image, image, cv::Size(IMAGE_SIZE, IMAGE_SIZE), 0, 0, cv::INTER_CUBIC); // It should be BILINEAR but it is not supported by OpenCV
     image.convertTo(image, CV_32FC3, 1.0f / 255.0f);
     tensor = torch::from_blob(image.data, {1, IMAGE_SIZE, IMAGE_SIZE, IMAGE_CHANNEL});
