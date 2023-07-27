@@ -19,3 +19,14 @@ include("${TTOOL_CMAKE_DIR}/TToolTargets.cmake")
 
 set(TTOOL_DSET_DOI @TTOOL_DSET_DOI@)
 check_required_components(@PROJECT_NAME@)
+
+include(CMakeFindDependencyMacro)
+find_dependency(OpenCV)
+find_dependency(glog)
+find_dependency(GLEW)
+find_dependency(GLUT)
+find_dependency(Torch)
+
+if(NOT @TTool_USE_EXTERNAL_GLM@)
+  find_dependency(glm)
+endif()

@@ -148,12 +148,16 @@ function(add_external_package package)
   set(_cmake_includes ${PROJECT_SOURCE_DIR}/${_aep_args_THIRD_PARTY_DIR})
   set(_${package}_external_dir ${PROJECT_BINARY_DIR}/${_aep_args_THIRD_PARTY_DIR})
 
-
   if(NOT EXISTS ${_cmake_includes}/${package}.cmake)
     set(_required REQUIRED)
   endif()
 
-  if(NOT _aep_args_IGNORE_SYSTEM)
+  string(TOUPPER "${package}" u_package)
+  if(NOT DEFINED  ${PROJECT_NAME}_USE_EXTERNAL_${u_package})
+    set(${PROJECT_NAME}_USE_EXTERNAL_${u_package} FALSE CACHE INTERNAL "")
+  endif()
+
+  if(NOT _aep_args_IGNORE_SYSTEM AND NOT ${PROJECT_NAME}_USE_EXTERNAL_${u_package})
     find_package(${package} ${_${package}_version} ${_required} ${_aep_UNPARSED_ARGUMENTS} QUIET)
     if(${package}_FOUND AND NOT ${package}_FOUND_EXTERNAL)
       string(TOUPPER ${package} u_package)
@@ -165,6 +169,7 @@ function(add_external_package package)
 
   if(EXISTS ${_cmake_includes}/${package}.cmake)
     include(${_cmake_includes}/${package}.cmake)
+    set(${PROJECT_NAME}_USE_EXTERNAL_${u_package} TRUE CACHE INTERNAL "")
   endif()
   string(TOUPPER ${package} u_package)
   mark_as_advanced_prefix(${package})

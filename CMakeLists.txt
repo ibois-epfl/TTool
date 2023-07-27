@@ -14,18 +14,17 @@ list(REMOVE_ITEM TTool_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc)
 
 file(GLOB TTOOL_PUBLIC_HDRS include/*.hh)
 
-set(TTOOL_INSTALL_TARGETS ttool_lib)
+set(TTOOL_INSTALL_TARGETS ttool)
 
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
-add_library(ttool_lib SHARED
-    ${TTool_SOURCES} ${glsl_SOURCES})
+add_library(ttool SHARED ${TTool_SOURCES} ${glsl_SOURCES})
 
-add_library(TTool::ttool ALIAS ttool_lib)
+add_library(TTool::ttool ALIAS ttool)
 
-target_compile_features(ttool_lib PUBLIC cxx_std_17)
-target_link_libraries(ttool_lib
+target_compile_features(ttool PUBLIC cxx_std_17)
+target_link_libraries(ttool
     PUBLIC
       ${OpenCV_LIBS}
       GLEW::GLEW
@@ -35,8 +34,8 @@ target_link_libraries(ttool_lib
       torch
 )
 
-set_property(TARGET ttool_lib PROPERTY PUBLIC_HEADER ${TTOOL_PUBLIC_HDRS})
-target_include_directories(ttool_lib
+set_property(TARGET ttool PROPERTY PUBLIC_HEADER ${TTOOL_PUBLIC_HDRS})
+target_include_directories(ttool
     PUBLIC    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     INTERFACE $<INSTALL_INTERFACE:include/TTool>
 )
@@ -49,7 +48,7 @@ set(__TTOOL_ROOT_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}")
 if (TTOOL_BUILD_TTOOL_EXE)
     add_executable(ttoolexec src/main.cc)
     target_link_libraries(ttoolexec
-        ttool_lib
+        TTool::ttool
         OpenGL::GL
         OpenGL::GLU
         glfw
@@ -109,7 +108,7 @@ install(
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
-if(TTOOL_LIBTORCH_DEPS)
+if(TTool_USE_EXTERNAL_TORCH)
   install(IMPORTED_RUNTIME_ARTIFACTS torch
     RUNTIME_DEPENDENCY_SET torch-set)
   install(RUNTIME_DEPENDENCY_SET torch-set)

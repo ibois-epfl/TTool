@@ -11,4 +11,3 @@ download_external_project(libtorch
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/libtorch")
 find_package(Torch REQUIRED)
 
-set(TTOOL_LIBTORCH_DEPS ON CACHE INTERNAL "")
