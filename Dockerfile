@@ -16,16 +16,15 @@ RUN apt-get -y install unzip
 # For downloading the dataset
 RUN apt-get install -y python3
 RUN  apt-get update \
-  && apt-get install -y wget \
+  && apt-get install -y wget curl patch\
   && rm -rf /var/lib/apt/lists/*
 
-COPY . .
-WORKDIR .
-
+#COPY . .
+#WORKDIR .
 
 # Clear CMakeCache for Docker (this line is mainly for VSCode dev container)
-RUN find . -name "CMakeCache.txt" -type f -delete
+#RUN find . -name "CMakeCache.txt" -type f -delete
 
 # Config/build cmake 
-RUN ./configure.sh
-RUN ./build.sh
+#RUN ./configure.sh
+#RUN ./build.sh
