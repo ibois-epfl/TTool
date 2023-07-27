@@ -3,20 +3,19 @@ FROM ubuntu:latest
 ARG DEBIAN_FRONTEND=noninteractive # ignore user input required
 
 # install required dependencies
-RUN apt-get -y update && apt-get install -y
-RUN apt-get -y install g++ cmake git git-lfs
-RUN apt-get -y install libopencv-dev=4.5.4+dfsg-9ubuntu4
-RUN apt-get -y install libassimp-dev
-RUN apt-get -y install libgoogle-glog-dev
-RUN apt-get -y install freeglut3-dev libglew-dev libglfw3 libglfw3-dev
-
-# For extracting the libtorch zip
-RUN apt-get -y install unzip
+RUN apt-get -qq update && apt-get -qq -y install \
+  g++ cmake git git-lfs \
+  libopencv-dev=4.5.4+dfsg-9ubuntu4 \
+  libassimp-dev \
+  libgoogle-glog-dev \
+  libglew-dev libglfw3-dev libglm-dev \
+  unzip \
+  && rm -rf /var/lib/apt/lists/*
 
 # For downloading the dataset
-RUN apt-get install -y python3
-RUN  apt-get update \
-  && apt-get install -y wget curl patch\
+RUN apt-get -qq update && apt-get -qq -y install \
+  python3 \
+  wget curl patch \
   && rm -rf /var/lib/apt/lists/*
 
 #COPY . .

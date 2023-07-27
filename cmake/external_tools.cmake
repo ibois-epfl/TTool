@@ -25,9 +25,12 @@ function(download_external_project project_name)
   endif()
 
   if(_dep_args_BACKEND)
-    set(_ep_backend ${dep_args_BACKEND}_REPOSITORY ${_dep_args_URL})
+    set(_ep_backend "${dep_args_BACKEND}_REPOSITORY \"${_dep_args_URL}\"")
   else()
-    set(_ep_backend URL ${_dep_args_URL} DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+    set(_ep_backend "URL \"${_dep_args_URL}\"")
+    if(CMAKE_VERSION VERSION_GREATER 3.23)
+      list(APPEND _ep_backend "DOWNLOAD_EXTRACT_TIMESTAMP TRUE")
+    endif()
   endif()
 
   if(_dep_args_TAG)
@@ -41,7 +44,7 @@ function(download_external_project project_name)
 
   if (_dep_args_PATCH)
     find_program(PATCH_EXECUTABLE patch REQUIRED)
-    set(_patch_cmd PATCH_COMMAND ${PATCH_EXECUTABLE} -p1 < "${PROJECT_SOURCE_DIR}/${_dep_args_THIRD_PARTY_DIR}/${_dep_args_PATCH}")
+    set(_patch_cmd "PATCH_COMMAND ${PATCH_EXECUTABLE} -p1 < \"${PROJECT_SOURCE_DIR}/${_dep_args_THIRD_PARTY_DIR}/${_dep_args_PATCH}\"")
   endif()
 
   set(_src_dir ${PROJECT_SOURCE_DIR}/${_dep_args_THIRD_PARTY_DIR}/${project_name})
@@ -57,7 +60,9 @@ function(download_external_project project_name)
   file(APPEND ${_cmake_lists} "ExternalProject_Add(${project_name}\n")
   file(APPEND ${_cmake_lists} "    SOURCE_DIR ${_src_dir}\n")
   file(APPEND ${_cmake_lists} "    BINARY_DIR ${_working_dir}\n")
-  file(APPEND ${_cmake_lists} "    ${_ep_backend}\n")
+  foreach(line ${_ep_backend})
+    file(APPEND ${_cmake_lists} "    ${line}\n")
+  endforeach()
   file(APPEND ${_cmake_lists} "    ${_ep_tag}\n")
   file(APPEND ${_cmake_lists} "    CONFIGURE_COMMAND \"\"\n")
   file(APPEND ${_cmake_lists} "    BUILD_COMMAND     \"\"\n")
@@ -77,8 +82,9 @@ function(download_external_project project_name)
     message(SEND_ERROR "Something went wrong (${_result}) during the download"
       " process of ${project_name} check the file"
       " ${_working_dir}/download-error.log for more details:")
-    file(STRINGS "${_working_dir}/download-error.log" ERROR_MSG)
-    message(FATAL_ERROR "${ERROR_MSG}")
+    file(STRINGS "${_working_dir}/download-error.log" _error_strings)
+    string(REPLACE ";" "\n" _error_msg "${_error_strings}")
+    message(FATAL_ERROR "${_error_msg}")
   endif()
 
   execute_process(COMMAND "${CMAKE_COMMAND}" --build .
@@ -91,8 +97,9 @@ function(download_external_project project_name)
     message("Something went wrong (${_result}) during the download"
       " process of ${project_name} check the file"
       " ${_working_dir}/build-error.log for more details")
-    file(STRINGS "${_working_dir}/build-error.log" ERROR_MSG)
-    message(FATAL_ERROR "${ERROR_MSG}")
+    file(STRINGS "${_working_dir}/build-error.log" _error_strings)
+    string(REPLACE ";" "\n" _error_msg "${_error_strings}")
+    message(FATAL_ERROR "${_error_msg}")
   endif()
 
   file(WRITE ${_src_dir}/.DOWNLOAD_SUCCESS "")
