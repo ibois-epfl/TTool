@@ -4,6 +4,7 @@ include(external_tools)
 find_package(OpenCV 4.5.4 REQUIRED)
 find_package(glog REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(GLUT REQUIRED)
 
 if (TTOOL_BUILD_TTOOL_EXE)
     find_package(assimp REQUIRED)

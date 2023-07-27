@@ -53,6 +53,7 @@ if (TTOOL_BUILD_TTOOL_EXE)
         OpenGL::GL
         OpenGL::GLU
         glfw
+        GLUT::GLUT
     )
     list(APPEND TTOOL_INSTALL_TARGETS ttoolexec)
 

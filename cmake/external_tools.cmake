@@ -187,3 +187,38 @@ function(quote_arguments var)
     set(${var} "${_quoted}" PARENT_SCOPE)
   endif()
 endfunction()
+
+# Download and update submodules with latest remote version
+function(download_submodule_project project_name)
+  find_package(Git QUIET)
+  if(NOT GIT_FOUND OR NOT EXISTS "${PROJECT_SOURCE_DIR}/.git")
+  endif()
+  message(STATUS "Submodule update with latest commit")
+
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} --version
+    OUTPUT_VARIABLE GIT_VERSION_STRING
+  )
+  string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)" GIT_VERSION_STRING ${GIT_VERSION_STRING})
+  set(GIT_VERSION_MAJOR ${CMAKE_MATCH_1})
+  set(GIT_VERSION_MINOR ${CMAKE_MATCH_2})
+  set(GIT_VERSION_PATCH ${CMAKE_MATCH_3})
+
+  if(NOT (GIT_VERSION_MAJOR GREATER 1 OR (GIT_VERSION_MAJOR EQUAL 1 AND GIT_VERSION_MINOR GREATER 8)))
+    message(FATAL_ERROR "Git version 1.8 or greater is required.")
+  endif()
+
+  if(NOT EXISTS ${PROJECT_SOURCE_DIR}/deps/${project_name}/.git)
+    execute_process(COMMAND ${GIT_EXECUTABLE} submodule init -- deps/${project_name}
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  endif()
+
+  execute_process(COMMAND ${GIT_EXECUTABLE} submodule sync -- deps/${project_name}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote -- deps/${project_name}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    RESULT_VARIABLE GIT_SUBMOD_RESULT)
+  if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+    message(FATAL_ERROR "git submodule update --init --recursive --remote failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+  endif()
+endfunction()
