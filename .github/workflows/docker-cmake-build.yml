@@ -35,8 +35,8 @@ jobs:
         working-directory: /code
         run: cmake -B /code/build .
       - uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
         with:
-          if: ${{ failure() }}
           name: configure-artifacts
           path: /code/build
           retention-days: 1
