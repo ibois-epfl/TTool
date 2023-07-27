@@ -32,7 +32,6 @@ jobs:
         with:
           lfs: true
       - name: Configure
-        working-directory: /code
         run: cmake -B build .
       - uses: actions/upload-artifact@v3
         if: ${{ failure() }}
