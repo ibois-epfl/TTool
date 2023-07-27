@@ -8,7 +8,7 @@ RUN apt-get -qq update && apt-get -qq -y install \
   libopencv-dev=4.5.4+dfsg-9ubuntu4 \
   libassimp-dev \
   libgoogle-glog-dev \
-  libglut-dev libglew-dev libglfw3-dev libglm-dev \
+  freeglut3-dev libglew-dev libglfw3-dev libglm-dev \
   unzip \
   && rm -rf /var/lib/apt/lists/*
 
