@@ -1,5 +1,7 @@
 import pathlib
 
+import cv2
+import numpy as np
 import pandas as pd
 import torch
 import torchvision
@@ -53,6 +55,7 @@ mapping = {
     "drill_hinge_cutter_bit_50": "self_feeding_bit_50",
     "saber_saw_blade": "saber_saw_blade",
     "saber_saw_blade_makita_t": "saber_saw_blade",
+    "saber_saw_blade_makita_t_300": "saber_saw_blade",
     "saber_sawblade_t1": "saber_saw_blade",
     "self_feeding_drill_bit_30_90": "self_feeding_drill_bit_30_90",
     "self_feeding_bit_40_90": "self_feeding_bit_40",
@@ -165,3 +168,48 @@ augmentation_transforms = torchvision.transforms.Compose(
         torchvision.transforms.ColorJitter(),
     ]
 )
+
+
+class ToolheadDemoDataset(torch.utils.data.Dataset):
+    def __init__(self, data_dir, transform, target_transform):
+        self.data_dir = pathlib.Path(data_dir)
+        self.img_paths = list(self.data_dir.glob("*/*.png"))
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __len__(self):
+        return len(self.img_paths)
+
+    def __getitem__(self, idx):
+        img_path = self.img_paths[idx]
+        label = img_path.parent.stem
+        label = label.rstrip("whitebalanced_light")
+        label = mapping[label]
+        image2 = cv2.imread(str(img_path))
+        image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
+        # make square
+        side = np.min(image2.shape[:2])
+        y = (image2.shape[0] - side) // 2
+        x = (image2.shape[1] - side) // 2
+        image2 = image2[y : y + side, x : x + side]
+
+        height, width = 384, 384
+        image2 = cv2.resize(image2, (height, width), cv2.INTER_CUBIC)
+        image2 = image2.astype(np.float32)
+        image2 = image2 / 255
+        image2 = torch.tensor(image2)
+        image2 = image2.permute((2, 0, 1))
+        image2[0] = image2[0].sub_(0.485).div_(0.229)
+        image2[1] = image2[1].sub_(0.456).div_(0.224)
+        image2[2] = image2[2].sub_(0.406).div_(0.225)
+
+        image = torchvision.io.read_image(str(img_path))
+        image = image.float() / 255
+        if self.transform:
+            image = self.transform(image)
+            torchvision.utils.save_image(image, "image.tif")
+            torchvision.utils.save_image(image2, "image2.tif")
+            quit()
+        if self.target_transform:
+            label = self.target_transform(label)
+        return image, label

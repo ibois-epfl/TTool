@@ -69,9 +69,15 @@ elif model_type == "TransferEfficientNetAugmentationTwoDataSets":
 #     target_transform=datasets.label_transform,
 #     subsampling=100,
 # )
-img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images/val")
-val_dataset = datasets.ToolDataset(
-    img_dir,
+# img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images/val")
+# val_dataset = datasets.ToolDataset(
+#     img_dir,
+#     transform=image_transform,
+#     target_transform=datasets.label_transform,
+# )
+data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo")
+val_dataset = datasets.ToolheadDemoDataset(
+    data_dir,
     transform=image_transform,
     target_transform=datasets.label_transform,
 )
@@ -107,5 +113,5 @@ ax.tick_params(axis="both", which="minor", labelsize=6)
 plt.xticks(rotation=90)
 plt.tight_layout()
 plt.title(f"{model_type} acc={acc:.2f}")
-plt.savefig(f"confusion_matrix_{model_type}_test_dataset.pdf")
+plt.savefig(f"confusion_matrix_{model_type}_toolhead_demo_dataset.pdf")
 plt.close()
