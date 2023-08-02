@@ -54,6 +54,7 @@ elif model_type == "TransferEfficientNetNewSplit":
 elif model_type == "TransferEfficientNetAugmentationTwoDataSets":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
     ckpt = "./lightning_logs/version_148/checkpoints/epoch=19-step=3840.ckpt"
+    # ckpt = "./lightning_logs/version_181/checkpoints/epoch=41-step=8064.ckpt"  # Extra augmentation
     network = models.TransferEfficientNet(num_classes=len(datasets.labels))
 
 # img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
@@ -81,6 +82,13 @@ val_dataset = datasets.ToolheadDemoDataset(
     transform=image_transform,
     target_transform=datasets.label_transform,
 )
+data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo2")
+val_dataset2 = datasets.ToolheadDemoDataset(
+    data_dir,
+    transform=image_transform,
+    target_transform=datasets.label_transform,
+)
+val_dataset = torch.utils.data.ConcatDataset([val_dataset, val_dataset2])
 val_dataloader = DataLoader(val_dataset, batch_size=25, num_workers=8)
 
 model = train.LitClassifier.load_from_checkpoint(
