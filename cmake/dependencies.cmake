@@ -1,7 +1,14 @@
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 include(external_tools)
 
-find_package(OpenCV 4.5.4 REQUIRED)
+find_package(OpenCV 4.5.4 REQUIRED
+    COMPONENTS
+      calib3d
+      core
+      highgui
+      videoio
+)
+
 find_package(glog REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLUT REQUIRED)
