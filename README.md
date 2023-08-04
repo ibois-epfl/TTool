@@ -161,7 +161,7 @@ distortion_coefficients: !!opencv-matrix
 
 ### Configuration File
 A configuration file contains the information about the View, SLET, Model and Augmented Carpentry configuration.
-The comments indicate where a group of parameters belongs.
+The comments indicate where a group of parameters belongs. All the path should be relative to the TTool root folder. (Behind the scene the class `Config` can receive the absolute path to the TTool directory and appends this path to all the path to make them absolute)
 
 ```yml
 %YAML:1.0
@@ -211,31 +211,31 @@ groundTruthPoses:
        1.18437737e-01, 9.79524612e-01, -5.95245212e-02, -9.92136419e-01,
        1.10068895e-01, 0., 0., 1.39999986e-01 ]
 modelFiles:
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/circular_saw_blade_makita_190/model.obj"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/chain_saw_blade_f_250/model.obj"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/auger_drill_bit_20_235/model.obj"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/twist_drill_bit_32_165/model.obj"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_40_90/model.obj"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_50_90/model.obj"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/saber_saw_blade_makita_t/model.obj"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/brad_point_drill_bit_20_150/model.obj"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/spade_drill_bit_25_150/model.obj"
+   - "/assets/toolheads/circular_saw_blade_makita_190/model.obj"
+   - "/assets/toolheads/chain_saw_blade_f_250/model.obj"
+   - "/assets/toolheads/auger_drill_bit_20_235/model.obj"
+   - "/assets/toolheads/twist_drill_bit_32_165/model.obj"
+   - "/assets/toolheads/self_feeding_bit_40_90/model.obj"
+   - "/assets/toolheads/self_feeding_bit_50_90/model.obj"
+   - "/assets/toolheads/saber_saw_blade_makita_t/model.obj"
+   - "/assets/toolheads/brad_point_drill_bit_20_150/model.obj"
+   - "/assets/toolheads/spade_drill_bit_25_150/model.obj"
 
 # Augmented Carpentry
 acitFiles:
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/twist_drill_bit_32_165/metadata.acit"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/brad_point_drill_bit_20_150/metadata.acit"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_40_90/metadata.acit"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/spade_drill_bit_25_150/metadata.acit"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/saber_saw_blade_makita_t/metadata.acit"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/auger_drill_bit_20_235/metadata.acit"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/self_feeding_bit_50_90/metadata.acit"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/chain_saw_blade_f_250/metadata.acit"
-   - "/home/tpp/IBOIS/TTool/assets/toolheads/circular_saw_blade_makita_190/metadata.acit"
+   - "/assets/toolheads/twist_drill_bit_32_165/metadata.acit"
+   - "/assets/toolheads/brad_point_drill_bit_20_150/metadata.acit"
+   - "/assets/toolheads/self_feeding_bit_40_90/metadata.acit"
+   - "/assets/toolheads/spade_drill_bit_25_150/metadata.acit"
+   - "/assets/toolheads/saber_saw_blade_makita_t/metadata.acit"
+   - "/assets/toolheads/auger_drill_bit_20_235/metadata.acit"
+   - "/assets/toolheads/self_feeding_bit_50_90/metadata.acit"
+   - "/assets/toolheads/chain_saw_blade_f_250/metadata.acit"
+   - "/assets/toolheads/circular_saw_blade_makita_190/metadata.acit"
 
 ```
 
-The groundTruthPoses is in the format of 3x3 rotation matrix followed by a vector of a translation matrix.
+The groundTruthPoses is in the format of 3x3 rotation matrix followed by a vector of a translation matrix. Notice that it is **unlike** normal pose convention where 6D pose matrix is [R|t], but instead...
 ```
 {
   R00, R01, R02,
@@ -256,8 +256,16 @@ Essentially, this is how ttool is used in the main. Other parts of the `main.cc`
 
 ...
 
-// ttool setup with `std::string` configFilePath and `std::string` calibFilePath
-std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(configFilePath, calibFilePath);
+// ttool setup with `std::string` pathToTToolRootDir, `std::string` configFilePath and `std::string` calibFilePath
+std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(pathToTToolRootDir, configFilePath, calibFilePath);
+
+// detect tool head model
+std::string label = ttool->Classify(image);
+
+// change the object according to the label
+int modelID = ttool->GetModelManager()->GetObjectID(label);
+if (modelID != -1)
+    ttool->GetModelManager()->SetObjectID(modelID);
 
 // changing the model to be tracked, adjusting the 6DoF pose of the model via `char` key.
 ttool->ManipulateModel(key);
@@ -300,8 +308,16 @@ Consequently, we can see the `main.cc` of the standalone program be the followin
 auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
 
 //======== BEGIN Using `ttool`, or anything related to OpenGL ========//
-// ttool setup with `std::string` configFilePath and `std::string` calibFilePath
-std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(configFilePath, calibFilePath);
+// ttool setup with `std::string` pathToTToolRootDir, `std::string` configFilePath and `std::string` calibFilePath
+std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(pathToTToolRootDir, configFilePath, calibFilePath);
+
+// detect tool head model
+std::string label = ttool->Classify(image);
+
+// change the object according to the label
+int modelID = ttool->GetModelManager()->GetObjectID(label);
+if (modelID != -1)
+    ttool->GetModelManager()->SetObjectID(modelID);
 
 // changing the model to be tracked, adjusting the 6DoF pose of the model via `char` key.
 ttool->ManipulateModel(key);
