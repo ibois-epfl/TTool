@@ -7,92 +7,6 @@
     <img src="https://img.shields.io/badge/license-GPL--v3-brightgreen">
 </p>
 
-```mermaid
-gantt
-    dateFormat  YYYY-MM-DD
-    title       NC package planning
-    axisFormat %Y-%m
-
-    Start                                                     :milestone, done, strt, 2023-06-01, 0d
-
-    section Vocation
-    french course half-day                                    :crit, 2023-06-12, 2023-06-23
-    day off                                                   :crit, milestone, 2023-06-16
-
-    section TTool standalone dev
-    (1)dataset                                                   :crit, dtset, 2023-06-05, 12d
-    (2)utilities (video export + visuals)                        :active, util, after dtset, 2d
-    (3)API Ttool library refactoring                             :apirefct, after util, 10d
-
-    section Ttool-AC integration
-    (4)Ttool layer                                               :ttollay, after apirefct, 20d
-    (5)Fabrication testing + unit testing                        :ftref, after ttollay, 5d
-
-    section ML 2D dev
-    (*)classifier prototype with real data                       :classrdata, 2023-06-12, 2023-06-24
-    (6)2d detection - state of the art                           :2ddetsota, after apirefct, 4d
-    (7)2d detection - refactoring synth generator                :2ddetref, after 2ddetsota, 10d
-    (8)2d detection - training                                   :2ddettra, after 2ddetref, 5d
-    (9)2d detection - refinement/evaluation                      :2ddetrefin, after 2ddettra, 5d
-    (10)2d detection - integration API                           :2ddetinteg, after 2ddetrefin, 10d
-    (11) 3d pose detector                                        :crit, 3dposde, after 2ddetinteg, 12d
-
-    section ML imaging team
-    (12)provide the trained model to AC team :providemodel, 2023-07-18, 2023-07-20
-    (13)CAM visualization for visual debugging :camvis, after providemodel, 5d
-    (14)Retrain the model with synthetic data :retrain, after synth, 5d
-
-    section ML AC team
-    (15)Getting more fixed camera view data :getdata, 2023-07-18, 2023-07-20
-    (16)Integrate the model in AC :integ, after getdata, 5d
-    (17)Synthetic data generation :synth, after integ, 7d
-
-    section optimisation
-    (**)tSLET optimisation                                        :crit, optim, after 2ddetinteg, 12d
-
-    code refinement                                           :ref, after 3dposde, 4d
-    documentation/cleaning                                    :docclean, 2023-08-10, 2023-08-14
-
-    End                                                       :milestone, ender, 2023-08-14, 0d
-```
-
-## NC description working packages
-- [ ] **(1) dataset**: the dataset needs to be finished and uploaded on zenodo. Here's the upcomong tasks:
-  - [x] chainsaw blade to scan
-  - [ ] long drillb its (x2) to scan
-  - [x] refactor and reorder the dataset
-  - [x] add to the dataset: circular sawblade, saber sawblade, (optional) drillbit, check if it exists
-  - [x] refactor dataset nameing: <englishname>_<widthmm>_<lengthmm> (e.g. spadedrill_25_115)
-  - [x] integrate downloading procedures in AC and TTool
-
-- [x] **(2) utilities**: all utilities for the documentation of the developement needs to be implemented:
-  - [x] video recorder (with and without gui images)
-  - [x] camera pose output
-  - [x] log output with fabrication info
-
-- [x] **(3) API Ttool library refactoring**: the TTool needs to be refactored to an API. The executable should only use calls from the API. The API will be integrated to AC in the package later.
-
-- [x] **(4) Ttool layer**: in AC the tool header recognition needs to occupy a layer folling the AC structure and calls from the TTool API take place unikely there. It is possible that some level of multithreading (?) or corutine needs to be implemented to avoid bottlenecks in the main AC rander thread.
-
-- [ ] **(5) Fabrication testing + unit testing**: the ttool layer integration in AC needs to be tested in fabrication scenario and features and modifications will be added following observations and quick user tests.
-
-- [ ] **(6) 2d detection - state of the art**: some days will be reserved to an extensive review of the existing code that can be used in our application. Once the model identified it will be vet and discussed before starting the development.
-
-- [ ] **(7-8-9-10) 2d detection - generator/training/refinement**: classical ML development for the custom training based on pre-existing synthetic data generator. The generator will need to be refacotered to add:
-  - [ ] general simplifications
-  - [ ] connection to the open-source dataset
-  - [ ] procedural background images
-  - [ ] procedural lighting
-  - [ ] format output based on the chosen training format
-
-- [ ] **(11) (optional) 3d pose detector**: if we are on time, 2 weeks will be reserved to the integration of a initial 6DOF pose detector to avoid the manual placing of the object.
-
-- [ ] **optimisation**:
-  - [ ] [Track's RunIteration](./src/tracker_sle.cc#L185) has fixed number of run
-  - [ ] Search line depends on the size of the Object3D. This leads to slower [EstimatePose](./src/tracker_sle.cc#L306) on some models
-
----
-
 # TTool
 This is modified from the [SLET](https://github.com/huanghone/SLET) for augmented carpentry reserach. This is the repository hosting the API for TTool. It is a programable to detect the 6dof of a fix toolhead from the feed of a fix camera view. The contributions of this project are
 - Making this SLET be more of an API than just a standalone programe.
@@ -103,6 +17,25 @@ This is modified from the [SLET](https://github.com/huanghone/SLET) for augmente
 - RESET, FREEZE, TRACK implementation. We found the correlation between the average score of the search points and the quality of the tracking. We added a thresholding to the SLET to exploit this score. As a consequece, the tracking works better on our setting of a fixed camera mounting on the toolhead.
 
 ## Config & Build
+### Dependencies
+(Optional) There are some dependencies that TTool needs. If using Ubuntu, thes commands may be useful if the package has not been installed in the computer.
+```bash
+apt-get -y install libopencv-dev
+apt-get -y install libassimp-dev
+apt-get -y install libgoogle-glog-dev
+apt-get -y install freeglut3-dev libglew-dev libglfw3 libglfw3-dev
+```
+
+**(Mandatory)** TTool has a [classifier for tool head](./include/classifier.hh) which requires [libtorch](https://pytorch.org/cppdocs/installing.html). Our CMake will automatically install this for you. This requires git lfs to pull the package and for CMake to extract the package in the deps folder. Hence, please [install git lfs](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) before building TTool. The zip file of the libtorch should be located at `assets/libtorch-cxx11-abi-shared-with-deps-2.0.1+cpu.zip`. If you don't have this file, please pull it from the main
+
+```bash
+git lfs pull
+```
+
+IMPORTANT, if you manually install libtorch following the intrucstion from the website, you will not be able to use TTool with the augmented carpentry, or generally, any other project that declare using namespace std. This is because the libtorch will conflict with the std namespace. We did patch this on the package following this [forum](https://discuss.pytorch.org/t/linker-failed-with-ambiguous-references/36255/6). Hence, we recommend using our CMake to install libtorch for you.
+
+### Build
+Once dependencies are installed, you can build the project with the following commands.
 ```bash
 ./config.sh
 ./build.sh
@@ -131,6 +64,103 @@ where,
 - `[-l,--calib]`: calibration file for the camera
 - `[-s,--save]`: record video of session, give custom path for output (default: ./default)
 - `[-t,--trackPose]`: it saves all poses and objects in a log file
+
+## TTool API - where to start using / developing
+In order to use this project as an API or start developing from this project, please start from [ttool.h](./include/ttool.hh). This is the header of the class `ttool` from which you can make a call to all the APIs.
+
+In order to see how [ttool.h](./include/ttool.hh) is being used, we created a standalone program for this project. This executable file is [main.cc](./src/main.cc). It is a good demonstration of how `ttool` is being used a called.
+
+Essentially, this is how ttool is used in the main. Other parts of the `main.cc` are just the object for ttool standalone program.
+```cpp
+#include "ttool.hh"
+
+...
+
+// ttool setup with `std::string` pathToTToolRootDir, `std::string` configFilePath and `std::string` calibFilePath
+std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(pathToTToolRootDir, configFilePath, calibFilePath);
+
+// detect tool head model
+std::string label = ttool->Classify(image);
+
+// change the object according to the label
+int modelID = ttool->GetModelManager()->GetObjectID(label);
+if (modelID != -1)
+    ttool->GetModelManager()->SetObjectID(modelID);
+
+// changing the model to be tracked, adjusting the 6DoF pose of the model via `char` key.
+ttool->ManipulateModel(key);
+
+// Estimate the pose from `cv::Mat` image
+ttool->RunOnAFrame(image);
+
+// Getting the estimated pose
+cv::Matx44f pose = ttool->GetPose();
+```
+
+### Standalone notes
+Now that the `ttool` runs alone, there might be no GLFW initialization/OpenGL context that the SLET tracking can run. Thus, in the `main.cc`, it calls intailization and termination before and after using `ttool` or using any OpenGL. 
+
+🚧 **THIS APPLIES TO EVERTHING RELATED TO OPENGL, INCLUDING the ttool::standaloneUtils::Visualizer** 🚧
+
+```cpp
+#include "util.hh"
+
+...
+
+// Before intializing and using `ttool`
+// Intiailizing GLFW
+auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
+
+... // Using `ttool`, or anything related to OpenGL
+
+// After finished using `ttool`
+// Terminate GLFW
+ttool::standaloneUtils::TerminateStandalone(GLFWWindow);
+```
+
+Consequently, we can see the `main.cc` of the standalone program be the following
+```cpp
+#include "ttool.hh"
+#include "util.hh"
+
+// Before intializing and using `ttool`
+// Intiailizing GLFW
+auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
+
+//======== BEGIN Using `ttool`, or anything related to OpenGL ========//
+// ttool setup with `std::string` pathToTToolRootDir, `std::string` configFilePath and `std::string` calibFilePath
+std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(pathToTToolRootDir, configFilePath, calibFilePath);
+
+// detect tool head model
+std::string label = ttool->Classify(image);
+
+// change the object according to the label
+int modelID = ttool->GetModelManager()->GetObjectID(label);
+if (modelID != -1)
+    ttool->GetModelManager()->SetObjectID(modelID);
+
+// changing the model to be tracked, adjusting the 6DoF pose of the model via `char` key.
+ttool->ManipulateModel(key);
+
+// Estimate the pose from `cv::Mat` image
+ttool->RunOnAFrame(image);
+
+// Getting the estimated pose
+cv::Matx44f pose = ttool->GetPose();
+//======== END Using `ttool`, or anything related to OpenGL ========//
+
+// After finished using `ttool`
+// Terminate GLFW
+ttool::standaloneUtils::TerminateStandalone(GLFWWindow);
+```
+
+There are other `ttool::standaloneUtils` that might be useful, but not vital for TTool API. This includes `ttool::standaloneUtils::Camera` and `ttool::standaloneUtils::Visualizer`.
+
+`ttool::standaloneUtils::Camera` was modified from SLET for managing the camera and undistort the frame with the calibration file.
+
+`ttool::standaloneUtils::Visualizer` was modified the user interface of the standalone program that shows all the keymap help, useful information and most importantly, visualize the 3D model to see the tracker.
+
+How to initialize and use them can also be seen in the `main.cc`.
 
 ### Calibration file
 A calibration file contains the information of the camera device to be used with the TTool.
@@ -244,100 +274,88 @@ The groundTruthPoses is in the format of 3x3 rotation matrix followed by a vecto
   T_x, T_y, T_z,
 }
 ```
+---
+```mermaid
+gantt
+    dateFormat  YYYY-MM-DD
+    title       NC package planning
+    axisFormat %Y-%m
 
-## TTool API - where to start using / developing
-In order to use this project as an API or start developing from this project, please start from [ttool.h](./include/ttool.hh). This is the header of the class `ttool` from which you can make a call to all the APIs.
+    Start                                                     :milestone, done, strt, 2023-06-01, 0d
 
-In order to see how [ttool.h](./include/ttool.hh) is being used, we created a standalone program for this project. This executable file is [main.cc](./src/main.cc). It is a good demonstration of how `ttool` is being used a called.
+    section Vocation
+    french course half-day                                    :crit, 2023-06-12, 2023-06-23
+    day off                                                   :crit, milestone, 2023-06-16
 
-Essentially, this is how ttool is used in the main. Other parts of the `main.cc` are just the object for ttool standalone program.
-```cpp
-#include "ttool.hh"
+    section TTool standalone dev
+    (1)dataset                                                   :crit, dtset, 2023-06-05, 12d
+    (2)utilities (video export + visuals)                        :active, util, after dtset, 2d
+    (3)API Ttool library refactoring                             :apirefct, after util, 10d
 
-...
+    section Ttool-AC integration
+    (4)Ttool layer                                               :ttollay, after apirefct, 20d
+    (5)Fabrication testing + unit testing                        :ftref, after ttollay, 5d
 
-// ttool setup with `std::string` pathToTToolRootDir, `std::string` configFilePath and `std::string` calibFilePath
-std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(pathToTToolRootDir, configFilePath, calibFilePath);
+    section ML 2D dev
+    (*)classifier prototype with real data                       :classrdata, 2023-06-12, 2023-06-24
+    (6)2d detection - state of the art                           :2ddetsota, after apirefct, 4d
+    (7)2d detection - refactoring synth generator                :2ddetref, after 2ddetsota, 10d
+    (8)2d detection - training                                   :2ddettra, after 2ddetref, 5d
+    (9)2d detection - refinement/evaluation                      :2ddetrefin, after 2ddettra, 5d
+    (10)2d detection - integration API                           :2ddetinteg, after 2ddetrefin, 10d
+    (11) 3d pose detector                                        :crit, 3dposde, after 2ddetinteg, 12d
 
-// detect tool head model
-std::string label = ttool->Classify(image);
+    section ML imaging team
+    (12)provide the trained model to AC team :providemodel, 2023-07-18, 2023-07-20
+    (13)CAM visualization for visual debugging :camvis, after providemodel, 5d
+    (14)Retrain the model with synthetic data :retrain, after synth, 5d
 
-// change the object according to the label
-int modelID = ttool->GetModelManager()->GetObjectID(label);
-if (modelID != -1)
-    ttool->GetModelManager()->SetObjectID(modelID);
+    section ML AC team
+    (15)Getting more fixed camera view data :getdata, 2023-07-18, 2023-07-20
+    (16)Integrate the model in AC :integ, after getdata, 5d
+    (17)Synthetic data generation :synth, after integ, 7d
 
-// changing the model to be tracked, adjusting the 6DoF pose of the model via `char` key.
-ttool->ManipulateModel(key);
+    section optimisation
+    (**)tSLET optimisation                                        :crit, optim, after 2ddetinteg, 12d
 
-// Estimate the pose from `cv::Mat` image
-ttool->RunOnAFrame(image);
+    code refinement                                           :ref, after 3dposde, 4d
+    documentation/cleaning                                    :docclean, 2023-08-10, 2023-08-14
 
-// Getting the estimated pose
-cv::Matx44f pose = ttool->GetPose();
+    End                                                       :milestone, ender, 2023-08-14, 0d
 ```
 
-### Standalone notes
-Now that the `ttool` runs alone, there might be no GLFW initialization/OpenGL context that the SLET tracking can run. Thus, in the `main.cc`, it calls intailization and termination before and after using `ttool` or using any OpenGL. 
+## NC description working packages
+- [ ] **(1) dataset**: the dataset needs to be finished and uploaded on zenodo. Here's the upcomong tasks:
+  - [x] chainsaw blade to scan
+  - [ ] long drillb its (x2) to scan
+  - [x] refactor and reorder the dataset
+  - [x] add to the dataset: circular sawblade, saber sawblade, (optional) drillbit, check if it exists
+  - [x] refactor dataset nameing: <englishname>_<widthmm>_<lengthmm> (e.g. spadedrill_25_115)
+  - [x] integrate downloading procedures in AC and TTool
 
-🚧 **THIS APPLIES TO EVERTHING RELATED TO OPENGL, INCLUDING the ttool::standaloneUtils::Visualizer** 🚧
+- [x] **(2) utilities**: all utilities for the documentation of the developement needs to be implemented:
+  - [x] video recorder (with and without gui images)
+  - [x] camera pose output
+  - [x] log output with fabrication info
 
-```cpp
-#include "util.hh"
+- [x] **(3) API Ttool library refactoring**: the TTool needs to be refactored to an API. The executable should only use calls from the API. The API will be integrated to AC in the package later.
 
-...
+- [x] **(4) Ttool layer**: in AC the tool header recognition needs to occupy a layer folling the AC structure and calls from the TTool API take place unikely there. It is possible that some level of multithreading (?) or corutine needs to be implemented to avoid bottlenecks in the main AC rander thread.
 
-// Before intializing and using `ttool`
-// Intiailizing GLFW
-auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
+- [ ] **(5) Fabrication testing + unit testing**: the ttool layer integration in AC needs to be tested in fabrication scenario and features and modifications will be added following observations and quick user tests.
 
-... // Using `ttool`, or anything related to OpenGL
+- [ ] **(6) 2d detection - state of the art**: some days will be reserved to an extensive review of the existing code that can be used in our application. Once the model identified it will be vet and discussed before starting the development.
 
-// After finished using `ttool`
-// Terminate GLFW
-ttool::standaloneUtils::TerminateStandalone(GLFWWindow);
-```
+- [ ] **(7-8-9-10) 2d detection - generator/training/refinement**: classical ML development for the custom training based on pre-existing synthetic data generator. The generator will need to be refacotered to add:
+  - [ ] general simplifications
+  - [ ] connection to the open-source dataset
+  - [ ] procedural background images
+  - [ ] procedural lighting
+  - [ ] format output based on the chosen training format
 
-Consequently, we can see the `main.cc` of the standalone program be the following
-```cpp
-#include "ttool.hh"
-#include "util.hh"
+- [ ] **(11) (optional) 3d pose detector**: if we are on time, 2 weeks will be reserved to the integration of a initial 6DOF pose detector to avoid the manual placing of the object.
 
-// Before intializing and using `ttool`
-// Intiailizing GLFW
-auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
+- [ ] **optimisation**:
+  - [ ] [Track's RunIteration](./src/tracker_sle.cc#L185) has fixed number of run
+  - [ ] Search line depends on the size of the Object3D. This leads to slower [EstimatePose](./src/tracker_sle.cc#L306) on some models
 
-//======== BEGIN Using `ttool`, or anything related to OpenGL ========//
-// ttool setup with `std::string` pathToTToolRootDir, `std::string` configFilePath and `std::string` calibFilePath
-std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(pathToTToolRootDir, configFilePath, calibFilePath);
-
-// detect tool head model
-std::string label = ttool->Classify(image);
-
-// change the object according to the label
-int modelID = ttool->GetModelManager()->GetObjectID(label);
-if (modelID != -1)
-    ttool->GetModelManager()->SetObjectID(modelID);
-
-// changing the model to be tracked, adjusting the 6DoF pose of the model via `char` key.
-ttool->ManipulateModel(key);
-
-// Estimate the pose from `cv::Mat` image
-ttool->RunOnAFrame(image);
-
-// Getting the estimated pose
-cv::Matx44f pose = ttool->GetPose();
-//======== END Using `ttool`, or anything related to OpenGL ========//
-
-// After finished using `ttool`
-// Terminate GLFW
-ttool::standaloneUtils::TerminateStandalone(GLFWWindow);
-```
-
-There are other `ttool::standaloneUtils` that might be useful, but not vital for TTool API. This includes `ttool::standaloneUtils::Camera` and `ttool::standaloneUtils::Visualizer`.
-
-`ttool::standaloneUtils::Camera` was modified from SLET for managing the camera and undistort the frame with the calibration file.
-
-`ttool::standaloneUtils::Visualizer` was modified the user interface of the standalone program that shows all the keymap help, useful information and most importantly, visualize the 3D model to see the tracker.
-
-How to initialize and use them can also be seen in the `main.cc`.
