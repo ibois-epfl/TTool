@@ -178,6 +178,44 @@ namespace ttool
                 cv::drawContours(frame, contours, i, color, 2);
         }
 
+        /**
+         * @brief Draw the shaded of the model on the camera frame
+         * 
+         * @param frame camera frame
+         * @param clr color of the silhouette
+         */
+        void DrawShaded(cv::Mat& frame)
+        {
+            View *view = View::Instance();
+
+            view->RenderSilhouette(m_ModelManagerPtr->GetObject(), GL_FILL);
+
+            cv::Mat depth = view->DownloadFrame(View::DEPTH); // This is the depth map of the model 0.0f and 1.0f are the min and max depth
+
+            view->RenderShaded(m_ModelManagerPtr->GetObject(), GL_FILL);
+            cv::Mat rgb = view->DownloadFrame(View::RGB); // This is the rendered image of the model
+
+            float alpha = 0.5f;
+            for (int y = 0; y < frame.rows; y++)
+            {
+                for (int x = 0; x < frame.cols; x++)
+                {
+                    if (depth.at<float>(y, x) != 0.0f)
+                    {
+                        frame.at<cv::Vec3b>(y, x) = alpha * rgb.at<cv::Vec3b>(y, x) + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x);
+                    }
+                }
+            }
+
+            cv::Mat maskCvt;
+            view->ConvertMask(depth, maskCvt, m_ModelManagerPtr->GetObject()->getModelID());
+            std::vector<std::vector<cv::Point>> contours;
+            cv::findContours(maskCvt, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+            cv::Vec3b color = cv::Vec3b(30, 255, 0);
+            for (int i = 0; i < contours.size(); i++)
+                cv::drawContours(frame, contours, i, color, 2);
+        }
+
         /// @brief Destroy the View object
         void DestrolView()
         {
