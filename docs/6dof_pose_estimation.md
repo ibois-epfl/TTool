@@ -2,12 +2,15 @@
     - Extending the model from EfficientDet - an efficient net for object detection - to output the rotation and translation vector
     - The model is only compatible with one camera and limited number of models.
     - They use Linemod dataset and Occlusion dataset, which is a subset of linemod, for training the model (training a separated model for each dataset).
+    - Better than DROD+ even without the refiner module
+    - The refiner module is built-in inside the model
+    - Has a summary of add ADD acuuracy of several SOTA (YOLO6D, Pix2Pose, PVNet, DPOD, DPOD+, CDPN, HybridPose)
 
 2. [6 DoF Pose Regression via Differentiable Rendering](https://link.springer.com/chapter/10.1007/978-3-031-06430-2_54)
     - Orignally, there are 2 approaches: direct regression and perspective-n-points (PnP)
         - The first one requires a lot of training data - which we may have, but model needs to remember the limited set of 3D models (becuase it needs to implicitly detect the type of the model and regress its 6DoF pose) (The model depends on spcific 3D models).
         - The second method requires 2D-3D correspondence points which imposes additional complication layer to our augmented carpentry.
-    - Using differentiable rendering to do the coarse pose estimation and render-and-compare refinement.
+    - Using direct regression to do the coarse pose estimation and differentiable rendering to do render-and-compare refinement.
     - Reconstructing a 3D model and then use that to generate more dataset for the model. **Reflection**: we don't really need to use the Blender if it is too complicated for deriving the pose as the camera is moving. We can also generate the dataset from all the 3D model that we have and the renderer from view.hh in the TTool. By doing this, we are simplifying the model by fixing the camera matrix of the renderer (which we will have to check and do the same thing if we use the data from the Blender).
     - With the model being rendered on the model, this method should work on any kind of object provided to it.
     - Coarse pose estimation is done by ResNet feature extraction shared between rotaion and translation regressor
@@ -25,7 +28,7 @@
     - Differentiable rendering :)
 
 3. [End-to-End 6-DoF Object Pose Estimation Through Differentiable Rasterization ](https://link.springer.com/chapter/10.1007/978-3-030-11015-4_53)
-    - The initial pose estimation is done with the CNN to predict both the class and the 6DoF at simultaneously.
+    - The initial pose estimation is done with the PoseCNN to predict both the class and the 6DoF at simultaneously.
     - The loss of the pose is the MSE of the element in the predicted pose and the true pose matrix.
     - The classification loss is the cross-entropy function (to which we don't have to pay attention)
     - The paper then refine the estimated pose with the differentiable renderer, but what is interesting and useful is that they use the silhouette of the 3D model. This means that the model does not need to have a accurate texture or the notion of the lighting which is much simpler than to have a realistic rendering method.
@@ -91,3 +94,36 @@
         -With RANSAC-based, these two output yield keypoint hypotheses.
     - Loss function for learning unit vectors (the network only learns from this loss function)
 
+12. [PoseCNN: A Convolutional Neural Network for 6D Object Pose Estimation in Cluttered Scenes](https://arxiv.org/pdf/1711.00199.pdf)
+    - End-to-end pose estimation and very robust to occlusion
+    - ShapeMatch-loss to address symmetric objects + Pose Loss for other rotational loss
+    - The network does 3 things: semantic segmentation, center box prediction (for translation given camera intrinsic), and rotaion prediction
+    - PoseCNN outperforms the 3D coordinate regression network
+    - Using ADD and ADD-S as the metrics for evaluating
+    - ADD metric is the average of the projection euclideean distance of 3D points in the model between the ground truth and the estimation
+    - ADD-S metric is the average of the **minimum** projection euclideean distance of 3D points in the model between the ground truth and the estimation. The use of minimum is to address the symmetric model.
+
+13. [SegICP: Integrated Deep Semantic Segmentation and Pose Estimation](https://www.cs.princeton.edu/~jw60/wong2017segicp.pdf)
+    - It is using RGB-D which is not of our interest.
+    - It introduced the model-to-scene alignment metric between the point clouds of the model and the estimated point clouds. This is interesting because it has been used in the refinement of the PoseCNN, however still with depth. Nevertheless, the should inspire us to use the alignment idea have another pseudo-goodness metric of the SLET.
+        - a(M, S) = |c| / |M
+        - M is the set of points in the in the crop point cloud
+        - S is the set of points in the segmented object scene cloud
+        - c is the set of points in M with unqiue corresponding points in S at most τ metwers away.
+        - computation is done with the help of kd-tree 
+
+14. [DPOD: 6D Pose Object Detector and Refiner](https://arxiv.org/pdf/1902.11020.pdf)
+    - 2D-3D correspondence map with refiner
+    - Surpassing the PVNet method but refiner is needed
+    - Has a summary of add ADD acuuracy of several SOTA (YOLO6D, PoseCNN, PVNet, DeepIM)
+
+15. [ROPE: Occlusion-Robust Object Pose Estimation with Holistic Representation](https://arxiv.org/pdf/2110.11636v1.pdf)
+    - 2D-3D correspondence map
+    - Enforcing robustness against occlusion without the need ot pose refinement via data augmentation
+    - Need 3D point cloud of the target object
+    - Surpassing SoTA with refinement
+
+16. [SSD-6D: Making RGB-based 3D detection and 6D pose estimation great again](https://openaccess.thecvf.com/content_ICCV_2017/papers/Kehl_SSD-6D_Making_RGB-Based_ICCV_2017_paper.pdf)
+    - https://github.com/wadimkehl/ssd-6d - code for training and refinement cannot be made available
+    - End-to-end approach
+    - Can just do the inference, no training or fine-tuning
