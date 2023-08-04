@@ -20,7 +20,8 @@ torch.set_float32_matmul_precision("high")
 # model_type = "ResNet222"
 # model_type = "TransferResNet"
 # model_type = "TransferEfficientNet"
-model_type = "TransferEfficientNetNewSplit"
+# model_type = "TransferEfficientNetNewSplit"
+model_type = "TransferEfficientNetAugmentationTwoDataSets"
 
 if model_type == "ResNet":
     train_means_stds = pd.read_csv("train_means_stds.csv")
@@ -50,6 +51,11 @@ elif model_type == "TransferEfficientNetNewSplit":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
     ckpt = "./lightning_logs/version_61/checkpoints/epoch=45-step=28934.ckpt"
     network = models.TransferEfficientNet()
+elif model_type == "TransferEfficientNetAugmentationTwoDataSets":
+    image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
+    ckpt = "./lightning_logs/version_148/checkpoints/epoch=19-step=3840.ckpt"
+    # ckpt = "./lightning_logs/version_181/checkpoints/epoch=41-step=8064.ckpt"  # Extra augmentation
+    network = models.TransferEfficientNet(num_classes=len(datasets.labels))
 
 # img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
 # val_dataset = datasets.ToolDataset(
@@ -64,12 +70,25 @@ elif model_type == "TransferEfficientNetNewSplit":
 #     target_transform=datasets.label_transform,
 #     subsampling=100,
 # )
-img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images")
-val_dataset = datasets.ToolDataset(
-    img_dir,
+# img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images/val")
+# val_dataset = datasets.ToolDataset(
+#     img_dir,
+#     transform=image_transform,
+#     target_transform=datasets.label_transform,
+# )
+data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo")
+val_dataset = datasets.ToolheadDemoDataset(
+    data_dir,
     transform=image_transform,
     target_transform=datasets.label_transform,
 )
+data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo2")
+val_dataset2 = datasets.ToolheadDemoDataset(
+    data_dir,
+    transform=image_transform,
+    target_transform=datasets.label_transform,
+)
+val_dataset = torch.utils.data.ConcatDataset([val_dataset, val_dataset2])
 val_dataloader = DataLoader(val_dataset, batch_size=25, num_workers=8)
 
 model = train.LitClassifier.load_from_checkpoint(
@@ -102,5 +121,5 @@ ax.tick_params(axis="both", which="minor", labelsize=6)
 plt.xticks(rotation=90)
 plt.tight_layout()
 plt.title(f"{model_type} acc={acc:.2f}")
-plt.savefig(f"confusion_matrix_{model_type}_test_dataset.pdf")
+plt.savefig(f"confusion_matrix_{model_type}_toolhead_demo_dataset.pdf")
 plt.close()
