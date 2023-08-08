@@ -11,6 +11,7 @@
 #include "view.hh"
 #include "config.hh"
 #include "classifier.hh"
+#include "pose_writer.hh"
 
 namespace ttool
 {
@@ -288,14 +289,59 @@ namespace ttool
             return m_ObjectTracker.GetTrackingStatus();
         }
 
+        /**
+         * @brief Write the pose of the object to a file with a corresponding image
+         * 
+         * @param image 
+         */
+        void WritePoseToFile(cv::Mat image)
+        {
+            if (m_PoseWriter == nullptr)
+            {
+                std::time_t time = std::time({});
+                char timeString[std::size("YYYY-MM-DD_HH-MM-SS")];
+                std::strftime(timeString, sizeof(timeString), "%Y-%m-%d_%H-%M-%S", std::localtime(&time));
+
+                std::string outputParentDir = m_ConfigPtr->GetTToolRootPath() + "/TToolOutput/";
+
+                std::string outputDir = outputParentDir + timeString;
+                std::filesystem::create_directories(outputDir);
+                
+                std::string outputLogFile = outputDir + "/PoseLog.txt";
+
+                std::filesystem::create_directory(outputDir);
+
+                m_PoseWriter = std::make_unique<ttool::PoseWriter>(outputLogFile, m_ConfigFile, m_ConfigPtr->GetConfigData().ModelFiles);
+                
+                // Make directory for the images, create "TToolOutput/<CurrentDate>__<CurrentTime>" directory
+                m_PoseWriter->SetImageDir(outputDir);
+            }
+            auto pose = GetPose();
+            m_PoseWriter->Write(pose, GetCurrentObjectID(), m_ModelManagerPtr->GetObjectName(), image);
+        }
+
+        /**
+         * @brief Reset the pose writer
+         * This will make the pose writer to create a new directory for the next pose writing
+         * 
+         */
+        void ResetPoseWriter() { m_PoseWriter = nullptr; }
+
     public:
         std::shared_ptr<ttool::Config> GetConfig() { return m_ConfigPtr; };
         std::shared_ptr<ttool::DModelManager> GetModelManager() { return m_ModelManagerPtr; };
         int GetCurrentObjectID() { return m_CurrentObjectID; };
 
     private:
+        /**
+         * @brief Initialize the config class with the TTool Root Path and the config file
+         * 
+         * @param ttoolRootPath path to the TTool root directory
+         * @param configFile    path to the config file
+         */
         void InitializeConfig(std::string ttoolRootPath, std::string configFile)
         {
+            m_ConfigFile = configFile;
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
             m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
         }
@@ -310,6 +356,7 @@ namespace ttool
                                                                    m_ConfigPtr->GetConfigData().ClassifierStd);
         }
 
+        /// @brief Check if the current object has changed. If yes, initialize the object tracker
         void CheckObjectChange()
         {
             if (m_ModelManagerPtr->GetObject()->getModelID() != m_CurrentObjectID)
@@ -392,6 +439,7 @@ namespace ttool
         cv::Size CamSize;
     
     private:
+        std::string m_ConfigFile;
         std::shared_ptr<ttool::Config> m_ConfigPtr;
         std::string m_CameraCalibFile;
 
@@ -402,6 +450,8 @@ namespace ttool
         tslet::ObjectTracker m_ObjectTracker;
         ttool::InputModelManager m_Input;
         int m_CurrentObjectID = 0;
+
+        std::unique_ptr<ttool::PoseWriter> m_PoseWriter;
     };
 }
 

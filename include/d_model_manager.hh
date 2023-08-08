@@ -49,6 +49,13 @@ namespace ttool
         std::shared_ptr<Object3D> GetObject() { return m_CurrentObjectPtr; }
 
         /**
+         * @brief Get the object name
+         * 
+         * @return std::string 
+         */
+        std::string GetObjectName() { return m_ModelID2ModelName[m_CurrentObjectID]; }
+
+        /**
          * @brief Set the object ID
          * 
          * @param objectID 
@@ -108,6 +115,15 @@ namespace ttool
         */
         std::map<std::string, int> ConvertVectorToMapString(std::vector<cv::String> someVector);
 
+        
+        /**
+         * @brief Make a map with model ID as key and model name as value
+         * 
+         * @param modelFiles 
+         * @return std::map<int, std::string> 
+         */
+        std::map<int, std::string> MakeModelID2ModelName(std::vector<cv::String> modelFiles);
+
         /**
          * @brief Set the Current Object Ptr object to the current ID and initialize it
          * 
@@ -120,6 +136,7 @@ namespace ttool
         std::map<int, cv::Matx44f> m_ModelID2ModelPoses;
 
         std::map<std::string, int> m_ModelName2ModelID;
+        std::map<int, std::string> m_ModelID2ModelName;
 
         std::shared_ptr<Config> m_ConfigPtr;
 

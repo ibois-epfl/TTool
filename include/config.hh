@@ -343,6 +343,16 @@ namespace ttool
             }
 
             /**
+             * @brief Get the TTool Root Path
+             * 
+             * @return std::string 
+             */
+            std::string GetTToolRootPath()
+            {
+                return m_TToolRootPath;
+            }
+
+            /**
              * @brief Write a value to the config file.
              * 
              * @tparam T type of the value to write

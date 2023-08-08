@@ -9,6 +9,7 @@ DModelManager::DModelManager(std::vector<cv::String> modelFiles, std::vector<cv:
     m_ModelID2InitialPoses = ConvertVectorToMapID(gtPoses);
     m_ModelID2ModelPoses = ConvertVectorToMapID(gtPoses);
     m_ModelName2ModelID = ConvertVectorToMapString(modelFiles);
+    m_ModelID2ModelName = MakeModelID2ModelName(modelFiles);
 
     SetCurrentObjectPtr();
 
@@ -126,6 +127,21 @@ std::map<std::string, int> DModelManager::ConvertVectorToMapString(std::vector<c
         mapString2ID[modelName] = i + 1;
     }
     return mapString2ID;
+}
+
+std::map<int, std::string> DModelManager::MakeModelID2ModelName(std::vector<cv::String> someVector)
+{
+    std::map<int, std::string> mapID2String;
+    for (int i = 0; i < someVector.size(); ++i)
+    {
+        std::string fullpath = someVector[i];
+
+        std::string folderName = fullpath.substr(0, fullpath.find_last_of("/\\"));
+        std::string modelName = folderName.substr(folderName.find_last_of("/\\") + 1);
+        // std::cout << modelName << std::endl;
+        mapID2String[i + 1] = modelName;
+    }
+    return mapID2String;
 }
 
 /**
