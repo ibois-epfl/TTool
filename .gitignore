@@ -14,6 +14,9 @@ ai/torchscripts/*
 
 deps/libtorch
 
+# ttool pose log
+TToolOutput/*
+
 ## >>>>>>>>> cmake >>>>>>>>>
 # Compiled Object files
 **/.DS_Store
