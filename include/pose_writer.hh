@@ -77,6 +77,7 @@ namespace ttool
             void Write(cv::Matx44f& pose, int objectID, std::string objectName, cv::Mat image)
             {
                 char buffer[9];
+                m_OutputFile << "\n";
                 std::snprintf(buffer, sizeof(buffer), "%08d", m_FrameID++);
                 std::string filename = m_ImageDir + "/" + buffer + ".png";
                 cv::imwrite(filename, image);
