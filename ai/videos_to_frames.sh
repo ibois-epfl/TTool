@@ -1,5 +1,5 @@
-DATADIR="/data/ENAC/iBOIS/test_dataset"
-IMAGEDIR="/data/ENAC/iBOIS/test_dataset/images"
+DATADIR="./data/ENAC/iBOIS/test_dataset"
+IMAGEDIR="./data/ENAC/iBOIS/test_dataset/images"
 
 for TOOLDIR in $DATADIR/*
 do

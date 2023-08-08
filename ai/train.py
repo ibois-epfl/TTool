@@ -80,7 +80,7 @@ if __name__ == "__main__":
     # MODEL_TYPE = "ResNet"
     MODEL_TYPE = "TransferEfficientNet"
 
-    img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
+    img_dir = pathlib.Path("/home/zholmaga/EPFL/TTool/ai/data/ENAC/iBOIS/images")
 
     if MODEL_TYPE == "ResNet":
         # Determine the mean and std for the training data
@@ -114,11 +114,11 @@ if __name__ == "__main__":
         network = models.TransferEfficientNet(num_classes=len(datasets.labels))
 
     # Create train and validation datasets
-
     transform = torchvision.transforms.Compose(
         [datasets.augmentation_transforms, normalization_transform]
     )
-
+    # DATASET #1
+    # img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
     tool_train_dataset = datasets.ToolDataset(
         img_dir / "train",
         transform=transform,
@@ -131,25 +131,28 @@ if __name__ == "__main__":
         target_transform=datasets.label_transform,
         # subsampling=20,
     )
-    img_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images")
-    fabrication_train_dataset = datasets.FabricationDataset(
-        img_dir,
-        transform=transform,
-        target_transform=datasets.label_transform,
-        # videos=[1, 2, 4, 20],
-        videos=[1, 3, 4, 5, 15, 16, 17, 18, 19],
-        # subsampling=10,
-        # subsampling=50,
-        subsampling=3,
-    )
-    fabrication_val_dataset = datasets.FabricationDataset(
-        img_dir,
-        transform=normalization_transform,
-        target_transform=datasets.label_transform,
-        # videos=[3, 18],
-        videos=[2, 20],
-        # subsampling=20,
-    )
+    # # DATASET #2
+    # img_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images")
+    # fabrication_train_dataset = datasets.FabricationDataset(
+    #     img_dir,
+    #     transform=transform,
+    #     target_transform=datasets.label_transform,
+    #     # videos=[1, 2, 4, 20],
+    #     videos=[1, 3, 4, 5, 15, 16, 17, 18, 19],
+    #     # subsampling=10,
+    #     # subsampling=50,
+    #     subsampling=3,
+    # )
+    # fabrication_val_dataset = datasets.FabricationDataset(
+    #     img_dir,
+    #     transform=normalization_transform,
+    #     target_transform=datasets.label_transform,
+    #     # videos=[3, 18],
+    #     videos=[2, 20],
+    #     # subsampling=20,
+    # )
+
+    # DATASET #3
     img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images")
     test_train_dataset = datasets.ToolDataset(
         img_dir / "train",
@@ -161,36 +164,56 @@ if __name__ == "__main__":
         transform=normalization_transform,
         target_transform=datasets.label_transform,
     )
+
+    # CONCATENATE DATASETS
+
     # train_dataset = fabrication_train_dataset
     # val_dataset = fabrication_val_dataset
     train_dataset = torch.utils.data.ConcatDataset(
-        [tool_train_dataset, fabrication_train_dataset, test_train_dataset]
+        [tool_train_dataset, test_train_dataset]
     )
     val_dataset = torch.utils.data.ConcatDataset(
-        [tool_val_dataset, fabrication_val_dataset, test_val_dataset]
+        [tool_val_dataset, test_val_dataset]
     )
+    # train_dataset = torch.utils.data.ConcatDataset(
+    #     [tool_train_dataset, fabrication_train_dataset, test_train_dataset]
+    # )
+    # val_dataset = torch.utils.data.ConcatDataset(
+    #     [tool_val_dataset, fabrication_val_dataset, test_val_dataset]
+    # )
 
     # Create data loaders
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=90, shuffle=True, num_workers=48
+        train_dataset, batch_size=16, shuffle=True, num_workers=48
     )
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=90, num_workers=48)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=16, num_workers=48)
+    # train_loader = torch.utils.data.DataLoader(
+    #     train_dataset, batch_size=90, shuffle=True, num_workers=48
+    # )
+    # val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=90, num_workers=48)
 
     # Create instance of lightning module
     classifier = LitClassifier(network)
 
     # Train
     trainer = pl.Trainer(
-        max_epochs=45,
+        max_epochs=10,
         callbacks=[
             ModelCheckpoint(mode="max", monitor="val_acc"),
             LearningRateMonitor("epoch"),
         ],
     )
+    # trainer = pl.Trainer(
+    #     max_epochs=45,
+    #     callbacks=[
+    #         ModelCheckpoint(mode="max", monitor="val_acc"),
+    #         LearningRateMonitor("epoch"),
+    #     ],
+    # )
     trainer.logger._log_graph = (True,)
     trainer.fit(
         model=classifier,
         train_dataloaders=train_loader,
         val_dataloaders=val_loader,
-        # ckpt_path="lightning_logs/version_4/checkpoints/epoch=199-step=22800.ckpt",
+        #ckpt_path="lightning_logs/version_4/checkpoints/epoch=199-step=22800.ckpt",
     )
