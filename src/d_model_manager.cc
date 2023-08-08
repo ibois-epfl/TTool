@@ -8,6 +8,7 @@ DModelManager::DModelManager(std::vector<cv::String> modelFiles, std::vector<cv:
     m_ModelID2ModelFiles = ConvertVectorToMapID(modelFiles);
     m_ModelID2InitialPoses = ConvertVectorToMapID(gtPoses);
     m_ModelID2ModelPoses = ConvertVectorToMapID(gtPoses);
+    m_ModelID2LastSavedPoses = ConvertVectorToMapID(gtPoses);
     m_ModelName2ModelID = ConvertVectorToMapString(modelFiles);
     m_ModelID2ModelName = MakeModelID2ModelName(modelFiles);
 
@@ -30,10 +31,21 @@ void DModelManager::InitModels()
     m_CurrentObjectPtr->setModelID(m_CurrentObjectID);
 }
 
-void DModelManager::ResetObjectToInitialPose()
+void DModelManager::ResetObjectToConfigInitialPose()
 {
     m_CurrentObjectPtr->setPose(m_ModelID2InitialPoses[m_CurrentObjectID]);
     SnapshotObjectPose();
+}
+
+void DModelManager::SaveObjectInitialPose(cv::Matx44f initialPose)
+{
+    m_ModelID2LastSavedPoses[m_CurrentObjectID] = initialPose;
+    SnapshotObjectPose();
+}
+
+void DModelManager::ResetObjectToLastSavePose()
+{
+    m_CurrentObjectPtr->setPose(m_ModelID2LastSavedPoses[m_CurrentObjectID]);
 }
 
 void DModelManager::SetObjectID(int objectID)

@@ -55,8 +55,12 @@ namespace ttool
                 m_ModelManagerPtr->IncreaseObjectID();
                 break;
             case 'r':
-                m_ModelManagerPtr->ResetObjectToInitialPose();
+                m_ModelManagerPtr->ResetObjectToConfigInitialPose();
                 break;
+            case 't':
+                m_ModelManagerPtr->ResetObjectToLastSavePose();
+                break;
+                
 
             // Translate the model
             case 'w':
@@ -102,6 +106,7 @@ namespace ttool
                 cv::Matx44f pose = m_ModelManagerPtr->GetObject()->getPose();
                 std::cout << "pose: " << pose << std::endl;
                 m_ModelManagerPtr->GetObject()->setInitialPose(pose);
+                m_ModelManagerPtr->SaveObjectInitialPose(pose);
                 m_ModelManagerPtr->SavePosesToConfig();
                 break;
             }
@@ -110,6 +115,7 @@ namespace ttool
             {
                 cv::Matx44f pose = m_ModelManagerPtr->GetObject()->getPose();
                 std::cout << "pose: " << pose << std::endl;
+                m_ModelManagerPtr->SaveObjectInitialPose(pose);
                 m_ModelManagerPtr->GetObject()->setInitialPose(pose);
                 break;
             }

@@ -39,7 +39,19 @@ namespace ttool
          * @brief Reset the object to ground truth (from a text file)
          * 
          */
-        void ResetObjectToInitialPose();
+        void ResetObjectToConfigInitialPose();
+
+        /**
+         * @brief Save the pose as model initial pose as well as keep the metadata on the model manager
+         * 
+         * @param initialPose the new initial pose to be save to the model and the mdoel manager
+        */
+       void SaveObjectInitialPose(cv::Matx44f initialPose);
+        /**
+         * @brief Reset the object to the initial pose (which may be saved by the user during the pose adjustment)
+         * 
+        */
+        void ResetObjectToLastSavePose();
 
         /**
          * @brief Get the current object
@@ -134,6 +146,7 @@ namespace ttool
         std::map<int, std::string> m_ModelID2ModelFiles;
         std::map<int, cv::Matx44f> m_ModelID2InitialPoses;
         std::map<int, cv::Matx44f> m_ModelID2ModelPoses;
+        std::map<int, cv::Matx44f> m_ModelID2LastSavedPoses;
 
         std::map<std::string, int> m_ModelName2ModelID;
         std::map<int, std::string> m_ModelID2ModelName;
