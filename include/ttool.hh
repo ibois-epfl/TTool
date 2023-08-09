@@ -132,15 +132,38 @@ namespace ttool
             m_ObjectTracker.CallEstimatePose(m_ModelManagerPtr->GetObject(), m_CurrentObjectID, frame);
         }
 
+        /**
+         * @brief Classify the tool based on the camera frame
+         * 
+         * @param frame 
+         * @return std::string the name of the tool
+         */
         std::string Classify(cv::Mat frame)
         {
             int prediction = m_Classifier->Classify(frame);
             return m_Classifier->GetLabel(prediction);
         }
 
+        /**
+         * @brief Get the Classifier Log object
+         * 
+         * @return std::string 
+         */
         std::string GetClassifierLog()
         {
             return m_Classifier->ClassifierLog.str();
+        }
+
+        /**
+         * @brief Get the top k labels of the classification of the image frame of a tool head
+         * 
+         * @param frame 
+         * @return std::vector<std::string> 
+         */
+        std::vector<std::string> ClassifyWithSortedLabels(cv::Mat frame)
+        {
+            return m_Classifier->ClassifyTopK(frame, m_Classifier->GetTotalClass());
+
         }
 
         /**
@@ -346,6 +369,10 @@ namespace ttool
             m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
         }
 
+        /**
+         * @brief Initialize the tool head classifier
+         * 
+         */
         void InitializeClassifier()
         {
             m_Classifier = std::make_unique<ttool::ML::Classifier>(m_ConfigPtr->GetConfigData().ClassifierModelPath,
