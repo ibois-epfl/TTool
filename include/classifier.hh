@@ -47,6 +47,13 @@ namespace ttool::ML
          */
         std::string GetLabel(int prediction) { return m_Pred2Label[prediction]; }
 
+        /**
+         * @brief Get the total number of classes
+         * 
+         * @return int 
+         */
+        int GetTotalClass() { return m_Pred2Label.size(); }
+
         private:
         /**
          * @brief Transform the image to tensor and normalize it according to EfficientNet_v2 model

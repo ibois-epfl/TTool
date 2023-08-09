@@ -143,6 +143,12 @@ namespace ttool
             return m_Classifier->ClassifierLog.str();
         }
 
+        std::vector<std::string> ClassifyWithSortedLabels(cv::Mat frame)
+        {
+            return m_Classifier->ClassifyTopK(frame, m_Classifier->GetTotalClass());
+
+        }
+
         /**
          * @brief Draw the silhouette of the model on the camera frame
          * 
