@@ -19,6 +19,22 @@ ttool::ML::Classifier::Classifier(std::string modelPath,
 
 int ttool::ML::Classifier::Classify(cv::Mat image)
 {
+    torch::Tensor output = ClassifyRawScore(image);
+
+    output = output.softmax(1);
+    auto topk = torch::topk(output, 3, 1); // (values, indices)
+    ClassifierLog.str("");
+    for (int i = 0; i < 3; ++i)
+    {
+        ClassifierLog << "Top " << i << ": " << std::get<0>(topk)[0][i].item<float>() << " and " << GetLabel(std::get<1>(topk)[0][i].item<int>()) << std::endl;
+    }
+    int pred = output.argmax(1).item<int>();
+
+    return pred;
+}
+
+torch::Tensor ttool::ML::Classifier::ClassifyRawScore(cv::Mat image)
+{
     if (!m_IsInitialized)
     {
         cv::Mat imageFirstRun;
@@ -35,16 +51,29 @@ int ttool::ML::Classifier::Classify(cv::Mat image)
     Transform(image, tensor);
 
     torch::Tensor output = m_Module.forward({tensor}).toTensor();
+
+    return output;
+}
+
+std::vector<std::string> ttool::ML::Classifier::ClassifyTopK(cv::Mat image, int k)
+{
+    torch::Tensor output = ClassifyRawScore(image);
+
     output = output.softmax(1);
-    auto topk = torch::topk(output, 3, 1); // (values, indices)
+    auto topk = torch::topk(output, k, 1); // (values, indices)
+    std::vector<std::string> result;
+    for (int i = 0; i < k; ++i)
+    {
+        result.push_back(GetLabel(std::get<1>(topk)[0][i].item<int>()));
+    }
+
     ClassifierLog.str("");
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < k; ++i)
     {
         ClassifierLog << "Top " << i << ": " << std::get<0>(topk)[0][i].item<float>() << " and " << GetLabel(std::get<1>(topk)[0][i].item<int>()) << std::endl;
     }
-    int pred = output.argmax(1).item<int>();
 
-    return pred;
+    return result;
 }
 
 void ttool::ML::Classifier::Transform(cv::Mat image, torch::Tensor& tensor)

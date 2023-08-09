@@ -30,6 +30,16 @@ namespace ttool::ML
         int Classify(cv::Mat image);
 
         /**
+         * @brief Classify the image and return the top k predictions
+         * Image should be in BGR format
+         * 
+         * @param image 
+         * @param k 
+         * @return std::vector<std::string> The top k predictions in label names
+         */
+        std::vector<std::string> ClassifyTopK(cv::Mat image, int k);
+
+        /**
          * @brief Get the label of the prediction
          * 
          * @param prediction 
@@ -45,6 +55,14 @@ namespace ttool::ML
          * @param tensor  The output tensor
          */
         void Transform(cv::Mat image, torch::Tensor& tensor);
+
+        /**
+         * @brief Classify the image and return the raw score
+         * 
+         * @param image 
+         * @return std::vector<float> 
+         */
+        torch::Tensor ClassifyRawScore(cv::Mat image);
 
         public:
         std::stringstream ClassifierLog;
