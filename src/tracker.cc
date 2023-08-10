@@ -221,7 +221,7 @@ void TrackerBase::UpdateHistogram(cv::Mat frame, std::shared_ptr<ttool::tslet::O
 SLTracker::SLTracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> objects)
 	: TrackerBase(K, objects)
 {
-	search_line = std::make_shared<SearchLine>();
+	search_line = std::make_shared<ttool::tslet::SearchLine>();
 }
 
 void SLTracker::GetBundleProb(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Mat& frame) {

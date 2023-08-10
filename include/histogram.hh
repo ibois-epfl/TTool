@@ -21,10 +21,8 @@
 #include <vector>
 #include "object3d.hh"
 #include "tclc_histograms.hh"
-//#include "mbt/wtclc_histograms.hh"
 
 class View;
-class SearchLine;
 
 namespace ttool::tslet
 {

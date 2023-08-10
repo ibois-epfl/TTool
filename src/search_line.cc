@@ -22,18 +22,18 @@
 #include "tclc_histograms.hh"
 #include "search_line.hh"
 
-SearchLine::SearchLine() {
+ttool::tslet::SearchLine::SearchLine() {
 	//line_len = Nr;
 }
 
-void SearchLine::FindContours(const cv::Mat& projection_mask, int seg, bool all_contours) {
+void ttool::tslet::SearchLine::FindContours(const cv::Mat& projection_mask, int seg, bool all_contours) {
 	if (all_contours)
 		cv::findContours(projection_mask, contours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
 	else
 		cv::findContours(projection_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
 }
 
-void SearchLine::DrawContours(cv::Mat& buf) const {
+void ttool::tslet::SearchLine::DrawContours(cv::Mat& buf) const {
 	// std::cout << "contour size: " << contours.size() << std::endl;
 
 	CHECK(!buf.empty());
@@ -60,7 +60,7 @@ void SearchLine::DrawContours(cv::Mat& buf) const {
 	}
 }
 
-void SearchLine::DrawSearchLine(cv::Mat& buf) const {
+void ttool::tslet::SearchLine::DrawSearchLine(cv::Mat& buf) const {
 	float alpha = 0.3f;
 	for (int i = 0; i < search_points.size(); i++) {
 		if (actives[i])
@@ -75,7 +75,7 @@ void SearchLine::DrawSearchLine(cv::Mat& buf) const {
 	}
 }
 
-void SearchLine::FindSearchLine(const cv::Mat& mask, const cv::Mat& frame, int line_len, int seg, bool use_all) {
+void ttool::tslet::SearchLine::FindSearchLine(const cv::Mat& mask, const cv::Mat& frame, int line_len, int seg, bool use_all) {
 	FindContours(mask, seg, use_all);
 
 	search_points.clear();
@@ -145,7 +145,7 @@ static bool PtInFrame(const cv::Point& pt, int width, int height) {
 	return (pt.x < width && pt.y < height && pt.x >= 0 && pt.y >= 0);
 }
 
-void SearchLine::getLine(float k, const cv::Point& center, int line_len, const cv::Mat& fill_img, std::vector<cv::Point>& points, cv::Point2f& norm) {
+void ttool::tslet::SearchLine::getLine(float k, const cv::Point& center, int line_len, const cv::Mat& fill_img, std::vector<cv::Point>& points, cv::Point2f& norm) {
 	static std::vector<cv::Point> decrease;
 	static std::vector<cv::Point> increase;
 	decrease.resize(0);

@@ -25,6 +25,7 @@
 #include "template_view.hh"
 #include "camera.hh"
 #include "histogram.hh"
+#include "search_line.hh"
 
 class Viewer;
 
@@ -76,8 +77,6 @@ protected:
 	ttool::tslet::Histogram* m_Histogram;
 };
 
-class SearchLine;
-
 class SLTracker: public TrackerBase {
 public:
 	SLTracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
@@ -86,7 +85,7 @@ public:
 	void FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth);
 
 protected:
-	std::shared_ptr<SearchLine> search_line;
+	std::shared_ptr<ttool::tslet::SearchLine> search_line;
 	std::vector<float> scores;
 };
 
