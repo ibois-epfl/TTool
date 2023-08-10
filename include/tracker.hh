@@ -24,6 +24,7 @@
 #include "object3d.hh"
 #include "template_view.hh"
 #include "camera.hh"
+#include "histogram.hh"
 
 class Viewer;
 
@@ -62,8 +63,6 @@ protected:
 	std::stringstream m_trackingStatus;
 };
 
-class Histogram;
-
 class TrackerBase : public Tracker {
 public:
 	TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> object);
@@ -74,7 +73,7 @@ protected:
 	void DetectEdge(const cv::Mat& img, cv::Mat& edge_map);
 	
 protected:
-	Histogram* m_Histogram;
+	ttool::tslet::Histogram* m_Histogram;
 };
 
 class SearchLine;

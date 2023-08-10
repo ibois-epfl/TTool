@@ -23,7 +23,7 @@
 #include "tracker.hh"
 #include "object3d.hh"
 
-namespace tslet
+namespace ttool::tslet
 {
     /**
      * @brief This class is a wrapper around the tracker class. It is used to track a single object

@@ -126,7 +126,7 @@ int main(int argc, char **argv)
     cameraPtr->UpdateCamera();
     ttool::InputVisualizer inputVisualizer(visualizerPtr);
 
-    PoseWriter poseWriter = PoseWriter("trackingPose.log", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
+    ttool::PoseWriter poseWriter = ttool::PoseWriter("trackingPose.log", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
 
     // main thread
     bool exit = false;
@@ -205,7 +205,7 @@ int main(int argc, char **argv)
 
             cv::Matx44f pose = ttool->GetPose();
 
-            if (trackPose) { poseWriter.write(pose, ttool->GetCurrentObjectID()); }
+            if (trackPose) { poseWriter.Write(pose, ttool->GetCurrentObjectID()); }
         }
     }
 

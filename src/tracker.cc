@@ -194,7 +194,7 @@ void Tracker::ShowMask(const cv::Mat& masks, cv::Mat& buf) {
 TrackerBase::TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> object) 
 : Tracker(K, object) 
 {
-	m_Histogram = new RBOTHist(object);
+	m_Histogram = new ttool::tslet::RBOTHist(object);
 }
 
 void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {

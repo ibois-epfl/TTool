@@ -492,7 +492,7 @@ namespace ttool
 
         std::unique_ptr<ttool::ML::Classifier> m_Classifier;
 
-        tslet::ObjectTracker m_ObjectTracker;
+        ttool::tslet::ObjectTracker m_ObjectTracker;
         ttool::InputModelManager m_Input;
         int m_CurrentObjectID = 0;
 

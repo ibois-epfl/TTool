@@ -1,7 +1,6 @@
 /**
- * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
- * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
- *                     
+ * TTool
+ * Copyright (C) 2023  Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +18,7 @@
 
 #include "object_tracker.hh"
 
-using namespace tslet;
-
-void ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D> object, cv::Matx33f K)
+void ttool::tslet::ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D> object, cv::Matx33f K)
 {
     // We expect the frame to already be undistorted
     cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
@@ -34,7 +31,7 @@ void ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D> object, cv::M
     }
 }
 
-void ObjectTracker::UpdateHistogram(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame)
+void ttool::tslet::ObjectTracker::UpdateHistogram(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame)
 {
     if (!HasTracker(modelID))
     {
@@ -45,7 +42,7 @@ void ObjectTracker::UpdateHistogram(std::shared_ptr<Object3D> object, int modelI
     m_TrackerPtr->UpdateHistogram(frame, object);
 }
 
-void ObjectTracker::SetPose(int modelID, cv::Matx44f pose)
+void ttool::tslet::ObjectTracker::SetPose(int modelID, cv::Matx44f pose)
 {
     if (!HasTracker(modelID))
     {
@@ -56,7 +53,7 @@ void ObjectTracker::SetPose(int modelID, cv::Matx44f pose)
     m_ModelID2pose[modelID] = pose;
 }
 
-void ObjectTracker::CallEstimatePose(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame)
+void ttool::tslet::ObjectTracker::CallEstimatePose(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame)
 {
     if (!HasTracker(modelID))
     {
