@@ -183,5 +183,5 @@ public:
   virtual void update(const cv::Mat& frame, const cv::Mat& mask, const cv::Mat& depth, cv::Matx33f& K, float zNear, float zFar, float afg, float abg) override;
 
 protected:
-  SignedDistanceTransform2D* SDT2D;
+  ttool::tslet::SignedDistanceTransform2D* SDT2D;
 };

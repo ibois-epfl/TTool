@@ -1119,7 +1119,7 @@ public:
 WTCLCHistograms::WTCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset)
   : TCLCHistograms(model, numBins, radius, offset)
 {
-  SDT2D = new SignedDistanceTransform2D(8.0f);
+  SDT2D = new ttool::tslet::SignedDistanceTransform2D(8.0f);
 }
 
 WTCLCHistograms::~WTCLCHistograms()

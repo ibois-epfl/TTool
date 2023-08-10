@@ -62,7 +62,7 @@ TemplateView::TemplateView(std::shared_ptr<ttool::tslet::Object3D> object, float
     heavisidePyramid.resize(_numLevels);
     pixelDataPyramid.resize(_numLevels);
     
-    SignedDistanceTransform2D SDT2D(8.0f);
+    ttool::tslet::SignedDistanceTransform2D SDT2D(8.0f);
     
     Size maxSize = mask0.size();
     
