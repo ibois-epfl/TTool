@@ -29,137 +29,140 @@
 
 class Viewer;
 
-class Tracker {
-public:
-	Tracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
-	void Init() {}
-
-	static Tracker* GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<ttool::tslet::Object3D> object);
-
-	virtual void ToggleTracking(std::shared_ptr<ttool::tslet::Object3D> object);
-	virtual void EstimatePoses(std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx44f& initialPose, cv::Mat& frame) = 0;
-
-	virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<ttool::tslet::Object3D> object) = 0;
-
-	void Reset(std::shared_ptr<ttool::tslet::Object3D> object);
-
-	std::string GetTrackingStatus() const { return m_trackingStatus.str(); };
-
-protected:
-	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<ttool::tslet::Object3D> object, int runs, cv::Matx44f& initialPose) = 0;
-
-	cv::Rect Compute2DROI(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Size& maxSize, int offset);
-	static cv::Rect computeBoundingBox(const std::vector<cv::Point3i>& centersIDs, int offset, int level, const cv::Size& maxSize);
-
-	static void ConvertMask(const cv::Mat& maskm, uchar oid, cv::Mat& mask);
-	static void ConvertMask(const cv::Mat& maskm, uchar oid, cv::Rect& roi, cv::Mat& mask);
-	static void ShowMask(const cv::Mat& masks, cv::Mat& buf);
-
-protected:
-	View* view;
-	cv::Matx33f K;
-
-	bool initialized;
-
-	std::stringstream m_trackingStatus;
-};
-
-class TrackerBase : public Tracker {
-public:
-	TrackerBase(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
-
-	virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<ttool::tslet::Object3D> object) override;
-
-protected:
-	void DetectEdge(const cv::Mat& img, cv::Mat& edge_map);
-	
-protected:
-	ttool::tslet::Histogram* m_Histogram;
-};
-
-class SLTracker: public TrackerBase {
-public:
-	SLTracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
-
-	void GetBundleProb(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Mat& frame);
-	void FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth);
-
-protected:
-	std::shared_ptr<ttool::tslet::SearchLine> search_line;
-	std::vector<float> scores;
-};
-
-inline float GetDistance(const cv::Point& p1, const cv::Point& p2) {
-	float dx = float(p1.x - p2.x);
-	float dy = float(p1.y - p2.y);
-	return sqrt(dx*dx + dy*dy);
-}
-
-/**
- *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
- *  computations. Within the corresponding for loop, the RGB values per pixel
- *  of a color input image are converted to their corresponding histogram bin
- *  index.
- */
-class Parallel_For_convertToBins : public cv::ParallelLoopBody
+namespace ttool::tslet
 {
-private:
-	cv::Mat _frame;
-	cv::Mat _binned;
+	class Tracker {
+	public:
+		Tracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
+		void Init() {}
 
-	uchar* frameData;
-	int* binnedData;
+		static Tracker* GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<ttool::tslet::Object3D> object);
 
-	int _numBins;
+		virtual void ToggleTracking(std::shared_ptr<ttool::tslet::Object3D> object);
+		virtual void EstimatePoses(std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx44f& initialPose, cv::Mat& frame) = 0;
 
-	int _binShift;
+		virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<ttool::tslet::Object3D> object) = 0;
 
-	int _threads;
+		void Reset(std::shared_ptr<ttool::tslet::Object3D> object);
 
-public:
-	Parallel_For_convertToBins(const cv::Mat& frame, cv::Mat& binned, int numBins, int threads)
-	{
-		_frame = frame;
+		std::string GetTrackingStatus() const { return m_trackingStatus.str(); };
 
-		binned.create(_frame.rows, _frame.cols, CV_32SC1);
-		_binned = binned;
+	protected:
+		virtual void Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<ttool::tslet::Object3D> object, int runs, cv::Matx44f& initialPose) = 0;
 
-		frameData = _frame.data;
-		binnedData = (int*)_binned.ptr<int>();
+		cv::Rect Compute2DROI(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Size& maxSize, int offset);
+		static cv::Rect computeBoundingBox(const std::vector<cv::Point3i>& centersIDs, int offset, int level, const cv::Size& maxSize);
 
-		_numBins = numBins;
+		static void ConvertMask(const cv::Mat& maskm, uchar oid, cv::Mat& mask);
+		static void ConvertMask(const cv::Mat& maskm, uchar oid, cv::Rect& roi, cv::Mat& mask);
+		static void ShowMask(const cv::Mat& masks, cv::Mat& buf);
 
-		_binShift = 8 - log(numBins) / log(2);
+	protected:
+		View* view;
+		cv::Matx33f K;
 
-		_threads = threads;
+		bool initialized;
+
+		std::stringstream m_trackingStatus;
+	};
+
+	class TrackerBase : public Tracker {
+	public:
+		TrackerBase(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
+
+		virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<ttool::tslet::Object3D> object) override;
+
+	protected:
+		void DetectEdge(const cv::Mat& img, cv::Mat& edge_map);
+		
+	protected:
+		ttool::tslet::Histogram* m_Histogram;
+	};
+
+	class SLTracker: public TrackerBase {
+	public:
+		SLTracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
+
+		void GetBundleProb(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Mat& frame);
+		void FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth);
+
+	protected:
+		std::shared_ptr<ttool::tslet::SearchLine> search_line;
+		std::vector<float> scores;
+	};
+
+	inline float GetDistance(const cv::Point& p1, const cv::Point& p2) {
+		float dx = float(p1.x - p2.x);
+		float dy = float(p1.y - p2.y);
+		return sqrt(dx*dx + dy*dy);
 	}
 
-	virtual void operator()(const cv::Range& r) const
+	/**
+	 *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+	 *  computations. Within the corresponding for loop, the RGB values per pixel
+	 *  of a color input image are converted to their corresponding histogram bin
+	 *  index.
+	 */
+	class Parallel_For_convertToBins : public cv::ParallelLoopBody
 	{
-		int range = _frame.rows / _threads;
+	private:
+		cv::Mat _frame;
+		cv::Mat _binned;
 
-		int yEnd = r.end * range;
-		if (r.end == _threads)
+		uchar* frameData;
+		int* binnedData;
+
+		int _numBins;
+
+		int _binShift;
+
+		int _threads;
+
+	public:
+		Parallel_For_convertToBins(const cv::Mat& frame, cv::Mat& binned, int numBins, int threads)
 		{
-			yEnd = _frame.rows;
+			_frame = frame;
+
+			binned.create(_frame.rows, _frame.cols, CV_32SC1);
+			_binned = binned;
+
+			frameData = _frame.data;
+			binnedData = (int*)_binned.ptr<int>();
+
+			_numBins = numBins;
+
+			_binShift = 8 - log(numBins) / log(2);
+
+			_threads = threads;
 		}
 
-		for (int y = r.start * range; y < yEnd; y++)
+		virtual void operator()(const cv::Range& r) const
 		{
-			uchar* frameRow = frameData + y * _frame.cols * 3;
-			int* binnedRow = binnedData + y * _binned.cols;
+			int range = _frame.rows / _threads;
 
-			int idx = 0;
-			for (int x = 0; x < _frame.cols; x++, idx += 3)
+			int yEnd = r.end * range;
+			if (r.end == _threads)
 			{
-				int ru = (frameRow[idx] >> _binShift);
-				int gu = (frameRow[idx + 1] >> _binShift);
-				int bu = (frameRow[idx + 2] >> _binShift);
+				yEnd = _frame.rows;
+			}
 
-				int binIdx = (ru * _numBins + gu) * _numBins + bu;
+			for (int y = r.start * range; y < yEnd; y++)
+			{
+				uchar* frameRow = frameData + y * _frame.cols * 3;
+				int* binnedRow = binnedData + y * _binned.cols;
 
-				binnedRow[x] = binIdx;
+				int idx = 0;
+				for (int x = 0; x < _frame.cols; x++, idx += 3)
+				{
+					int ru = (frameRow[idx] >> _binShift);
+					int gu = (frameRow[idx + 1] >> _binShift);
+					int bu = (frameRow[idx + 2] >> _binShift);
+
+					int binIdx = (ru * _numBins + gu) * _numBins + bu;
+
+					binnedRow[x] = binIdx;
+				}
 			}
 		}
-	}
-};
+	};
+}
