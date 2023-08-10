@@ -135,14 +135,14 @@ void View::Initialize(const Matx33f &K, int width, int height, float zNear, floa
 	char* vertexFilePath = (char*)"assets/opengl/Silhouette.vs";
 	char* fragmentFilePath = (char*)"assets/opengl/Silhouette.fs";
 
-	m_SilhouetteShaderProgram = LoadShaders(vertexFilePath, fragmentFilePath);
+	m_SilhouetteShaderProgram = ttool::GLutils::LoadShaders(vertexFilePath, fragmentFilePath);
 	// Get a handle for our "MVP" uniform
 	m_SilhouetteMatrixId = glGetUniformLocation(m_SilhouetteShaderProgram, "uMVPMatrix");
 	m_SilhouetteAlphaId = glGetUniformLocation(m_SilhouetteShaderProgram, "uAlpha");
 	m_SilhouetteColorId = glGetUniformLocation(m_SilhouetteShaderProgram, "uColor");
 
 	// Phongblinn Shader
-	m_PhongblinnShaderProgram		= LoadShaders((char*)"assets/opengl/Phongblinn.vs", (char*)"assets/opengl/Phongblinn.fs");
+	m_PhongblinnShaderProgram		= ttool::GLutils::LoadShaders((char*)"assets/opengl/Phongblinn.vs", (char*)"assets/opengl/Phongblinn.fs");
 	m_PhongblinnMVPMatrixID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uMVPMatrix");
 	m_PhongblinnMVMatrixID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uMVMatrix");
 	m_PhongblinnNormalMatrixID		= glGetUniformLocation(m_PhongblinnShaderProgram, "uNormalMatrix");
