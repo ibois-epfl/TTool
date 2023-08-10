@@ -22,10 +22,11 @@
 #include "model.hh"
 #include "tclc_histograms.hh"
 
-class TemplateView;
-
 namespace ttool::tslet
 {
+  // forward declaration to avoid circular dependency
+  class TemplateView;
+
   /**
    *  A representation of a 3D object that provides all nessecary information
    *  for region-based pose estimation using tclc-histograms. It extends the

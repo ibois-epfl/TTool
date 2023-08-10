@@ -146,7 +146,7 @@ void ttool::tslet::Object3D::generateTemplates()
         {
             for(int d = 0; d < numDistances; d++)
             {
-                baseTemplates.push_back(std::make_shared<TemplateView>(std::static_pointer_cast<ttool::tslet::Object3D>(shared_from_this()), alpha, beta, gamma, templateDistances[d], numLevels, true));
+                baseTemplates.push_back(std::make_shared<ttool::tslet::TemplateView>(std::static_pointer_cast<ttool::tslet::Object3D>(shared_from_this()), alpha, beta, gamma, templateDistances[d], numLevels, true));
             }
         }
     }
@@ -166,7 +166,7 @@ void ttool::tslet::Object3D::generateTemplates()
         {
             for(int d = 0; d < numDistances; d++)
             {
-                neighboringTemplates.push_back(std::make_shared<TemplateView>(std::static_pointer_cast<ttool::tslet::Object3D>(shared_from_this()), alpha, beta, gamma, templateDistances[d], numLevels, true));
+                neighboringTemplates.push_back(std::make_shared<ttool::tslet::TemplateView>(std::static_pointer_cast<ttool::tslet::Object3D>(shared_from_this()), alpha, beta, gamma, templateDistances[d], numLevels, true));
             }
         }
     }
@@ -196,7 +196,7 @@ void ttool::tslet::Object3D::generateTemplates()
             {
                 for(int d = 0; d < numDistances; d++)
                 {
-                    std::shared_ptr<TemplateView> kv = baseTemplates[i*numBaseRotations*numDistances + numDistances*g + d];
+                    std::shared_ptr<ttool::tslet::TemplateView> kv = baseTemplates[i*numBaseRotations*numDistances + numDistances*g + d];
                     float gamma1 = kv->getGamma();
                     
                     int g2 = gamma1/gamma2Precision;
@@ -218,7 +218,7 @@ void ttool::tslet::Object3D::generateTemplates()
 }
 
 
-vector<std::shared_ptr<TemplateView>> ttool::tslet::Object3D::getTemplateViews()
+vector<std::shared_ptr<ttool::tslet::TemplateView>> ttool::tslet::Object3D::getTemplateViews()
 {
     return baseTemplates;
 }
