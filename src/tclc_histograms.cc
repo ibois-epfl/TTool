@@ -52,495 +52,498 @@ ttool::tslet::TCLCHistograms::~TCLCHistograms()
     
 }
 
-/**
- *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
- *  computations. Within the corresponding for loop, for every projected histogram center on or
- *  close to the object's contour, a new foreground and background color histogram are computed
- *  within a local circular image region is computed using the Bresenham algorithm to scan the
- *  corresponding pixels.
- */
-class Parallel_For_buildLocalHistograms : public cv::ParallelLoopBody
+namespace ttool::tslet
 {
-private:
-  cv::Mat _frame;
-  cv::Mat _mask;
-
-  uchar* frameData;
-  uchar* maskData;
-
-  size_t frameStep;
-  size_t maskStep;
-
-  cv::Size size;
-
-  std::vector<cv::Point3i> _centers;
-
-  int _radius;
-
-  int _numBins;
-
-  int _binShift;
-
-  int histogramSize;
-
-  cv::Mat _sumsFB;
-
-  int _m_id;
-
-  float* localFGData;
-  float* localBGData;
-
-  float* _sumsFBData;
-
-  int _threads;
-
-public:
-  Parallel_For_buildLocalHistograms(const cv::Mat& frame, const cv::Mat& mask, const std::vector<cv::Point3i>& centers, float radius, int numBins, cv::Mat& localHistogramsFG, cv::Mat& localHistogramsBG, cv::Mat& sumsFB, int m_id, int threads)
+  /**
+   *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+   *  computations. Within the corresponding for loop, for every projected histogram center on or
+   *  close to the object's contour, a new foreground and background color histogram are computed
+   *  within a local circular image region is computed using the Bresenham algorithm to scan the
+   *  corresponding pixels.
+   */
+  class Parallel_For_buildLocalHistograms : public cv::ParallelLoopBody
   {
-    _frame = frame;
-    _mask = mask;
+  private:
+    cv::Mat _frame;
+    cv::Mat _mask;
 
-    frameData = _frame.data;
-    maskData = _mask.data;
+    uchar* frameData;
+    uchar* maskData;
 
-    frameStep = _frame.step;
-    maskStep = _mask.step;
+    size_t frameStep;
+    size_t maskStep;
 
-    size = frame.size();
+    cv::Size size;
 
-    _centers = centers;
+    std::vector<cv::Point3i> _centers;
 
-    _radius = radius;
+    int _radius;
 
-    _numBins = numBins;
+    int _numBins;
 
-    _binShift = 8 - log(numBins) / log(2);
+    int _binShift;
 
-    histogramSize = localHistogramsFG.cols;
+    int histogramSize;
 
-    localFGData = (float*)localHistogramsFG.ptr<float>();
-    localBGData = (float*)localHistogramsBG.ptr<float>();
+    cv::Mat _sumsFB;
 
-    _sumsFB = sumsFB;
+    int _m_id;
 
-    _m_id = m_id;
+    float* localFGData;
+    float* localBGData;
 
-    _sumsFBData = (float*)_sumsFB.ptr<float>();
+    float* _sumsFBData;
 
-    _threads = threads;
-  }
+    int _threads;
 
-  void processLine(uchar* frameRow, uchar* maskRow, int xl, int xr, float* localHistogramFG, float* localHistogramBG, float* sumFB) const
-  {
-    uchar* frame_ptr = (uchar*)(frameRow)+3 * xl;
-
-    uchar* mask_ptr = (uchar*)(maskRow)+xl;
-    uchar* mask_max_ptr = (uchar*)(maskRow)+xr;
-
-    for (; mask_ptr <= mask_max_ptr; mask_ptr += 1, frame_ptr += 3)
+  public:
+    Parallel_For_buildLocalHistograms(const cv::Mat& frame, const cv::Mat& mask, const std::vector<cv::Point3i>& centers, float radius, int numBins, cv::Mat& localHistogramsFG, cv::Mat& localHistogramsBG, cv::Mat& sumsFB, int m_id, int threads)
     {
-      int pidx;
-      int ru, gu, bu;
-
-      ru = (frame_ptr[0] >> _binShift);
-      gu = (frame_ptr[1] >> _binShift);
-      bu = (frame_ptr[2] >> _binShift);
-      pidx = (ru * _numBins + gu) * _numBins + bu;
-
-      if (*mask_ptr == _m_id)
-      {
-        localHistogramFG[pidx] += 1;
-        sumFB[0]++;
-      }
-      else
-      {
-        localHistogramBG[pidx] += 1;
-        sumFB[1]++;
-      }
-    }
-  }
-
-
-  virtual void operator()(const cv::Range& r) const
-  {
-    int range = (int)_centers.size() / _threads;
-
-    int cEnd = r.end * range;
-    if (r.end == _threads)
-    {
-      cEnd = (int)_centers.size();
-    }
-
-    for (int c = r.start * range; c < cEnd; c++)
-    {
-      int err = 0;
-      int dx = _radius;
-      int dy = 0;
-      int plus = 1;
-      int minus = (_radius << 1) - 1;
-
-      int olddx = dx;
-
-      cv::Point3i center = _centers[c];
-
-      int inside = center.x >= _radius && center.x < size.width - _radius && center.y >= _radius && center.y < size.height - _radius;
-
-      float* localHistogramFG = localFGData + c * histogramSize;
-      float* localHistogramBG = localBGData + c * histogramSize;
-
-      int cID = _centers[c].z;
-      float* sumFB = _sumsFBData + cID * 2;
-      sumFB[0] = 0;
-      sumFB[1] = 0;
-
-      while (dx >= dy)
-      {
-        int mask;
-        int y11 = center.y - dy, y12 = center.y + dy, y21 = center.y - dx, y22 = center.y + dx;
-        int x11 = center.x - dx, x12 = center.x + dx, x21 = center.x - dy, x22 = center.x + dy;
-
-        if (inside)
-        {
-          uchar* frameRow0 = frameData + y11 * frameStep;
-          uchar* frameRow1 = frameData + y12 * frameStep;
-
-          uchar* maskRow0 = maskData + y11 * maskStep;
-          uchar* maskRow1 = maskData + y12 * maskStep;
-
-          processLine(frameRow0, maskRow0, x11, x12, localHistogramFG, localHistogramBG, sumFB);
-          if (y11 != y12) processLine(frameRow1, maskRow1, x11, x12, localHistogramFG, localHistogramBG, sumFB);
-
-          frameRow0 = frameData + y21 * frameStep;
-          frameRow1 = frameData + y22 * frameStep;
-
-          maskRow0 = maskData + y21 * maskStep;
-          maskRow1 = maskData + y22 * maskStep;
-
-          if (olddx != dx)
-          {
-            if (y11 != y21) processLine(frameRow0, maskRow0, x21, x22, localHistogramFG, localHistogramBG, sumFB);
-            if (y12 != y22) processLine(frameRow1, maskRow1, x21, x22, localHistogramFG, localHistogramBG, sumFB);
-          }
-        }
-        else if (x11 < size.width && x12 >= 0 && y21 < size.height && y22 >= 0)
-        {
-          x11 = std::max(x11, 0);
-          x12 = MIN(x12, size.width - 1);
-
-          if ((unsigned)y11 < (unsigned)size.height)
-          {
-            uchar* frameRow = frameData + y11 * frameStep;
-            uchar* maskRow = maskData + y11 * maskStep;
-
-            processLine(frameRow, maskRow, x11, x12, localHistogramFG, localHistogramBG, sumFB);
-          }
-
-          if ((unsigned)y12 < (unsigned)size.height && (y11 != y12))
-          {
-            uchar* frameRow = frameData + y12 * frameStep;
-            uchar* maskRow = maskData + y12 * maskStep;
-
-            processLine(frameRow, maskRow, x11, x12, localHistogramFG, localHistogramBG, sumFB);
-          }
-
-          if (x21 < size.width && x22 >= 0 && (olddx != dx))
-          {
-            x21 = std::max(x21, 0);
-            x22 = MIN(x22, size.width - 1);
-
-            if ((unsigned)y21 < (unsigned)size.height)
-            {
-              uchar* frameRow = frameData + y21 * frameStep;
-              uchar* maskRow = maskData + y21 * maskStep;
-
-              processLine(frameRow, maskRow, x21, x22, localHistogramFG, localHistogramBG, sumFB);
-            }
-
-            if ((unsigned)y22 < (unsigned)size.height)
-            {
-              uchar* frameRow = frameData + y22 * frameStep;
-              uchar* maskRow = maskData + y22 * maskStep;
-
-              processLine(frameRow, maskRow, x21, x22, localHistogramFG, localHistogramBG, sumFB);
-            }
-          }
-        }
-
-        olddx = dx;
-
-        dy++;
-        err += plus;
-        plus += 2;
-
-        mask = (err <= 0) - 1;
-
-        err -= minus & mask;
-        dx += mask;
-        minus -= mask & 2;
-      }
-    }
-  }
-};
-
-/**
- *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
- *  computations. Within the corresponding for loop, each previously computed local foreground
- *  and background color histogram is merged with their normalized temporally consistent
- *  representation based on respective learning rates.
- */
-class Parallel_For_mergeLocalHistograms : public cv::ParallelLoopBody
-{
-private:
-  int histogramSize;
-
-  cv::Mat _sumsFB;
-
-  float* notNormalizedFGData;
-  float* notNormalizedBGData;
-
-  float* normalizedFGData;
-  float* normalizedBGData;
-
-  uchar* initializedData;
-
-  std::vector<cv::Point3i> _centersIds;
-
-  float _alphaF;
-  float _alphaB;
-
-  float* _sumsFBData;
-
-  int _threads;
-
-public:
-  Parallel_For_mergeLocalHistograms(const cv::Mat& notNormalizedFG, const cv::Mat& notNormalizedBG, cv::Mat& normalizedFG, cv::Mat& normalizedBG, cv::Mat& initialized, const std::vector<cv::Point3i> centersIds, const cv::Mat& sumsFB, float alphaF, float alphaB, int threads)
-  {
-    histogramSize = notNormalizedFG.cols;
-
-    notNormalizedFGData = (float*)notNormalizedFG.ptr<float>();
-    notNormalizedBGData = (float*)notNormalizedBG.ptr<float>();
-
-    normalizedFGData = (float*)normalizedFG.ptr<float>();
-    normalizedBGData = (float*)normalizedBG.ptr<float>();
-
-    initializedData = initialized.data;
-
-    _centersIds = centersIds;
-
-    _sumsFB = sumsFB;
-
-    _alphaF = alphaF;
-    _alphaB = alphaB;
-
-    _sumsFBData = (float*)_sumsFB.ptr<float>();
-
-    _threads = threads;
-  }
-
-  virtual void operator()(const cv::Range& r) const
-  {
-    //int range = _sumsFB.rows / _threads;
-    int range = (int)_centersIds.size() / _threads;
-
-    int hEnd = r.end * range;
-    if (r.end == _threads)
-    {
-      //hEnd = _sumsFB.rows;
-      hEnd = (int)_centersIds.size();
-    }
-
-    for (int h = r.start * range; h < hEnd; h++)
-    {
-      int cID = _centersIds[h].z;
-
-      float* notNormalizedFG = notNormalizedFGData + h * histogramSize;
-      float* notNormalizedBG = notNormalizedBGData + h * histogramSize;
-
-      float* normalizedFG = normalizedFGData + cID * histogramSize;
-      float* normalizedBG = normalizedBGData + cID * histogramSize;
-
-      float totalFGPixels = _sumsFBData[cID * 2];
-      float totalBGPixels = _sumsFBData[cID * 2 + 1];
-
-      if (initializedData[cID] == 0)
-      {
-        for (int i = 0; i < histogramSize; i++)
-        {
-          if (false)
-          {
-            normalizedFG[i] = notNormalizedFG[i] / totalFGPixels;
-            normalizedBG[i] = notNormalizedBG[i] / totalBGPixels;
-
-          }
-          else
-          {
-            if (notNormalizedFG[i])
-            {
-              normalizedFG[i] = (float)notNormalizedFG[i] / totalFGPixels;
-            }
-            if (notNormalizedBG[i])
-            {
-              normalizedBG[i] = (float)notNormalizedBG[i] / totalBGPixels;
-            }
-          }
-        }
-        initializedData[cID] = 1;
-      }
-      else
-      {
-        for (int i = 0; i < histogramSize; i++)
-        {
-
-          if (false)
-          {
-            normalizedFG[i] = notNormalizedFG[i] / totalFGPixels;
-            normalizedBG[i] = notNormalizedBG[i] / totalBGPixels;
-          }
-          else
-          {
-            if (notNormalizedFG[i])
-            {
-              normalizedFG[i] = (1.0f - _alphaF) * normalizedFG[i] + _alphaF * (float)notNormalizedFG[i] / totalFGPixels;
-            }
-            if (notNormalizedBG[i])
-            {
-              normalizedBG[i] = (1.0f - _alphaB) * normalizedBG[i] + _alphaB * (float)notNormalizedBG[i] / totalBGPixels;
-            }
-          }
-        }
-
-      }
-    }
-  }
-};
-
-/**
- *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
- *  computations. Within the corresponding for loop, every 3D histogram center is projected
- *  into the image plane. Those that do not project on or close to the object's contour are
- *  being filtered based on a given binary silhouette mask and depth map at a specified image
- *  pyramid level.
- */
-class Parallel_For_computeHistogramCenters : public cv::ParallelLoopBody
-{
-private:
-  std::vector<cv::Vec3f> _verticies;
-
-  std::vector<cv::Point3i>* _centersIds;
-
-  cv::Mat _depth;
-  cv::Mat _mask;
-
-  uchar* maskData;
-
-  cv::Matx44f _T_cm;
-  cv::Matx33f _K;
-
-  float _zNear;
-  float _zFar;
-
-  int _m_id;
-
-  int _level;
-
-  int downScale;
-  int upScale;
-
-  int _threads;
-
-public:
-  Parallel_For_computeHistogramCenters(const cv::Mat& mask, const cv::Mat& depth, const std::vector<cv::Vec3f>& verticies, const cv::Matx44f& T_cm, const cv::Matx33f& K, float zNear, float zFar, int m_id, int level, std::vector<cv::Point3i>* centersIds, int threads)
-  {
-    _verticies = verticies;
-
-    _depth = depth;
-
-    _level = level;
-
-    downScale = pow(2, 2 - level);
-
-    upScale = pow(2, level);
-
-    if (mask.type() % 8 == 5)
-    {
-      mask.convertTo(_mask, CV_8UC1, 10000);
-    }
-    else
-    {
+      _frame = frame;
       _mask = mask;
+
+      frameData = _frame.data;
+      maskData = _mask.data;
+
+      frameStep = _frame.step;
+      maskStep = _mask.step;
+
+      size = frame.size();
+
+      _centers = centers;
+
+      _radius = radius;
+
+      _numBins = numBins;
+
+      _binShift = 8 - log(numBins) / log(2);
+
+      histogramSize = localHistogramsFG.cols;
+
+      localFGData = (float*)localHistogramsFG.ptr<float>();
+      localBGData = (float*)localHistogramsBG.ptr<float>();
+
+      _sumsFB = sumsFB;
+
+      _m_id = m_id;
+
+      _sumsFBData = (float*)_sumsFB.ptr<float>();
+
+      _threads = threads;
     }
 
-    maskData = mask.data;
-
-    _T_cm = T_cm;
-    _K = K;
-
-    _zNear = zNear;
-    _zFar = zFar;
-
-    _m_id = m_id;
-
-    _centersIds = centersIds;
-
-    _threads = threads;
-  }
-
-  virtual void operator()(const cv::Range& r) const
-  {
-    int range = (int)_verticies.size() / _threads;
-
-    int vEnd = r.end * range;
-    if (r.end == _threads)
+    void processLine(uchar* frameRow, uchar* maskRow, int xl, int xr, float* localHistogramFG, float* localHistogramBG, float* sumFB) const
     {
-      vEnd = (int)_verticies.size();
-    }
+      uchar* frame_ptr = (uchar*)(frameRow)+3 * xl;
 
-    std::vector<cv::Point3i>* tmp = &_centersIds[r.start];
+      uchar* mask_ptr = (uchar*)(maskRow)+xl;
+      uchar* mask_max_ptr = (uchar*)(maskRow)+xr;
 
-    for (int v = r.start * range; v < vEnd; v++)
-    {
-      cv::Vec3f V_m = _verticies[v];
-
-      float X_m = V_m[0];
-      float Y_m = V_m[1];
-      float Z_m = V_m[2];
-
-      float X_c = X_m * _T_cm(0, 0) + Y_m * _T_cm(0, 1) + Z_m * _T_cm(0, 2) + _T_cm(0, 3);
-      float Y_c = X_m * _T_cm(1, 0) + Y_m * _T_cm(1, 1) + Z_m * _T_cm(1, 2) + _T_cm(1, 3);
-      float Z_c = X_m * _T_cm(2, 0) + Y_m * _T_cm(2, 1) + Z_m * _T_cm(2, 2) + _T_cm(2, 3);
-
-      float x = X_c / Z_c * _K(0, 0) + _K(0, 2);
-      float y = Y_c / Z_c * _K(1, 1) + _K(1, 2);
-
-      if (x >= 0 && x < _depth.cols && y >= 0 && y < _depth.rows)
+      for (; mask_ptr <= mask_max_ptr; mask_ptr += 1, frame_ptr += 3)
       {
-        float d = 1.0f - _depth.at<float>(y, x);
+        int pidx;
+        int ru, gu, bu;
 
-        float Z_d = 2.0f * _zNear * _zFar / (_zFar + _zNear - (2.0f * (d)-1.0) * (_zFar - _zNear));
+        ru = (frame_ptr[0] >> _binShift);
+        gu = (frame_ptr[1] >> _binShift);
+        bu = (frame_ptr[2] >> _binShift);
+        pidx = (ru * _numBins + gu) * _numBins + bu;
 
-        if (fabs(Z_c - Z_d) < 1.0f || d == 1.0)
+        if (*mask_ptr == _m_id)
         {
-          int xi = (int)x;
-          int yi = (int)y;
+          localHistogramFG[pidx] += 1;
+          sumFB[0]++;
+        }
+        else
+        {
+          localHistogramBG[pidx] += 1;
+          sumFB[1]++;
+        }
+      }
+    }
 
-          if (xi >= downScale && xi < _mask.cols - downScale && yi >= downScale && yi < _mask.rows - downScale)
+
+    virtual void operator()(const cv::Range& r) const
+    {
+      int range = (int)_centers.size() / _threads;
+
+      int cEnd = r.end * range;
+      if (r.end == _threads)
+      {
+        cEnd = (int)_centers.size();
+      }
+
+      for (int c = r.start * range; c < cEnd; c++)
+      {
+        int err = 0;
+        int dx = _radius;
+        int dy = 0;
+        int plus = 1;
+        int minus = (_radius << 1) - 1;
+
+        int olddx = dx;
+
+        cv::Point3i center = _centers[c];
+
+        int inside = center.x >= _radius && center.x < size.width - _radius && center.y >= _radius && center.y < size.height - _radius;
+
+        float* localHistogramFG = localFGData + c * histogramSize;
+        float* localHistogramBG = localBGData + c * histogramSize;
+
+        int cID = _centers[c].z;
+        float* sumFB = _sumsFBData + cID * 2;
+        sumFB[0] = 0;
+        sumFB[1] = 0;
+
+        while (dx >= dy)
+        {
+          int mask;
+          int y11 = center.y - dy, y12 = center.y + dy, y21 = center.y - dx, y22 = center.y + dx;
+          int x11 = center.x - dx, x12 = center.x + dx, x21 = center.x - dy, x22 = center.x + dy;
+
+          if (inside)
           {
-            uchar v0 = maskData[yi * _mask.cols + xi] == _m_id;
-            uchar v1 = maskData[yi * _mask.cols + xi + downScale] == _m_id;
-            uchar v2 = maskData[yi * _mask.cols + xi - downScale] == _m_id;
-            uchar v3 = maskData[(yi + downScale) * _mask.cols + xi] == _m_id;
-            uchar v4 = maskData[(yi - downScale) * _mask.cols + xi] == _m_id;
+            uchar* frameRow0 = frameData + y11 * frameStep;
+            uchar* frameRow1 = frameData + y12 * frameStep;
 
-            if (v0 * v1 * v2 * v3 * v4 == 0)
+            uchar* maskRow0 = maskData + y11 * maskStep;
+            uchar* maskRow1 = maskData + y12 * maskStep;
+
+            processLine(frameRow0, maskRow0, x11, x12, localHistogramFG, localHistogramBG, sumFB);
+            if (y11 != y12) processLine(frameRow1, maskRow1, x11, x12, localHistogramFG, localHistogramBG, sumFB);
+
+            frameRow0 = frameData + y21 * frameStep;
+            frameRow1 = frameData + y22 * frameStep;
+
+            maskRow0 = maskData + y21 * maskStep;
+            maskRow1 = maskData + y22 * maskStep;
+
+            if (olddx != dx)
             {
-              tmp->push_back(cv::Point3i(x * upScale, y * upScale, v));
+              if (y11 != y21) processLine(frameRow0, maskRow0, x21, x22, localHistogramFG, localHistogramBG, sumFB);
+              if (y12 != y22) processLine(frameRow1, maskRow1, x21, x22, localHistogramFG, localHistogramBG, sumFB);
+            }
+          }
+          else if (x11 < size.width && x12 >= 0 && y21 < size.height && y22 >= 0)
+          {
+            x11 = std::max(x11, 0);
+            x12 = MIN(x12, size.width - 1);
+
+            if ((unsigned)y11 < (unsigned)size.height)
+            {
+              uchar* frameRow = frameData + y11 * frameStep;
+              uchar* maskRow = maskData + y11 * maskStep;
+
+              processLine(frameRow, maskRow, x11, x12, localHistogramFG, localHistogramBG, sumFB);
+            }
+
+            if ((unsigned)y12 < (unsigned)size.height && (y11 != y12))
+            {
+              uchar* frameRow = frameData + y12 * frameStep;
+              uchar* maskRow = maskData + y12 * maskStep;
+
+              processLine(frameRow, maskRow, x11, x12, localHistogramFG, localHistogramBG, sumFB);
+            }
+
+            if (x21 < size.width && x22 >= 0 && (olddx != dx))
+            {
+              x21 = std::max(x21, 0);
+              x22 = MIN(x22, size.width - 1);
+
+              if ((unsigned)y21 < (unsigned)size.height)
+              {
+                uchar* frameRow = frameData + y21 * frameStep;
+                uchar* maskRow = maskData + y21 * maskStep;
+
+                processLine(frameRow, maskRow, x21, x22, localHistogramFG, localHistogramBG, sumFB);
+              }
+
+              if ((unsigned)y22 < (unsigned)size.height)
+              {
+                uchar* frameRow = frameData + y22 * frameStep;
+                uchar* maskRow = maskData + y22 * maskStep;
+
+                processLine(frameRow, maskRow, x21, x22, localHistogramFG, localHistogramBG, sumFB);
+              }
+            }
+          }
+
+          olddx = dx;
+
+          dy++;
+          err += plus;
+          plus += 2;
+
+          mask = (err <= 0) - 1;
+
+          err -= minus & mask;
+          dx += mask;
+          minus -= mask & 2;
+        }
+      }
+    }
+  };
+
+  /**
+   *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+   *  computations. Within the corresponding for loop, each previously computed local foreground
+   *  and background color histogram is merged with their normalized temporally consistent
+   *  representation based on respective learning rates.
+   */
+  class Parallel_For_mergeLocalHistograms : public cv::ParallelLoopBody
+  {
+  private:
+    int histogramSize;
+
+    cv::Mat _sumsFB;
+
+    float* notNormalizedFGData;
+    float* notNormalizedBGData;
+
+    float* normalizedFGData;
+    float* normalizedBGData;
+
+    uchar* initializedData;
+
+    std::vector<cv::Point3i> _centersIds;
+
+    float _alphaF;
+    float _alphaB;
+
+    float* _sumsFBData;
+
+    int _threads;
+
+  public:
+    Parallel_For_mergeLocalHistograms(const cv::Mat& notNormalizedFG, const cv::Mat& notNormalizedBG, cv::Mat& normalizedFG, cv::Mat& normalizedBG, cv::Mat& initialized, const std::vector<cv::Point3i> centersIds, const cv::Mat& sumsFB, float alphaF, float alphaB, int threads)
+    {
+      histogramSize = notNormalizedFG.cols;
+
+      notNormalizedFGData = (float*)notNormalizedFG.ptr<float>();
+      notNormalizedBGData = (float*)notNormalizedBG.ptr<float>();
+
+      normalizedFGData = (float*)normalizedFG.ptr<float>();
+      normalizedBGData = (float*)normalizedBG.ptr<float>();
+
+      initializedData = initialized.data;
+
+      _centersIds = centersIds;
+
+      _sumsFB = sumsFB;
+
+      _alphaF = alphaF;
+      _alphaB = alphaB;
+
+      _sumsFBData = (float*)_sumsFB.ptr<float>();
+
+      _threads = threads;
+    }
+
+    virtual void operator()(const cv::Range& r) const
+    {
+      //int range = _sumsFB.rows / _threads;
+      int range = (int)_centersIds.size() / _threads;
+
+      int hEnd = r.end * range;
+      if (r.end == _threads)
+      {
+        //hEnd = _sumsFB.rows;
+        hEnd = (int)_centersIds.size();
+      }
+
+      for (int h = r.start * range; h < hEnd; h++)
+      {
+        int cID = _centersIds[h].z;
+
+        float* notNormalizedFG = notNormalizedFGData + h * histogramSize;
+        float* notNormalizedBG = notNormalizedBGData + h * histogramSize;
+
+        float* normalizedFG = normalizedFGData + cID * histogramSize;
+        float* normalizedBG = normalizedBGData + cID * histogramSize;
+
+        float totalFGPixels = _sumsFBData[cID * 2];
+        float totalBGPixels = _sumsFBData[cID * 2 + 1];
+
+        if (initializedData[cID] == 0)
+        {
+          for (int i = 0; i < histogramSize; i++)
+          {
+            if (false)
+            {
+              normalizedFG[i] = notNormalizedFG[i] / totalFGPixels;
+              normalizedBG[i] = notNormalizedBG[i] / totalBGPixels;
+
+            }
+            else
+            {
+              if (notNormalizedFG[i])
+              {
+                normalizedFG[i] = (float)notNormalizedFG[i] / totalFGPixels;
+              }
+              if (notNormalizedBG[i])
+              {
+                normalizedBG[i] = (float)notNormalizedBG[i] / totalBGPixels;
+              }
+            }
+          }
+          initializedData[cID] = 1;
+        }
+        else
+        {
+          for (int i = 0; i < histogramSize; i++)
+          {
+
+            if (false)
+            {
+              normalizedFG[i] = notNormalizedFG[i] / totalFGPixels;
+              normalizedBG[i] = notNormalizedBG[i] / totalBGPixels;
+            }
+            else
+            {
+              if (notNormalizedFG[i])
+              {
+                normalizedFG[i] = (1.0f - _alphaF) * normalizedFG[i] + _alphaF * (float)notNormalizedFG[i] / totalFGPixels;
+              }
+              if (notNormalizedBG[i])
+              {
+                normalizedBG[i] = (1.0f - _alphaB) * normalizedBG[i] + _alphaB * (float)notNormalizedBG[i] / totalBGPixels;
+              }
+            }
+          }
+
+        }
+      }
+    }
+  };
+
+  /**
+   *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+   *  computations. Within the corresponding for loop, every 3D histogram center is projected
+   *  into the image plane. Those that do not project on or close to the object's contour are
+   *  being filtered based on a given binary silhouette mask and depth map at a specified image
+   *  pyramid level.
+   */
+  class Parallel_For_computeHistogramCenters : public cv::ParallelLoopBody
+  {
+  private:
+    std::vector<cv::Vec3f> _verticies;
+
+    std::vector<cv::Point3i>* _centersIds;
+
+    cv::Mat _depth;
+    cv::Mat _mask;
+
+    uchar* maskData;
+
+    cv::Matx44f _T_cm;
+    cv::Matx33f _K;
+
+    float _zNear;
+    float _zFar;
+
+    int _m_id;
+
+    int _level;
+
+    int downScale;
+    int upScale;
+
+    int _threads;
+
+  public:
+    Parallel_For_computeHistogramCenters(const cv::Mat& mask, const cv::Mat& depth, const std::vector<cv::Vec3f>& verticies, const cv::Matx44f& T_cm, const cv::Matx33f& K, float zNear, float zFar, int m_id, int level, std::vector<cv::Point3i>* centersIds, int threads)
+    {
+      _verticies = verticies;
+
+      _depth = depth;
+
+      _level = level;
+
+      downScale = pow(2, 2 - level);
+
+      upScale = pow(2, level);
+
+      if (mask.type() % 8 == 5)
+      {
+        mask.convertTo(_mask, CV_8UC1, 10000);
+      }
+      else
+      {
+        _mask = mask;
+      }
+
+      maskData = mask.data;
+
+      _T_cm = T_cm;
+      _K = K;
+
+      _zNear = zNear;
+      _zFar = zFar;
+
+      _m_id = m_id;
+
+      _centersIds = centersIds;
+
+      _threads = threads;
+    }
+
+    virtual void operator()(const cv::Range& r) const
+    {
+      int range = (int)_verticies.size() / _threads;
+
+      int vEnd = r.end * range;
+      if (r.end == _threads)
+      {
+        vEnd = (int)_verticies.size();
+      }
+
+      std::vector<cv::Point3i>* tmp = &_centersIds[r.start];
+
+      for (int v = r.start * range; v < vEnd; v++)
+      {
+        cv::Vec3f V_m = _verticies[v];
+
+        float X_m = V_m[0];
+        float Y_m = V_m[1];
+        float Z_m = V_m[2];
+
+        float X_c = X_m * _T_cm(0, 0) + Y_m * _T_cm(0, 1) + Z_m * _T_cm(0, 2) + _T_cm(0, 3);
+        float Y_c = X_m * _T_cm(1, 0) + Y_m * _T_cm(1, 1) + Z_m * _T_cm(1, 2) + _T_cm(1, 3);
+        float Z_c = X_m * _T_cm(2, 0) + Y_m * _T_cm(2, 1) + Z_m * _T_cm(2, 2) + _T_cm(2, 3);
+
+        float x = X_c / Z_c * _K(0, 0) + _K(0, 2);
+        float y = Y_c / Z_c * _K(1, 1) + _K(1, 2);
+
+        if (x >= 0 && x < _depth.cols && y >= 0 && y < _depth.rows)
+        {
+          float d = 1.0f - _depth.at<float>(y, x);
+
+          float Z_d = 2.0f * _zNear * _zFar / (_zFar + _zNear - (2.0f * (d)-1.0) * (_zFar - _zNear));
+
+          if (fabs(Z_c - Z_d) < 1.0f || d == 1.0)
+          {
+            int xi = (int)x;
+            int yi = (int)y;
+
+            if (xi >= downScale && xi < _mask.cols - downScale && yi >= downScale && yi < _mask.rows - downScale)
+            {
+              uchar v0 = maskData[yi * _mask.cols + xi] == _m_id;
+              uchar v1 = maskData[yi * _mask.cols + xi + downScale] == _m_id;
+              uchar v2 = maskData[yi * _mask.cols + xi - downScale] == _m_id;
+              uchar v3 = maskData[(yi + downScale) * _mask.cols + xi] == _m_id;
+              uchar v4 = maskData[(yi - downScale) * _mask.cols + xi] == _m_id;
+
+              if (v0 * v1 * v2 * v3 * v4 == 0)
+              {
+                tmp->push_back(cv::Point3i(x * upScale, y * upScale, v));
+              }
             }
           }
         }
       }
     }
-  }
-};
+  };
+}
 
 void ttool::tslet::TCLCHistograms::TestLine(uchar* frameRow, uchar* maskRow, int xl, int xr, float* localHistogramFG, float* localHistogramBG, float& sum_err, float& sum_all)
 {
