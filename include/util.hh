@@ -43,7 +43,7 @@
 #include <stdio.h>
 
 
-namespace ttool::gl
+namespace ttool::GLutils
 {
     /**
      * @brief Convert a cv::Mat to glm::mat4
