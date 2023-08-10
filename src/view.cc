@@ -27,9 +27,9 @@
 using namespace std;
 using namespace cv;
 
-View *View::m_Instance;
+ttool::View *ttool::View::m_Instance;
 
-View::View(void)
+ttool::View::View(void)
 {
 	m_CalibrationMatrices.push_back(Matx44f::eye());
 
@@ -40,7 +40,7 @@ View::View(void)
 	m_CurrentLevel = 0;
 }
 
-View::~View(void)
+ttool::View::~View(void)
 {
 	glDeleteTextures(1, &m_ColorTextureID);
 	glDeleteTextures(1, &m_DepthTextureID);
@@ -52,7 +52,7 @@ View::~View(void)
 	// delete surface;
 }
 
-void View::Destroy()
+void ttool::View::Destroy()
 {
 	// doneCurrent();
 	m_ProjectionMatrix = Matx44f::eye();
@@ -68,12 +68,12 @@ void View::Destroy()
 	m_Instance = NULL;
 }
 
-Matx44f View::GetCalibrationMatrix()
+Matx44f ttool::View::GetCalibrationMatrix()
 {
 	return m_CalibrationMatrices[m_CurrentLevel];
 }
 
-void View::Initialize(const Matx33f &K, int width, int height, float zNear, float zFar, int numLevels)
+void ttool::View::Initialize(const Matx33f &K, int width, int height, float zNear, float zFar, int numLevels)
 {
 	if (m_IsInitialized)
 	{
@@ -156,7 +156,7 @@ void View::Initialize(const Matx33f &K, int width, int height, float zNear, floa
 	m_IsInitialized = true;
 }
 
-void View::SetLevel(int level)
+void ttool::View::SetLevel(int level)
 {
 	m_CurrentLevel = level;
 	int s = pow(2, m_CurrentLevel);
@@ -167,12 +167,12 @@ void View::SetLevel(int level)
 	m_Height += m_Height % 4;
 }
 
-int View::GetLevel()
+int ttool::View::GetLevel()
 {
 	return m_CurrentLevel;
 }
 
-bool View::InitRenderingBuffers()
+bool ttool::View::InitRenderingBuffers()
 {
 	glBindVertexArray(m_VAO);
 
@@ -211,7 +211,7 @@ static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 	return (pt(0) < width && pt(1) < height && pt(0) >= 0 && pt(1) >= 0);
 }
 
-void View::RenderSilhouette(shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, bool invertDepth)
+void ttool::View::RenderSilhouette(shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, bool invertDepth)
 {
 	glBindVertexArray(m_VAO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
@@ -257,7 +257,7 @@ void View::RenderSilhouette(shared_ptr<ttool::tslet::Model> model, GLenum polygo
 	glFinish();
 }
 
-void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
+void ttool::View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 {
 	mask = cv::Mat(src_mask.size(), CV_8UC1, cv::Scalar(0));
 	uchar depth = src_mask.type() & CV_MAT_DEPTH_MASK;
@@ -286,7 +286,7 @@ void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 	}
 }
 
-void View::RenderShaded(std::shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, const cv::Point3f color)
+void ttool::View::RenderShaded(std::shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, const cv::Point3f color)
 {
 	glBindVertexArray(m_VAO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
@@ -331,7 +331,7 @@ void View::RenderShaded(std::shared_ptr<ttool::tslet::Model> model, GLenum polyg
 }
 
 
-void View::ProjectBoundingBox(std::shared_ptr<ttool::tslet::Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
+void ttool::View::ProjectBoundingBox(std::shared_ptr<ttool::tslet::Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
 {
 	Vec3f lbn = model->getLBN();
 	Vec3f rtf = model->getRTF();
@@ -387,7 +387,7 @@ void View::ProjectBoundingBox(std::shared_ptr<ttool::tslet::Model> model, std::v
 	boundingRect.height = rb.y - lt.y;
 }
 
-Mat View::DownloadFrame(View::FrameType type)
+Mat ttool::View::DownloadFrame(ttool::View::FrameType type)
 {
 	glBindVertexArray(m_VAO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
