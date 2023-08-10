@@ -42,7 +42,7 @@ TemplateView::TemplateView(std::shared_ptr<ttool::tslet::Object3D> object, float
     float zFar = view->GetZFar();
     
     // std::cout << "template_view" << std::endl;
-    std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
+    std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
     
     int m_id = object->getModelID();
     

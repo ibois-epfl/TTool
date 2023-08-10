@@ -30,7 +30,7 @@ ttool::tslet::Histogram::~Histogram() {}
 
 ttool::tslet::RBOTHist::RBOTHist(const std::shared_ptr<ttool::tslet::Object3D> object) {
 	if (object->getTCLCHistograms() == nullptr)
-		object->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(object, 32, 40, 10.0f)));
+		object->SetTCLCHistograms(std::make_shared<ttool::tslet::TCLCHistograms>(ttool::tslet::TCLCHistograms(object, 32, 40, 10.0f)));
 	else
 		std::cout << "RBOTHist::RBOTHist: TCLCHistograms already exists!" << std::endl;
 }
@@ -44,7 +44,7 @@ void ttool::tslet::RBOTHist::Update(std::shared_ptr<ttool::tslet::Object3D> obje
 }
 
 void ttool::tslet::RBOTHist::GetPixelProb(std::shared_ptr<ttool::tslet::Object3D> object, uchar rc, uchar gc, uchar bc, int x, int y, float& ppf, float& ppb) {
-	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
+	std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	uchar* initializedData = tclcHistograms->getInitialized().data;
@@ -115,7 +115,7 @@ void ttool::tslet::RBOTHist::GetRegionProb(std::shared_ptr<ttool::tslet::Object3
 	int level = view->GetLevel();
 	int upscale = pow(2, level);
 	
-	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
+	std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();
 	int numBins = tclcHistograms->getNumBins();

@@ -118,12 +118,12 @@ ttool::tslet::Object3D::~Object3D()
 }
 
 
-std::shared_ptr<TCLCHistograms> ttool::tslet::Object3D::getTCLCHistograms()
+std::shared_ptr<ttool::tslet::TCLCHistograms> ttool::tslet::Object3D::getTCLCHistograms()
 {
     return tclcHistograms;
 }
 
-void ttool::tslet::Object3D::SetTCLCHistograms(std::shared_ptr<TCLCHistograms> histograms) {
+void ttool::tslet::Object3D::SetTCLCHistograms(std::shared_ptr<ttool::tslet::TCLCHistograms> histograms) {
     tclcHistograms = histograms;
 }
 

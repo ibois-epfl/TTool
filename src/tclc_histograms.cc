@@ -23,10 +23,8 @@
 #include "tclc_histograms.hh"
 #include "model.hh"
 
-using namespace std;
-using namespace cv;
 
-TCLCHistograms::TCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset)
+ttool::tslet::TCLCHistograms::TCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset)
 {
     this->_model = model;
     
@@ -38,18 +36,18 @@ TCLCHistograms::TCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int n
     
     this->_numHistograms = _model->getNumSimpleVertices();
     
-    normalizedFG = Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
-    normalizedBG = Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
+    normalizedFG = cv::Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
+    normalizedBG = cv::Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
     
-    notNormalizedFG = Mat::zeros(300, numBins*numBins*numBins, CV_32FC1);
-    notNormalizedBG = Mat::zeros(300, numBins*numBins*numBins, CV_32FC1);
+    notNormalizedFG = cv::Mat::zeros(300, numBins*numBins*numBins, CV_32FC1);
+    notNormalizedBG = cv::Mat::zeros(300, numBins*numBins*numBins, CV_32FC1);
     
-    sumsFB = Mat::zeros(this->_numHistograms, 1, CV_32FC2);
+    sumsFB = cv::Mat::zeros(this->_numHistograms, 1, CV_32FC2);
 
-    initialized = Mat::zeros(1, this->_numHistograms, CV_8UC1);
+    initialized = cv::Mat::zeros(1, this->_numHistograms, CV_8UC1);
 }
 
-TCLCHistograms::~TCLCHistograms()
+ttool::tslet::TCLCHistograms::~TCLCHistograms()
 {
     
 }
@@ -544,7 +542,7 @@ public:
   }
 };
 
-void TCLCHistograms::TestLine(uchar* frameRow, uchar* maskRow, int xl, int xr, float* localHistogramFG, float* localHistogramBG, float& sum_err, float& sum_all)
+void ttool::tslet::TCLCHistograms::TestLine(uchar* frameRow, uchar* maskRow, int xl, int xr, float* localHistogramFG, float* localHistogramBG, float& sum_err, float& sum_all)
 {
   uchar* frame_ptr = (uchar*)(frameRow)+3 * xl;
 
@@ -583,7 +581,7 @@ void TCLCHistograms::TestLine(uchar* frameRow, uchar* maskRow, int xl, int xr, f
   }
 }
 
-float TCLCHistograms::ComputeWeight(const cv::Mat& frame, const cv::Mat& mask, cv::Point3i& center, int radius) {
+float ttool::tslet::TCLCHistograms::ComputeWeight(const cv::Mat& frame, const cv::Mat& mask, cv::Point3i& center, int radius) {
 	uchar* frame_data = frame.data;
 	uchar* mask_data = mask.data;
 
@@ -688,7 +686,7 @@ float TCLCHistograms::ComputeWeight(const cv::Mat& frame, const cv::Mat& mask, c
 	return (sum_all - sum_err) / sum_all;
 }
 
-void TCLCHistograms::update(const Mat &frame, const Mat &mask, const Mat &depth, Matx33f &K, float zNear, float zFar, float afg, float abg)
+void ttool::tslet::TCLCHistograms::update(const cv::Mat &frame, const cv::Mat &mask, const cv::Mat &depth, cv::Matx33f &K, float zNear, float zFar, float afg, float abg)
 {
     _centersIDs = parallelComputeLocalHistogramCenters(mask, depth, K, zNear, zFar, 0);
     
@@ -702,7 +700,7 @@ void TCLCHistograms::update(const Mat &frame, const Mat &mask, const Mat &depth,
     memset(normalizedFG.ptr<float>(), 0, _centersIDs.size()*numBins*numBins*numBins*sizeof(float));
     memset(normalizedBG.ptr<float>(), 0, _centersIDs.size()*numBins*numBins*numBins*sizeof(float));
     
-    //Mat sumsFB = Mat::zeros((int)_centersIDs.size(), 1, CV_32SC2);
+    //cv::Mat sumsFB = cv::Mat::zeros((int)_centersIDs.size(), 1, CV_32SC2);
     
     parallel_for_(cv::Range(0, threads), Parallel_For_buildLocalHistograms(frame, mask, _centersIDs, radius, numBins, notNormalizedFG, notNormalizedBG, sumsFB, _model->getModelID(), threads));
     
@@ -714,7 +712,7 @@ void TCLCHistograms::update(const Mat &frame, const Mat &mask, const Mat &depth,
     //}
 }
 
-void TCLCHistograms::updateCentersAndIds(const cv::Mat &mask, const cv::Mat &depth, const cv::Matx33f &K, float zNear, float zFar, int level)
+void ttool::tslet::TCLCHistograms::updateCentersAndIds(const cv::Mat &mask, const cv::Mat &depth, const cv::Matx33f &K, float zNear, float zFar, int level)
 {
     _centersIDs = parallelComputeLocalHistogramCenters(mask, depth, K, zNear, zFar, level);
     
@@ -722,11 +720,11 @@ void TCLCHistograms::updateCentersAndIds(const cv::Mat &mask, const cv::Mat &dep
 }
 
 
-vector<Point3i> TCLCHistograms::computeLocalHistogramCenters(const Mat &mask)
+std::vector<cv::Point3i> ttool::tslet::TCLCHistograms::computeLocalHistogramCenters(const cv::Mat &mask)
 {
     uchar *maskData = mask.data;
     
-    std::vector<Point3i> centers;
+    std::vector<cv::Point3i> centers;
     
     int m_id = _model->getModelID();
     
@@ -742,7 +740,7 @@ vector<Point3i> TCLCHistograms::computeLocalHistogramCenters(const Mat &mask)
                    || maskData[idx + 2*mask.cols] != m_id || maskData[idx - 2*mask.cols] != m_id
                    )
                 {
-                    centers.push_back(Point3i(j, i, (int)centers.size()));
+                    centers.push_back(cv::Point3i(j, i, (int)centers.size()));
                 }
             }
         }
@@ -752,24 +750,24 @@ vector<Point3i> TCLCHistograms::computeLocalHistogramCenters(const Mat &mask)
 }
 
 
-vector<Point3i> TCLCHistograms::parallelComputeLocalHistogramCenters(const Mat &mask, const Mat &depth, const Matx33f &K, float zNear, float zFar, int level)
+std::vector<cv::Point3i> ttool::tslet::TCLCHistograms::parallelComputeLocalHistogramCenters(const cv::Mat &mask, const cv::Mat &depth, const cv::Matx33f &K, float zNear, float zFar, int level)
 {
-    vector<Point3i> res;
-    // Convert vector<glm::vec3> to vector<cv::Vec3f>
-    vector<Vec3f> verticies;
+    std::vector<cv::Point3i> res;
+    // Convert std::vector<glm::vec3> to std::vector<cv::Vec3f>
+    std::vector<cv::Vec3f> verticies;
     verticies.resize(_model->getSimpleVertices().size());
     for(int i = 0; i < verticies.size(); i++)
     {
-        verticies[i] = Vec3f(_model->getSimpleVertices()[i].x, _model->getSimpleVertices()[i].y, _model->getSimpleVertices()[i].z);
+        verticies[i] = cv::Vec3f(_model->getSimpleVertices()[i].x, _model->getSimpleVertices()[i].y, _model->getSimpleVertices()[i].z);
     }
-    // vector<Vec3f> verticies = _model->getSimpleVertices();
-    Matx44f T_cm = _model->getPose();
-    Matx44f T_n = _model->getNormalization();
+    // std::vector<cv::Vec3f> verticies = _model->getSimpleVertices();
+    cv::Matx44f T_cm = _model->getPose();
+    cv::Matx44f T_n = _model->getNormalization();
     
-    vector<vector<Point3i> > centersIdsCollection;
+    std::vector<std::vector<cv::Point3i> > centersIdsCollection;
     centersIdsCollection.resize(8);
     
-    Matx44f T_cm_n = T_cm * T_n;
+    cv::Matx44f T_cm_n = T_cm * T_n;
     
     int m_id = _model->getModelID();
     
@@ -777,7 +775,7 @@ vector<Point3i> TCLCHistograms::parallelComputeLocalHistogramCenters(const Mat &
     
     for(int i = 0; i < centersIdsCollection.size(); i++)
     {
-        vector<Point3i> tmp = centersIdsCollection[i];
+        std::vector<cv::Point3i> tmp = centersIdsCollection[i];
         for(int j = 0; j < tmp.size(); j++)
         {
             res.push_back(tmp[j]);
@@ -789,11 +787,11 @@ vector<Point3i> TCLCHistograms::parallelComputeLocalHistogramCenters(const Mat &
 }
 
 
-void TCLCHistograms::filterHistogramCenters(int numHistograms, float offset)
+void ttool::tslet::TCLCHistograms::filterHistogramCenters(int numHistograms, float offset)
 {
     int offset2 = (offset)*(offset);
     
-    vector<Point3i> res;
+    std::vector<cv::Point3i> res;
     
     do
     {
@@ -801,12 +799,12 @@ void TCLCHistograms::filterHistogramCenters(int numHistograms, float offset)
         
         while(_centersIDs.size() > 0)
         {
-            Point3i center = _centersIDs[0];
-            vector<Point3i> tmp;
+            cv::Point3i center = _centersIDs[0];
+            std::vector<cv::Point3i> tmp;
             res.push_back(center);
             for(int c2 = 1; c2 < _centersIDs.size(); c2++)
             {
-                Point3i center2 = _centersIDs[c2];
+                cv::Point3i center2 = _centersIDs[c2];
                 int dx = center.x - center2.x;
                 int dy = center.y - center2.y;
                 int d = dx*dx + dy*dy;
@@ -829,61 +827,61 @@ void TCLCHistograms::filterHistogramCenters(int numHistograms, float offset)
 }
 
 
-Mat TCLCHistograms::getLocalForegroundHistograms()
+cv::Mat ttool::tslet::TCLCHistograms::getLocalForegroundHistograms()
 {
     return normalizedFG;
 }
 
 
-Mat TCLCHistograms::getLocalBackgroundHistograms()
+cv::Mat ttool::tslet::TCLCHistograms::getLocalBackgroundHistograms()
 {
     return normalizedBG;
 }
 
 
-vector<Point3i> TCLCHistograms::getCentersAndIDs()
+std::vector<cv::Point3i> ttool::tslet::TCLCHistograms::getCentersAndIDs()
 {
     return _centersIDs;
 }
 
 
-Mat TCLCHistograms::getInitialized()
+cv::Mat ttool::tslet::TCLCHistograms::getInitialized()
 {
     return initialized;
 }
 
 
-int TCLCHistograms::getNumBins()
+int ttool::tslet::TCLCHistograms::getNumBins()
 {
     return numBins;
 }
 
-int TCLCHistograms::getNumHistograms()
+int ttool::tslet::TCLCHistograms::getNumHistograms()
 {
     return _numHistograms;
 }
 
-int TCLCHistograms::getRadius()
+int ttool::tslet::TCLCHistograms::getRadius()
 {
     return radius;
 }
 
 
-float TCLCHistograms::getOffset()
+float ttool::tslet::TCLCHistograms::getOffset()
 {
     return _offset;
 }
 
 
-void TCLCHistograms::clear()
+void ttool::tslet::TCLCHistograms::clear()
 {
-    normalizedFG = Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
-    normalizedBG = Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
+    normalizedFG = cv::Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
+    normalizedBG = cv::Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
     
-    notNormalizedFG = Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
-    notNormalizedBG = Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
+    notNormalizedFG = cv::Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
+    notNormalizedBG = cv::Mat::zeros(this->_numHistograms, numBins*numBins*numBins, CV_32FC1);
     
-    initialized = Mat::zeros(1, this->_numHistograms, CV_8UC1);
+    initialized = cv::Mat::zeros(1, this->_numHistograms, CV_8UC1);
 }
 
 class Parallel_For_buildWeightedLocalHistograms : public cv::ParallelLoopBody {
@@ -1116,18 +1114,18 @@ public:
   }
 };
 
-WTCLCHistograms::WTCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset)
+ttool::tslet::WTCLCHistograms::WTCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset)
   : TCLCHistograms(model, numBins, radius, offset)
 {
   SDT2D = new ttool::tslet::SignedDistanceTransform2D(8.0f);
 }
 
-WTCLCHistograms::~WTCLCHistograms()
+ttool::tslet::WTCLCHistograms::~WTCLCHistograms()
 {
 
 }
 
-void WTCLCHistograms::update(const Mat& frame, const Mat& mask, const Mat& depth, Matx33f& K, float zNear, float zFar, float afg, float abg) {
+void ttool::tslet::WTCLCHistograms::update(const cv::Mat& frame, const cv::Mat& mask, const cv::Mat& depth, cv::Matx33f& K, float zNear, float zFar, float afg, float abg) {
   _centersIDs = parallelComputeLocalHistogramCenters(mask, depth, K, zNear, zFar, 0);
 
   filterHistogramCenters(100, 10.0f);
@@ -1140,7 +1138,7 @@ void WTCLCHistograms::update(const Mat& frame, const Mat& mask, const Mat& depth
   memset(normalizedFG.ptr<float>(), 0, _centersIDs.size() * numBins * numBins * numBins * sizeof(float));
   memset(normalizedBG.ptr<float>(), 0, _centersIDs.size() * numBins * numBins * numBins * sizeof(float));
 
-  //Mat sumsFB = Mat::zeros((int)_centersIDs.size(), 1, CV_32SC2);
+  //cv::Mat sumsFB = cv::Mat::zeros((int)_centersIDs.size(), 1, CV_32SC2);
   
   cv::Mat sdt, xyPos;
   SDT2D->computeTransform(mask, sdt, xyPos, 8, _model->getModelID());

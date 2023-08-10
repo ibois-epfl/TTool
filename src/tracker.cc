@@ -231,7 +231,7 @@ void SLTracker::GetBundleProb(std::shared_ptr<ttool::tslet::Object3D> object, co
 
 	int level = view->GetLevel();
 	int upscale = pow(2, level);
-	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
+	std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();
 	int numBins = tclcHistograms->getNumBins();

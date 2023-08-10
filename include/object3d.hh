@@ -20,8 +20,8 @@
 #pragma once
 
 #include "model.hh"
+#include "tclc_histograms.hh"
 
-class TCLCHistograms;
 class TemplateView;
 
 namespace ttool::tslet
@@ -64,8 +64,8 @@ namespace ttool::tslet
        *
        *  @return  The set of tclc-histograms associated with this object.
        */
-      std::shared_ptr<TCLCHistograms> getTCLCHistograms();
-      void SetTCLCHistograms(std::shared_ptr<TCLCHistograms> tclcHistograms);
+      std::shared_ptr<ttool::tslet::TCLCHistograms> getTCLCHistograms();
+      void SetTCLCHistograms(std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms);
 
       /**
        *  Generates all base and neighboring templates required for
@@ -111,7 +111,7 @@ namespace ttool::tslet
       std::vector<cv::Vec3f> baseIcosahedron;
       std::vector<cv::Vec3f> subdivIcosahedron;
       
-      std::shared_ptr<TCLCHistograms> tclcHistograms;
+      std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms;
       
       std::vector<std::shared_ptr<TemplateView>> baseTemplates;
       std::vector<std::shared_ptr<TemplateView>> neighboringTemplates;
