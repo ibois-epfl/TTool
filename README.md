@@ -17,5 +17,11 @@ The contributions of this project are
 - GLEW's OpenGL rendering. SLET is using QT5's OpenGL rendering. However, our [augmented carpentry](https://github.com/ibois-epfl/augmented-carpentry) is using GLFW. Hence, we changed the rendering back-end to suit our project.
 - RESET, FREEZE, TRACK implementation. We found the correlation between the average score of the search points and the quality of the tracking. We added a thresholding to the SLET to exploit this score. As a consequece, the tracking works better on our setting of a fixed camera mounting on the toolhead.
 - ML Tool head classification to detect the type of the tool from the camera.
+
+TTool ML detects the tool head from the camera feed and track the 6Dof Pose.
+![TTool Demo Detecting and Tracking the Tool Head](dev_log/main_readme/detect_track.gif)
+
+TTool allows user the input the initial pose of the tool head and track the 6Dof Pose.
+![TTool Demo Inputing and Tracking the Tool Head](dev_log/main_readme/input_track.gif)
 # Wiki
 The wiki of this project is hosted on [github](https://github.com/ibois-epfl/TTool/wiki)
