@@ -128,7 +128,7 @@ namespace ttool::standaloneUtils
         glfwTerminate();
     }
 }
-namespace tk
+namespace ttool::utils
 {
     inline bool IsFileExist (const std::string& name)
     {

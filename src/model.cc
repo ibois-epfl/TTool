@@ -25,7 +25,7 @@
 #include <assimp/scene.h>
 #include <assimp/mesh.h>
 #include <assimp/postprocess.h>
-#include "util.hh" // for tk::IsFileExist
+#include "util.hh" // for ttool::utils::IsFileExist
 
 ttool::tslet::Model::Model(const std::string modelFilename, float tx, float ty, float tz, float alpha, float beta, float gamma, float scale)
 {
@@ -299,7 +299,7 @@ void ttool::tslet::Model::loadModel(const std::string modelFilename)
 
 //#define DELETE_EXTRA_VERTEX
 #ifdef DELETE_EXTRA_VERTEX
-    if (tk::IsFileExist(modelFilename + 's')) {
+    if (ttool::utils::IsFileExist(modelFilename + 's')) {
       //loadSimpleModel(modelFilename + 's');
       Assimp::Importer importer;
       const aiScene* scene = importer.ReadFile(modelFilename, aiProcessPreset_TargetRealtime_Fast);
@@ -310,7 +310,7 @@ void ttool::tslet::Model::loadModel(const std::string modelFilename)
       IdentAdd(svertices, mesh->mVertices, mesh->mNumVertices);
     }
 #else
-    if (tk::IsFileExist(modelFilename + 's')) {
+    if (ttool::utils::IsFileExist(modelFilename + 's')) {
       loadSimpleModel(modelFilename + 's');
     } else {
       svertices = vertices;
