@@ -1,6 +1,7 @@
 /**
- * SLET
- * Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
+ * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *                     
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
