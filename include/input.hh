@@ -152,7 +152,7 @@ namespace ttool
         void Translate(std::shared_ptr<ttool::tslet::Model> model, cv::Vec3f translation)
         {
             cv::Matx44f pose = model->getPose();
-            cv::Matx44f translate = Transformations::translationMatrix(translation);
+            cv::Matx44f translate = ttool::utils::Transformations::translationMatrix(translation);
             pose = translate * pose;
             model->setPose(pose);
         }
@@ -177,9 +177,9 @@ namespace ttool
 
             cv::Vec4f worldCenter = (pose * normalization) * cv::Vec4f(center(0), center(1), center(2), 1.0f);
             worldCenter = worldCenter / worldCenter(3);
-            pose = Transformations::translationMatrix(-worldCenter(0), -worldCenter(1), -worldCenter(2)) * pose;
-            pose = Transformations::rotationMatrix(angle, cv::Vec3f(localAxis(0), localAxis(1), localAxis(2))) * pose;
-            pose = Transformations::translationMatrix(worldCenter(0), worldCenter(1), worldCenter(2)) * pose;
+            pose = ttool::utils::Transformations::translationMatrix(-worldCenter(0), -worldCenter(1), -worldCenter(2)) * pose;
+            pose = ttool::utils::Transformations::rotationMatrix(angle, cv::Vec3f(localAxis(0), localAxis(1), localAxis(2))) * pose;
+            pose = ttool::utils::Transformations::translationMatrix(worldCenter(0), worldCenter(1), worldCenter(2)) * pose;
             model->setPose(pose);
         }
 

@@ -292,7 +292,7 @@ void ttool::tslet::SLETracker::RunIteration(std::shared_ptr<ttool::tslet::Object
 	cv::Matx61f JT;
 	ComputeJac(object, m_id, imagePyramid[level], depth_map, depth_inv_map, wJTJ, JT);
 
-	auto deltaT = Transformations::exp(-wJTJ.inv(cv::DECOMP_CHOLESKY) * JT);
+	auto deltaT = ttool::utils::Transformations::exp(-wJTJ.inv(cv::DECOMP_CHOLESKY) * JT);
 	cv::Matx44f T_cm = deltaT * object->getPose();
 
 	if (avg < 0.0125 / 2)

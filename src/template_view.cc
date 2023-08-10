@@ -21,7 +21,7 @@
 
 ttool::tslet::TemplateView::TemplateView(std::shared_ptr<ttool::tslet::Object3D> object, float alpha, float beta, float gamma, float distance, int numLevels, bool generateNeighbors)
 {
-    T_cm = Transformations::translationMatrix(0, 0, distance)*Transformations::rotationMatrix(gamma, cv::Vec3f(0, 0, 1))*Transformations::rotationMatrix(alpha, cv::Vec3f(1, 0, 0))*Transformations::rotationMatrix(beta, cv::Vec3f(0, 1, 0));
+    T_cm = ttool::utils::Transformations::translationMatrix(0, 0, distance)*ttool::utils::Transformations::rotationMatrix(gamma, cv::Vec3f(0, 0, 1))*ttool::utils::Transformations::rotationMatrix(alpha, cv::Vec3f(1, 0, 0))*ttool::utils::Transformations::rotationMatrix(beta, cv::Vec3f(0, 1, 0));
     
     object->setPose(T_cm);
     

@@ -29,10 +29,10 @@
 
 ttool::tslet::Model::Model(const std::string modelFilename, float tx, float ty, float tz, float alpha, float beta, float gamma, float scale)
 {
-	cv::Matx44f Ti = Transformations::translationMatrix(tx, ty, tz)
-	*Transformations::rotationMatrix(alpha, cv::Vec3f(1, 0, 0))
-	*Transformations::rotationMatrix(beta, cv::Vec3f(0, 1, 0))
-	*Transformations::rotationMatrix(gamma, cv::Vec3f(0, 0, 1))
+	cv::Matx44f Ti = ttool::utils::Transformations::translationMatrix(tx, ty, tz)
+	*ttool::utils::Transformations::rotationMatrix(alpha, cv::Vec3f(1, 0, 0))
+	*ttool::utils::Transformations::rotationMatrix(beta, cv::Vec3f(0, 1, 0))
+	*ttool::utils::Transformations::rotationMatrix(gamma, cv::Vec3f(0, 0, 1))
 	*cv::Matx44f::eye();
 
 	Init(modelFilename, Ti, scale);
@@ -295,7 +295,7 @@ void ttool::tslet::Model::loadModel(const std::string modelFilename)
     // the center of the 3d bounding box
     cv::Vec3f bbCenter = (rtf + lbn) / 2.0f;
     // compute a normalization transform that moves the object to the center of its bounding box and scales it according to the prescribed factor
-    T_n = Transformations::scaleMatrix(scaling)*Transformations::translationMatrix(-bbCenter[0], -bbCenter[1], -bbCenter[2]);
+    T_n = ttool::utils::Transformations::scaleMatrix(scaling)*ttool::utils::Transformations::translationMatrix(-bbCenter[0], -bbCenter[1], -bbCenter[2]);
 
 //#define DELETE_EXTRA_VERTEX
 #ifdef DELETE_EXTRA_VERTEX
