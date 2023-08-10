@@ -46,7 +46,7 @@ Tracker::Tracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> o
 
 Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<ttool::tslet::Object3D> objects) {
 	Tracker* poseEstimator = NULL;
-	poseEstimator = new SLETracker(K, objects);
+	poseEstimator = new ttool::tslet::SLETracker(K, objects);
 
 	CHECK(poseEstimator) << "Check |tracker_mode| in yml file";
 	return poseEstimator;

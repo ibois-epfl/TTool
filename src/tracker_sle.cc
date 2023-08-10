@@ -31,11 +31,11 @@ enum {
 	RUN_DEBUG = 1,
 };
 
-SLETracker::SLETracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> objects)
+ttool::tslet::SLETracker::SLETracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> objects)
 	: SLTracker(K, objects)
 {}
 
-void SLETracker::ComputeJac(
+void ttool::tslet::SLETracker::ComputeJac(
 	std::shared_ptr<ttool::tslet::Object3D> object,
 	int m_id, 
 	const cv::Mat& frame,
@@ -143,7 +143,7 @@ void SLETracker::ComputeJac(
 	}
 }
 
-void SLETracker::FindMatchPointMaxProb(float diff) {
+void ttool::tslet::SLETracker::FindMatchPointMaxProb(float diff) {
 	std::vector<std::vector<cv::Point> >& search_points = search_line->search_points;
 	const std::vector<std::vector<cv::Point2f> >& bundle_prob = search_line->bundle_prob;
 	scores.resize(search_points.size());
@@ -199,7 +199,7 @@ void SLETracker::FindMatchPointMaxProb(float diff) {
 	}
 }
 
-void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<ttool::tslet::Object3D> object, int runs, cv::Matx44f& init_pose)
+void ttool::tslet::SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<ttool::tslet::Object3D> object, int runs, cv::Matx44f& init_pose)
 {
     for (int iter = 0; iter < runs * 4; iter++) {
         RunIteration(object, imagePyramid, 2, 12, 2, init_pose);
@@ -214,7 +214,7 @@ void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<ttool
     }
 }
 
-void SLETracker::RunIteration(std::shared_ptr<ttool::tslet::Object3D> object, const std::vector<cv::Mat>& imagePyramid, int level, int sl_len, int sl_seg, cv::Matx44f& init_pose)
+void ttool::tslet::SLETracker::RunIteration(std::shared_ptr<ttool::tslet::Object3D> object, const std::vector<cv::Mat>& imagePyramid, int level, int sl_len, int sl_seg, cv::Matx44f& init_pose)
 {
 	m_trackingStatus.str(std::string()); // Clearing the string
 	m_trackingStatus.precision(4);
@@ -311,7 +311,7 @@ void SLETracker::RunIteration(std::shared_ptr<ttool::tslet::Object3D> object, co
 	}
 }
 
-void SLETracker::EstimatePoses(std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx44f& init_pose, cv::Mat& frame) {
+void ttool::tslet::SLETracker::EstimatePoses(std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx44f& init_pose, cv::Mat& frame) {
     std::vector<cv::Mat> imagePyramid;
     imagePyramid.push_back(frame);
 
