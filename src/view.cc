@@ -211,7 +211,7 @@ static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 	return (pt(0) < width && pt(1) < height && pt(0) >= 0 && pt(1) >= 0);
 }
 
-void View::RenderSilhouette(shared_ptr<Model> model, GLenum polygonMode, bool invertDepth)
+void View::RenderSilhouette(shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, bool invertDepth)
 {
 	glBindVertexArray(m_VAO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
@@ -286,7 +286,7 @@ void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 	}
 }
 
-void View::RenderShaded(std::shared_ptr<Model> model, GLenum polygonMode, const cv::Point3f color)
+void View::RenderShaded(std::shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, const cv::Point3f color)
 {
 	glBindVertexArray(m_VAO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
@@ -331,7 +331,7 @@ void View::RenderShaded(std::shared_ptr<Model> model, GLenum polygonMode, const 
 }
 
 
-void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
+void View::ProjectBoundingBox(std::shared_ptr<ttool::tslet::Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
 {
 	Vec3f lbn = model->getLBN();
 	Vec3f rtf = model->getRTF();

@@ -22,7 +22,7 @@
 using namespace std;
 using namespace cv;
 
-TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float beta, float gamma, float distance, int numLevels, bool generateNeighbors)
+TemplateView::TemplateView(std::shared_ptr<ttool::tslet::Object3D> object, float alpha, float beta, float gamma, float distance, int numLevels, bool generateNeighbors)
 {
     T_cm = Transformations::translationMatrix(0, 0, distance)*Transformations::rotationMatrix(gamma, Vec3f(0, 0, 1))*Transformations::rotationMatrix(alpha, Vec3f(1, 0, 0))*Transformations::rotationMatrix(beta, Vec3f(0, 1, 0));
     

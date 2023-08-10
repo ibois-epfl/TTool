@@ -28,14 +28,14 @@ ttool::tslet::Histogram::Histogram() {
 
 ttool::tslet::Histogram::~Histogram() {}
 
-ttool::tslet::RBOTHist::RBOTHist(const std::shared_ptr<Object3D> object) {
+ttool::tslet::RBOTHist::RBOTHist(const std::shared_ptr<ttool::tslet::Object3D> object) {
 	if (object->getTCLCHistograms() == nullptr)
 		object->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(object, 32, 40, 10.0f)));
 	else
 		std::cout << "RBOTHist::RBOTHist: TCLCHistograms already exists!" << std::endl;
 }
 
-void ttool::tslet::RBOTHist::Update(std::shared_ptr<Object3D> object, const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, float afg, float abg){
+void ttool::tslet::RBOTHist::Update(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, float afg, float abg){
 	float zNear = view->GetZNear();
 	float zFar = view->GetZFar();
 	cv::Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
@@ -43,7 +43,7 @@ void ttool::tslet::RBOTHist::Update(std::shared_ptr<Object3D> object, const cv::
 	object->getTCLCHistograms()->update(frame, mask_map, depth_map, K, zNear, zFar, afg, abg);
 }
 
-void ttool::tslet::RBOTHist::GetPixelProb(std::shared_ptr<Object3D> object, uchar rc, uchar gc, uchar bc, int x, int y, float& ppf, float& ppb) {
+void ttool::tslet::RBOTHist::GetPixelProb(std::shared_ptr<ttool::tslet::Object3D> object, uchar rc, uchar gc, uchar bc, int x, int y, float& ppf, float& ppb) {
 	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
@@ -109,7 +109,7 @@ void ttool::tslet::RBOTHist::GetPixelProb(std::shared_ptr<Object3D> object, ucha
 	}
 }
 
-void ttool::tslet::RBOTHist::GetRegionProb(std::shared_ptr<Object3D> object, const cv::Mat& frame, cv::Mat& prob_map) {
+void ttool::tslet::RBOTHist::GetRegionProb(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Mat& frame, cv::Mat& prob_map) {
 	prob_map = cv::Mat(frame.size(), CV_8UC1);
 
 	int level = view->GetLevel();

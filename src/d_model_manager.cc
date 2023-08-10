@@ -18,9 +18,7 @@
 
 #include "d_model_manager.hh"
 
-using namespace ttool;
-
-DModelManager::DModelManager(std::vector<cv::String> modelFiles, std::vector<cv::Matx44f> &gtPoses, std::shared_ptr<Config> configPtr)
+ttool::DModelManager::DModelManager(std::vector<cv::String> modelFiles, std::vector<cv::Matx44f> &gtPoses, std::shared_ptr<Config> configPtr)
 {
     assert(("There should be at least one model file", modelFiles.size() >= 1));
     m_ModelID2ModelFiles = ConvertVectorToMapID(modelFiles);
@@ -35,7 +33,7 @@ DModelManager::DModelManager(std::vector<cv::String> modelFiles, std::vector<cv:
     m_ConfigPtr = configPtr;
 }
 
-void DModelManager::InitModels()
+void ttool::DModelManager::InitModels()
 {
     if (m_CurrentObjectPtr->isInitialized())
     {
@@ -49,24 +47,24 @@ void DModelManager::InitModels()
     m_CurrentObjectPtr->setModelID(m_CurrentObjectID);
 }
 
-void DModelManager::ResetObjectToConfigInitialPose()
+void ttool::DModelManager::ResetObjectToConfigInitialPose()
 {
     m_CurrentObjectPtr->setPose(m_ModelID2InitialPoses[m_CurrentObjectID]);
     SnapshotObjectPose();
 }
 
-void DModelManager::SaveObjectInitialPose(cv::Matx44f initialPose)
+void ttool::DModelManager::SaveObjectInitialPose(cv::Matx44f initialPose)
 {
     m_ModelID2LastSavedPoses[m_CurrentObjectID] = initialPose;
     SnapshotObjectPose();
 }
 
-void DModelManager::ResetObjectToLastSavePose()
+void ttool::DModelManager::ResetObjectToLastSavePose()
 {
     m_CurrentObjectPtr->setPose(m_ModelID2LastSavedPoses[m_CurrentObjectID]);
 }
 
-void DModelManager::SetObjectID(int objectID)
+void ttool::DModelManager::SetObjectID(int objectID)
 {
     SnapshotObjectPose();
     m_CurrentObjectID = objectID;
@@ -77,24 +75,24 @@ void DModelManager::SetObjectID(int objectID)
     SetCurrentObjectPtr();
 }
 
-void DModelManager::IncreaseObjectID()
+void ttool::DModelManager::IncreaseObjectID()
 {
     SnapshotObjectPose();
     m_CurrentObjectID = m_CurrentObjectID % GetNumObjects() + 1;
     SetCurrentObjectPtr();
 }
 
-int DModelManager::GetNumObjects()
+int ttool::DModelManager::GetNumObjects()
 {
     return m_ModelID2ModelFiles.size();
 }
 
-void DModelManager::SnapshotObjectPose()
+void ttool::DModelManager::SnapshotObjectPose()
 {
     m_ModelID2ModelPoses[m_CurrentObjectID] = m_CurrentObjectPtr->getPose();
 }
 
-void DModelManager::SavePosesToConfig()
+void ttool::DModelManager::SavePosesToConfig()
 {
     SnapshotObjectPose();
 
@@ -126,7 +124,7 @@ void DModelManager::SavePosesToConfig()
     m_ConfigPtr->write("groundTruthPoses", poses);
 }
 
-int DModelManager::GetObjectID(std::string modelName)
+int ttool::DModelManager::GetObjectID(std::string modelName)
 { 
     if (m_ModelName2ModelID.find(modelName) != m_ModelName2ModelID.end())
         return m_ModelName2ModelID[modelName]; 
@@ -134,7 +132,7 @@ int DModelManager::GetObjectID(std::string modelName)
 }
 
 template <typename T>
-std::map<int, T> DModelManager::ConvertVectorToMapID(std::vector<T> someVector)
+std::map<int, T> ttool::DModelManager::ConvertVectorToMapID(std::vector<T> someVector)
 {
     std::map<int, T> mapID2Value;
     for (int i = 0; i < someVector.size(); ++i)
@@ -144,7 +142,7 @@ std::map<int, T> DModelManager::ConvertVectorToMapID(std::vector<T> someVector)
     return mapID2Value;
 }
 
-std::map<std::string, int> DModelManager::ConvertVectorToMapString(std::vector<cv::String> someVector)
+std::map<std::string, int> ttool::DModelManager::ConvertVectorToMapString(std::vector<cv::String> someVector)
 {
     std::map<std::string, int> mapString2ID;
     for (int i = 0; i < someVector.size(); ++i)
@@ -159,7 +157,7 @@ std::map<std::string, int> DModelManager::ConvertVectorToMapString(std::vector<c
     return mapString2ID;
 }
 
-std::map<int, std::string> DModelManager::MakeModelID2ModelName(std::vector<cv::String> someVector)
+std::map<int, std::string> ttool::DModelManager::MakeModelID2ModelName(std::vector<cv::String> someVector)
 {
     std::map<int, std::string> mapID2String;
     for (int i = 0; i < someVector.size(); ++i)
@@ -178,11 +176,11 @@ std::map<int, std::string> DModelManager::MakeModelID2ModelName(std::vector<cv::
  * @brief Set the Current Object Ptr object to the current ID and initialize it
  * 
  */
-void DModelManager::SetCurrentObjectPtr()
+void ttool::DModelManager::SetCurrentObjectPtr()
 {
     // Initialize object(s) to with model file, starting pose, ...
     std::vector<float> distances = { 200.0f, 400.0f, 600.0f };
-    m_CurrentObjectPtr = std::make_shared<Object3D>(m_ModelID2ModelFiles[m_CurrentObjectID], m_ModelID2ModelPoses[m_CurrentObjectID], 1.0, 0.55f, distances);
+    m_CurrentObjectPtr = std::make_shared<ttool::tslet::Object3D>(m_ModelID2ModelFiles[m_CurrentObjectID], m_ModelID2ModelPoses[m_CurrentObjectID], 1.0, 0.55f, distances);
 
     InitModels();
 }

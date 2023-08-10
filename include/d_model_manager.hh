@@ -74,9 +74,9 @@ namespace ttool
         /**
          * @brief Get the current object
          * 
-         * @return std::shared_ptr<Object3D> 
+         * @return std::shared_ptr<ttool::tslet::Object3D> 
          */
-        std::shared_ptr<Object3D> GetObject() { return m_CurrentObjectPtr; }
+        std::shared_ptr<ttool::tslet::Object3D> GetObject() { return m_CurrentObjectPtr; }
 
         /**
          * @brief Get the object name
@@ -172,6 +172,6 @@ namespace ttool
         std::shared_ptr<Config> m_ConfigPtr;
 
         int m_CurrentObjectID = 1; // 1 based indexing
-        std::shared_ptr<Object3D> m_CurrentObjectPtr;
+        std::shared_ptr<ttool::tslet::Object3D> m_CurrentObjectPtr;
     };
 }

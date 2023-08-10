@@ -18,7 +18,7 @@
 
 #include "object_tracker.hh"
 
-void ttool::tslet::ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D> object, cv::Matx33f K)
+void ttool::tslet::ObjectTracker::Consume(int modelID, std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx33f K)
 {
     // We expect the frame to already be undistorted
     cv::Matx14f distCoeffs = cv::Matx14f(0.0, 0.0, 0.0, 0.0);
@@ -31,7 +31,7 @@ void ttool::tslet::ObjectTracker::Consume(int modelID, std::shared_ptr<Object3D>
     }
 }
 
-void ttool::tslet::ObjectTracker::UpdateHistogram(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame)
+void ttool::tslet::ObjectTracker::UpdateHistogram(std::shared_ptr<ttool::tslet::Object3D> object, int modelID, cv::Mat frame)
 {
     if (!HasTracker(modelID))
     {
@@ -53,7 +53,7 @@ void ttool::tslet::ObjectTracker::SetPose(int modelID, cv::Matx44f pose)
     m_ModelID2pose[modelID] = pose;
 }
 
-void ttool::tslet::ObjectTracker::CallEstimatePose(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame)
+void ttool::tslet::ObjectTracker::CallEstimatePose(std::shared_ptr<ttool::tslet::Object3D> object, int modelID, cv::Mat frame)
 {
     if (!HasTracker(modelID))
     {

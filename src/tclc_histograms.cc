@@ -26,7 +26,7 @@
 using namespace std;
 using namespace cv;
 
-TCLCHistograms::TCLCHistograms(std::shared_ptr<Model> model, int numBins, int radius, float offset)
+TCLCHistograms::TCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset)
 {
     this->_model = model;
     
@@ -1116,7 +1116,7 @@ public:
   }
 };
 
-WTCLCHistograms::WTCLCHistograms(std::shared_ptr<Model> model, int numBins, int radius, float offset)
+WTCLCHistograms::WTCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset)
   : TCLCHistograms(model, numBins, radius, offset)
 {
   SDT2D = new SignedDistanceTransform2D(8.0f);

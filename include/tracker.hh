@@ -30,24 +30,24 @@ class Viewer;
 
 class Tracker {
 public:
-	Tracker(const cv::Matx33f& K, std::shared_ptr<Object3D> object);
+	Tracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
 	void Init() {}
 
-	static Tracker* GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<Object3D> object);
+	static Tracker* GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<ttool::tslet::Object3D> object);
 
-	virtual void ToggleTracking(std::shared_ptr<Object3D> object);
-	virtual void EstimatePoses(std::shared_ptr<Object3D> object, cv::Matx44f& initialPose, cv::Mat& frame) = 0;
+	virtual void ToggleTracking(std::shared_ptr<ttool::tslet::Object3D> object);
+	virtual void EstimatePoses(std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx44f& initialPose, cv::Mat& frame) = 0;
 
-	virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<Object3D> object) = 0;
+	virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<ttool::tslet::Object3D> object) = 0;
 
-	void Reset(std::shared_ptr<Object3D> object);
+	void Reset(std::shared_ptr<ttool::tslet::Object3D> object);
 
 	std::string GetTrackingStatus() const { return m_trackingStatus.str(); };
 
 protected:
-	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<Object3D> object, int runs, cv::Matx44f& initialPose) = 0;
+	virtual void Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<ttool::tslet::Object3D> object, int runs, cv::Matx44f& initialPose) = 0;
 
-	cv::Rect Compute2DROI(std::shared_ptr<Object3D> object, const cv::Size& maxSize, int offset);
+	cv::Rect Compute2DROI(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Size& maxSize, int offset);
 	static cv::Rect computeBoundingBox(const std::vector<cv::Point3i>& centersIDs, int offset, int level, const cv::Size& maxSize);
 
 	static void ConvertMask(const cv::Mat& maskm, uchar oid, cv::Mat& mask);
@@ -65,9 +65,9 @@ protected:
 
 class TrackerBase : public Tracker {
 public:
-	TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> object);
+	TrackerBase(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
 
-	virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<Object3D> object) override;
+	virtual void UpdateHistogram(cv::Mat frame, std::shared_ptr<ttool::tslet::Object3D> object) override;
 
 protected:
 	void DetectEdge(const cv::Mat& img, cv::Mat& edge_map);
@@ -80,9 +80,9 @@ class SearchLine;
 
 class SLTracker: public TrackerBase {
 public:
-	SLTracker(const cv::Matx33f& K, std::shared_ptr<Object3D> object);
+	SLTracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
 
-	void GetBundleProb(std::shared_ptr<Object3D> object, const cv::Mat& frame);
+	void GetBundleProb(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Mat& frame);
 	void FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth);
 
 protected:

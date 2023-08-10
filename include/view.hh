@@ -95,7 +95,7 @@ public:
 	 * @param polygonMode 	Polygon rasterization mode
 	 * @param invertDepth   Whether to invert the depth map (so the model is black and the background is white)
 	 */
-	void RenderSilhouette(std::shared_ptr<Model> model, GLenum polygonMode, bool invertDepth = false);
+	void RenderSilhouette(std::shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, bool invertDepth = false);
 
 	/**
 	 * @brief Render phongblinn shaded model
@@ -104,7 +104,7 @@ public:
 	 * @param polygonMode 	Polygon rasterization mode
 	 * @param color 		The color of the model
 	 */
-	void RenderShaded(std::shared_ptr<Model> model, GLenum polygonMode, const cv::Point3f color = cv::Point3f(1.0, 0.5, 0.0));
+	void RenderShaded(std::shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, const cv::Point3f color = cv::Point3f(1.0, 0.5, 0.0));
 
 	/**
 	 * @brief Convert a mask to 0 and 255 values
@@ -124,7 +124,7 @@ public:
 	 * @param projections  Resulting projections of the bounding box
 	 * @param boundingRect Resulting bounding box
 	 */
-	void ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f>& projections, cv::Rect& boundingRect);
+	void ProjectBoundingBox(std::shared_ptr<ttool::tslet::Model> model, std::vector<cv::Point2f>& projections, cv::Rect& boundingRect);
 
 	/**
 	 * @brief Download a frame from the view

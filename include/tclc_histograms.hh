@@ -23,8 +23,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include "signed_distance_transform2d.hh"
-
-class Model;
+#include "model.hh"
 
 /**
  *  This class implements an statistical image segmentation model based on temporary
@@ -43,7 +42,7 @@ public:
      *  @param  radius The radius of the local image region in pixels used for updating the histograms.
      *  @param  offset The minimum distance between two projected histogram centers in pixels during an update.
      */
-    TCLCHistograms(std::shared_ptr<Model> model, int numBins, int radius, float offset);
+    TCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset);
     
     virtual ~TCLCHistograms();
     
@@ -164,7 +163,7 @@ protected:
 
     cv::Mat initialized;
     
-    std::shared_ptr<Model> _model;
+    std::shared_ptr<ttool::tslet::Model> _model;
     
     std::vector<cv::Point3i> _centersIDs;
 
@@ -178,7 +177,7 @@ protected:
 
 class WTCLCHistograms: public TCLCHistograms {
 public:
-  WTCLCHistograms(std::shared_ptr<Model> model, int numBins, int radius, float offset);
+  WTCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset);
   virtual ~WTCLCHistograms();
 
   virtual void update(const cv::Mat& frame, const cv::Mat& mask, const cv::Mat& depth, cv::Matx33f& K, float zNear, float zFar, float afg, float abg) override;

@@ -40,7 +40,7 @@ namespace ttool::tslet
          * @param object  the object to be tracked
          * @param K       the camera matrix
          */
-        void Consume(int modelID, std::shared_ptr<Object3D> object, cv::Matx33f K);
+        void Consume(int modelID, std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx33f K);
 
         /**
          * @brief Call the UpdateHistogram function of the tracker which update the TCLC histogram from the projected model on the frame
@@ -49,7 +49,7 @@ namespace ttool::tslet
          * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
          * @param frame   the current frame from the camera
          */
-        void UpdateHistogram(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame);
+        void UpdateHistogram(std::shared_ptr<ttool::tslet::Object3D> object, int modelID, cv::Mat frame);
 
         /**
          * @brief Set the Pose object
@@ -66,7 +66,7 @@ namespace ttool::tslet
          * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
          * @param frame   the current frame from the camera
          */
-        void CallEstimatePose(std::shared_ptr<Object3D>object, int modelID, cv::Mat frame);
+        void CallEstimatePose(std::shared_ptr<ttool::tslet::Object3D>object, int modelID, cv::Mat frame);
 
         /**
          * @brief Get the Tracking Status from the tracker

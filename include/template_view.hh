@@ -67,7 +67,7 @@ public:
      *  @param  numLevels Number of template pyramid levels to be created with a downscale factor of 2.
      *  @param  generateNeighbors A flag telling whether neighboring templates should also be created or not.
      */
-    TemplateView(std::shared_ptr<Object3D> object, float alpha, float beta, float gamma, float distance, int numLevels, bool generateNeighbors);
+    TemplateView(std::shared_ptr<ttool::tslet::Object3D> object, float alpha, float beta, float gamma, float distance, int numLevels, bool generateNeighbors);
     
     ~TemplateView();
     

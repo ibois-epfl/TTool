@@ -23,25 +23,23 @@
 #include "view.hh"
 
 
-using namespace ttool::standaloneUtils;
-
-void Viewer::StartSavingImages(const std::filesystem::path &path)
+void ttool::standaloneUtils::Viewer::StartSavingImages(const std::filesystem::path &path)
 {
 	m_SaveImages = true;
 	m_SavePath = path;
 }
 
-void Viewer::StopSavingImages()
+void ttool::standaloneUtils::Viewer::StopSavingImages()
 {
 	m_SaveImages = false;
 }
 
-void Viewer::SetDisplayImage(bool dispalyImages)
+void ttool::standaloneUtils::Viewer::SetDisplayImage(bool dispalyImages)
 {
 	m_DisplayImages = dispalyImages;
 }
 
-void Viewer::DrawInterface(cv::Mat frame)
+void ttool::standaloneUtils::Viewer::DrawInterface(cv::Mat frame)
 	{
 		cv::Scalar color(25, 25, 125);
 
@@ -91,21 +89,21 @@ void Viewer::DrawInterface(cv::Mat frame)
 		}
 	}
 
-void Viewer::PrintID(int fid, cv::Mat &frame)
+void ttool::standaloneUtils::Viewer::PrintID(int fid, cv::Mat &frame)
 {
 	std::stringstream sstr;
 	sstr << "#" << std::setw(3) << std::setfill('0') << fid;
 	cv::putText(frame, sstr.str(), cv::Point(5, 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(0, 255, 0), 1);
 }
 
-void Viewer::PrintFPS(int fps, cv::Mat &frame)
+void ttool::standaloneUtils::Viewer::PrintFPS(int fps, cv::Mat &frame)
 {
 	std::stringstream sstr;
 	sstr << "FPS" << std::setw(3) << std::setfill('0') << fps;
 	cv::putText(frame, sstr.str(), cv::Point(frame.size[1] - 150, 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(0, 255, 0), 1);
 }
 
-void Viewer::ShowImage(const cv::Mat &frame)
+void ttool::standaloneUtils::Viewer::ShowImage(const cv::Mat &frame)
 {
 	if (frame.cols > 1440)
 	{
@@ -119,7 +117,7 @@ void Viewer::ShowImage(const cv::Mat &frame)
 	}
 }
 
-void UnifiedViewer::Init(const std::string &name, View *view, std::shared_ptr<Model> object, std::shared_ptr<Camera> camera_ptr)
+void ttool::standaloneUtils::UnifiedViewer::Init(const std::string &name, View *view, std::shared_ptr<ttool::tslet::Model> object, std::shared_ptr<Camera> camera_ptr)
 {
 	m_CameraPtr = std::move(camera_ptr);
 	renderer_ = view;
@@ -128,14 +126,14 @@ void UnifiedViewer::Init(const std::string &name, View *view, std::shared_ptr<Mo
 	m_IsInitialzed = true;
 }
 
-void UnifiedViewer::StopSavingImages()
+void ttool::standaloneUtils::UnifiedViewer::StopSavingImages()
 {
 	m_SaveImages = false;
 	m_SaveIndex = 0;
 }
 
 
-void UnifiedViewer::UpdateViewer(int frameID, int fps)
+void ttool::standaloneUtils::UnifiedViewer::UpdateViewer(int frameID, int fps)
 {
 	const cv::Mat &frame = m_CameraPtr->Image();
 	auto res_img = DrawOverlay(renderer_, objects_, frame);
@@ -156,7 +154,7 @@ void UnifiedViewer::UpdateViewer(int frameID, int fps)
 	}
 }
 
-cv::Mat UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<Model> object, const cv::Mat &frame)
+cv::Mat ttool::standaloneUtils::UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<ttool::tslet::Model> object, const cv::Mat &frame)
 {
 	// render the models with phong shading
 	view->SetLevel(0);

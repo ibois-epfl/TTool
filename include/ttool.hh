@@ -280,7 +280,7 @@ namespace ttool
          * 
          * @return std::shared_ptr<ttool::Model> 
          */
-        std::shared_ptr<Object3D> GetModel()
+        std::shared_ptr<ttool::tslet::Object3D> GetModel()
         {
             CheckObjectChange();
             return m_ModelManagerPtr->GetObject();

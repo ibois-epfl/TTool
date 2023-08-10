@@ -149,7 +149,7 @@ namespace ttool
          * @param model shared pointer to the model
          * @param translation world coordinate translation vector - think of this as a global translation (i.e. when the model is translated, the translation will not change)
          */
-        void Translate(std::shared_ptr<Model> model, cv::Vec3f translation)
+        void Translate(std::shared_ptr<ttool::tslet::Model> model, cv::Vec3f translation)
         {
             cv::Matx44f pose = model->getPose();
             cv::Matx44f translate = Transformations::translationMatrix(translation);
@@ -166,7 +166,7 @@ namespace ttool
          * @param model shared pointer to the model
          * @param axis world axis of rotation - think of this as a global axis (i.e. when the model is rotated, the axis will not change)
          */
-        void Rotate(std::shared_ptr<Model> model, float angle, cv::Vec3f axis)
+        void Rotate(std::shared_ptr<ttool::tslet::Model> model, float angle, cv::Vec3f axis)
         {
             cv::Vec3f center = (model->getLBN() + model->getRTF()) / 2.0f;
 
@@ -193,7 +193,7 @@ namespace ttool
     public:
         InputVisualizer() {}
 
-        InputVisualizer(std::shared_ptr<Visualizer> visualizerPtr)
+        InputVisualizer(std::shared_ptr<ttool::standaloneUtils::Visualizer> visualizerPtr)
         {
             m_VisualizerPtr = visualizerPtr;
         }
@@ -219,13 +219,13 @@ namespace ttool
         }
 
     private:
-        std::shared_ptr<Visualizer> m_VisualizerPtr;
+        std::shared_ptr<ttool::standaloneUtils::Visualizer> m_VisualizerPtr;
     };
 
     class Input
     {
     public:
-        Input(std::shared_ptr<DModelManager> modelManagerPtr, std::shared_ptr<Visualizer> visualizerPtr)
+        Input(std::shared_ptr<DModelManager> modelManagerPtr, std::shared_ptr<ttool::standaloneUtils::Visualizer> visualizerPtr)
         {
             m_InputModelManager = InputModelManager(modelManagerPtr);
             m_InputVisualizer = InputVisualizer(visualizerPtr);

@@ -31,12 +31,12 @@ enum {
 	RUN_DEBUG = 1,
 };
 
-SLETracker::SLETracker(const cv::Matx33f& K, std::shared_ptr<Object3D> objects)
+SLETracker::SLETracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> objects)
 	: SLTracker(K, objects)
 {}
 
 void SLETracker::ComputeJac(
-	std::shared_ptr<Object3D> object,
+	std::shared_ptr<ttool::tslet::Object3D> object,
 	int m_id, 
 	const cv::Mat& frame,
 	const cv::Mat& depth_map,
@@ -199,7 +199,7 @@ void SLETracker::FindMatchPointMaxProb(float diff) {
 	}
 }
 
-void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<Object3D> object, int runs, cv::Matx44f& init_pose)
+void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<ttool::tslet::Object3D> object, int runs, cv::Matx44f& init_pose)
 {
     for (int iter = 0; iter < runs * 4; iter++) {
         RunIteration(object, imagePyramid, 2, 12, 2, init_pose);
@@ -214,7 +214,7 @@ void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<Objec
     }
 }
 
-void SLETracker::RunIteration(std::shared_ptr<Object3D> object, const std::vector<cv::Mat>& imagePyramid, int level, int sl_len, int sl_seg, cv::Matx44f& init_pose)
+void SLETracker::RunIteration(std::shared_ptr<ttool::tslet::Object3D> object, const std::vector<cv::Mat>& imagePyramid, int level, int sl_len, int sl_seg, cv::Matx44f& init_pose)
 {
 	m_trackingStatus.str(std::string()); // Clearing the string
 	m_trackingStatus.precision(4);
@@ -311,7 +311,7 @@ void SLETracker::RunIteration(std::shared_ptr<Object3D> object, const std::vecto
 	}
 }
 
-void SLETracker::EstimatePoses(std::shared_ptr<Object3D> object, cv::Matx44f& init_pose, cv::Mat& frame) {
+void SLETracker::EstimatePoses(std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx44f& init_pose, cv::Mat& frame) {
     std::vector<cv::Mat> imagePyramid;
     imagePyramid.push_back(frame);
 
