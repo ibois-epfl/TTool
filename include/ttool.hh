@@ -143,6 +143,26 @@ namespace ttool
         }
 
         /**
+         * @brief Set the Model Manipulation Translation Scale object
+         * 
+         * @param scale 
+         */
+        void SetModelManipulationTranslationScale(float scale)
+        {
+            m_Input.SetTranslationScale(scale);
+        }
+        
+        /**
+         * @brief Set the Model Manipulation Rotation Scale object
+         * 
+         * @param scale 
+         */
+        void SetModelManipulationRotationScale(float scale)
+        {
+            m_Input.SetRotationScale(scale);
+        }
+
+        /**
          * @brief Run the object tracker on a frame
          * 
          * @param frame 
