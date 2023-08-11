@@ -55,6 +55,26 @@ namespace ttool
         }
 
         /**
+         * @brief Set the Translation Scale object
+         * 
+         * @param scale 
+         */
+        void SetTranslationScale(float scale)
+        {
+            m_TranslateScale = scale;
+        }
+
+        /**
+         * @brief Set the Rotation Scale object
+         * 
+         * @param scale 
+         */
+        void SetRotationScale(float scale)
+        {
+            m_RotateScale = scale;
+        }
+
+        /**
          * @brief Consume a key press and perform the corresponding action related to the model manager
          * Note: when adding a new key here, it is a good idea to update the showing keymap in ttool::standaloneUtils::Viewer::DrawInterface()
          * @param key translate (w, s, a, d, q, e) or rotate (i, k, j, l, u, o
@@ -65,12 +85,12 @@ namespace ttool
             {
             // Adjust the translation and rotation scale
             case '1':
-                translateScale = translateScale / 2.0f;
-                rotateScale = rotateScale / 2.0f;
+                m_TranslateScale = m_TranslateScale / 2.0f;
+                m_RotateScale = m_RotateScale / 2.0f;
                 break;
             case '2':
-                translateScale = translateScale * 2.0f;
-                rotateScale = rotateScale * 2.0f;
+                m_TranslateScale = m_TranslateScale * 2.0f;
+                m_RotateScale = m_RotateScale * 2.0f;
                 break;
 
             // Change the model
@@ -89,42 +109,42 @@ namespace ttool
 
             // Translate the model
             case 'w':
-                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, -translateScale, 0.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, -m_TranslateScale, 0.0f));
                 break;
             case 's':
-                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, translateScale, 0.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, m_TranslateScale, 0.0f));
                 break;
             case 'a':
-                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(-translateScale, 0.0f, 0.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(-m_TranslateScale, 0.0f, 0.0f));
                 break;
             case 'd':
-                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(translateScale, 0.0f, 0.0f));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(m_TranslateScale, 0.0f, 0.0f));
                 break;
             case 'q':
-                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, 0.0f, -translateScale));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, 0.0f, -m_TranslateScale));
                 break;
             case 'e':
-                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, 0.0f, translateScale));
+                Translate(m_ModelManagerPtr->GetObject(), cv::Vec3f(0.0f, 0.0f, m_TranslateScale));
                 break;
 
             // Rotate the model
             case 'i':
-                Rotate(m_ModelManagerPtr->GetObject(), rotateScale, cv::Vec3f(1.0f, 0.0f, 0.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), m_RotateScale, cv::Vec3f(1.0f, 0.0f, 0.0f));
                 break;
             case 'k':
-                Rotate(m_ModelManagerPtr->GetObject(), rotateScale, cv::Vec3f(-1.0f, 0.0f, 0.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), m_RotateScale, cv::Vec3f(-1.0f, 0.0f, 0.0f));
                 break;
             case 'j':
-                Rotate(m_ModelManagerPtr->GetObject(), rotateScale, cv::Vec3f(0.0f, 0.0f, 1.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), m_RotateScale, cv::Vec3f(0.0f, 0.0f, 1.0f));
                 break;
             case 'l':
-                Rotate(m_ModelManagerPtr->GetObject(), rotateScale, cv::Vec3f(0.0f, 0.0f, -1.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), m_RotateScale, cv::Vec3f(0.0f, 0.0f, -1.0f));
                 break;
             case 'u':
-                Rotate(m_ModelManagerPtr->GetObject(), rotateScale, cv::Vec3f(0.0f, 1.0f, 0.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), m_RotateScale, cv::Vec3f(0.0f, 1.0f, 0.0f));
                 break;
             case 'o':
-                Rotate(m_ModelManagerPtr->GetObject(), rotateScale, cv::Vec3f(0.0f, -1.0f, 0.0f));
+                Rotate(m_ModelManagerPtr->GetObject(), m_RotateScale, cv::Vec3f(0.0f, -1.0f, 0.0f));
                 break;
             
             // Save the pose of the model
@@ -192,8 +212,8 @@ namespace ttool
         }
 
         std::shared_ptr<DModelManager> m_ModelManagerPtr;
-        float translateScale = 0.01f;
-        float rotateScale = 0.5f;
+        float m_TranslateScale = 0.01f;
+        float m_RotateScale = 0.5f;
     };
 
     /**
