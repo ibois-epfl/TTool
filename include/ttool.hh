@@ -40,6 +40,13 @@ namespace ttool
     class TTOOL_API TTool
     {
     public:
+        /**
+         * @brief Construct a new TTool object from a configuration file and a camera calibration file
+         * 
+         * @param ttoolRootPath absolute path to the root folder of the TTool library
+         * @param configFile 
+         * @param cameraCalibFile 
+         */
         TTool(std::string ttoolRootPath, std::string configFile, std::string cameraCalibFile)
         {
             InitializeConfig(ttoolRootPath, configFile);
@@ -68,6 +75,12 @@ namespace ttool
             RunOnAFrame(emptyMat);
         }
 
+        /**
+         * @brief Construct a new TTool object from a configuration file and a camera calibration file
+         * 
+         * @param configFile 
+         * @param cameraCalibFile 
+         */
         TTool(std::string configFile, std::string cameraCalibFile)
         {
             InitializeConfig("", configFile);
@@ -98,6 +111,14 @@ namespace ttool
             CheckObjectChange();
         };
 
+        /**
+         * @brief Construct a new TTool object from a configuration file and a camera matrix and camera size
+         * 
+         * @param ttoolRootPath an absolute path to the root folder of the TTool library
+         * @param configFile 
+         * @param cameraMatrix 
+         * @param cameraSize 
+         */
         TTool(std::string ttoolRootPath, std::string configFile, cv::Mat cameraMatrix, cv::Size cameraSize)
         {
             InitializeConfig(ttoolRootPath, configFile);
@@ -329,6 +350,11 @@ namespace ttool
             view->Initialize(CameraMatrix, CamSize.width, CamSize.height, zn, zf, 4);
         }
 
+        /**
+         * @brief Get the Tracking Status object from the object tracker
+         * 
+         * @return std::string 
+         */
         std::string GetTrackingStatus()
         {
             return m_ObjectTracker.GetTrackingStatus();
@@ -450,7 +476,18 @@ namespace ttool
         }
 
         /**
-         * @brief 
+         * @brief Transoform the ground truth poses of 
+         * r11 r12 r13
+         * r21 r22 r23
+         * r31 r32 r33
+         * t1  t2  t3
+         * 
+         * to
+         * 
+         * r11 r12 r13 t1
+         * r21 r22 r23 t2
+         * r31 r32 r33 t3
+         * 0   0   0   1
          * 
          * @param groundTruthPoses 
          * @return std::vector<cv::Matx44f> 
