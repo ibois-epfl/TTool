@@ -30,6 +30,11 @@
 
 namespace ttool
 {
+    /**
+     * @brief This class implements input handling for the model management.
+     * Hence, it is responsible for translating and rotating the model.
+     * Additionally, it is responsible for changing the model, saving the pose to the config file, and resetting the pose to the ground truth pose and more.
+     */
     class InputModelManager
     {
     public:
@@ -72,6 +77,8 @@ namespace ttool
             case char(KEY_UP):
                 m_ModelManagerPtr->IncreaseObjectID();
                 break;
+            
+            // Resetting the model
             case 'r':
                 m_ModelManagerPtr->ResetObjectToConfigInitialPose();
                 break;
@@ -119,6 +126,8 @@ namespace ttool
             case 'o':
                 Rotate(m_ModelManagerPtr->GetObject(), rotateScale, cv::Vec3f(0.0f, -1.0f, 0.0f));
                 break;
+            
+            // Save the pose of the model
             case 'y':
             {
                 cv::Matx44f pose = m_ModelManagerPtr->GetObject()->getPose();
@@ -128,7 +137,6 @@ namespace ttool
                 m_ModelManagerPtr->SavePosesToConfig();
                 break;
             }
-            // Save the pose of the model
             case 'p':
             {
                 cv::Matx44f pose = m_ModelManagerPtr->GetObject()->getPose();
@@ -188,6 +196,10 @@ namespace ttool
         float rotateScale = 0.5f;
     };
 
+    /**
+     * @brief This class implements input handling for the the visualizer.
+     * Hence, it is responsible for showing help menu.
+     */
     class InputVisualizer
     {
     public:
@@ -222,6 +234,11 @@ namespace ttool
         std::shared_ptr<ttool::standaloneUtils::Visualizer> m_VisualizerPtr;
     };
 
+    /**
+     * @brief This class implements input handling for the both the model manager and the visualizer.
+     * It is a wrapper class for the InputModelManager and InputVisualizer classes.
+     * 
+     */
     class Input
     {
     public:
@@ -243,7 +260,7 @@ namespace ttool
         /**
          * @brief Consume a key press and perform the corresponding action related to the model manager
          * 
-         * @param key translate (w, s, a, d, q, e) or rotate (i, k, j, l, u, o
+         * @param key translate (w, s, a, d, q, e) or rotate (i, k, j, l, u, o)
          */
         void ConsumeKey(char key)
         {

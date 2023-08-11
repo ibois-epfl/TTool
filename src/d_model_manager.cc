@@ -62,6 +62,7 @@ void ttool::DModelManager::SaveObjectInitialPose(cv::Matx44f initialPose)
 void ttool::DModelManager::ResetObjectToLastSavePose()
 {
     m_CurrentObjectPtr->setPose(m_ModelID2LastSavedPoses[m_CurrentObjectID]);
+    SnapshotObjectPose();
 }
 
 void ttool::DModelManager::SetObjectID(int objectID)

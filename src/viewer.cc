@@ -59,29 +59,37 @@ void ttool::standaloneUtils::Viewer::DrawInterface(cv::Mat frame)
 
 		if (m_ShowKeymaps)
 		{
-			cv::putText(frame, "Keymaps:", cv::Point(5, 60), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			int offset = 3;
+			int scale = 20;
+			cv::putText(frame, "Keymaps:", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
 			// Translation
-			cv::putText(frame, "W: Move model up", cv::Point(5, 80), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "S: Move model down", cv::Point(5, 100), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "A: Move model left", cv::Point(5, 120), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "D: Move model right", cv::Point(5, 140), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "Q: Move model forward", cv::Point(5, 160), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "E: Move model backward", cv::Point(5, 180), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "W: Move model up", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "S: Move model down", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "A: Move model left", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "D: Move model right", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "Q: Move model forward", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "E: Move model backward", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
 			// Rotation
-			cv::putText(frame, "I: Rotate model up", cv::Point(5, 200), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "K: Rotate model down", cv::Point(5, 220), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "J: Rotate model left", cv::Point(5, 240), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "L: Rotate model right", cv::Point(5, 260), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "U: Rotate model clockwise", cv::Point(5, 280), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "O: Rotate model counterclockwise", cv::Point(5, 300), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "I: Rotate model up", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "K: Rotate model down", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "J: Rotate model left", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "L: Rotate model right", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "U: Rotate model clockwise", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "O: Rotate model counterclockwise", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			// Scale
+			cv::putText(frame, "1: scale down the translation and rotation by 2", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "2: scale up the translation and rotation by 2", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+		
 			// Model Management
-			cv::putText(frame, "UP: Change model", cv::Point(5, 320), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "R: Reset model to ground truth", cv::Point(5, 340), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "P: Set current model pose as initial", cv::Point(5, 360), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "Y: Set current model pose as initial, and save to config file", cv::Point(5, 380), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "UP: Change model", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "R: Reset model to ground truth", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "T: Reset model to the last saved pose", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "P: Set current model pose as initial", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "Y: Set current model pose as initial, and save to config file", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			
 			// Tracking
-			cv::putText(frame, "Q: Stop tracking (while tracking)", cv::Point(5, 400), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "P: Start tracking (while not tracking)", cv::Point(5, 420), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "Q: Stop tracking (while tracking)", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "P: Start tracking (while not tracking)", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
 		}
 		else
 		{
