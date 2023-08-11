@@ -56,7 +56,7 @@ namespace ttool
 
         /**
          * @brief Consume a key press and perform the corresponding action related to the model manager
-         * 
+         * Note: when adding a new key here, it is a good idea to update the showing keymap in ttool::standaloneUtils::Viewer::DrawInterface()
          * @param key translate (w, s, a, d, q, e) or rotate (i, k, j, l, u, o
          */
         void ConsumeKey(char key)
@@ -212,7 +212,7 @@ namespace ttool
 
         /**
          * @brief Consume a key press and perform the corresponding action related to the visualizer
-         * 
+         * Note: when adding a new key here, it is a good idea to update the showing keymap in ttool::standaloneUtils::Viewer::DrawInterface()
          * @param key the key that was pressed
          */
         void ConsumeKey(char key)
