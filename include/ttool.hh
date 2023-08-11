@@ -33,6 +33,10 @@
 
 namespace ttool
 {
+    /**
+     * @brief This class is the main class of the TTool library.
+     * 
+     */
     class TTOOL_API TTool
     {
     public:

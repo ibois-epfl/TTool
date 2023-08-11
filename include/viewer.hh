@@ -29,6 +29,10 @@
 
 namespace ttool::standaloneUtils
 {
+	/**
+	 * @brief Viewer class, which is used to display the current frame and the current model
+	 * 
+	 */
 	class Viewer
 	{
 	public:
@@ -46,6 +50,7 @@ namespace ttool::standaloneUtils
 		 * @param path 
 		 */
 		void StartSavingImages(const std::filesystem::path &path);
+
 		/**
 		 * @brief Stop saving images
 		 * 
@@ -115,7 +120,7 @@ namespace ttool::standaloneUtils
 	};
 
 	/**
-	 * @brief Unified viewer shows the model and the cameraPtr on the same window
+	 * @brief Unified viewer shows the model in fragmented and contour rendering
 	 * 
 	 */
 	class UnifiedViewer : public Viewer
@@ -131,11 +136,30 @@ namespace ttool::standaloneUtils
 		 */
 		void Init(const std::string &name, View *view, std::shared_ptr<ttool::tslet::Model> object, std::shared_ptr<Camera> cameraPtr);
 		UnifiedViewer() = default;
+
+		/**
+		 * @brief Stop saving images
+		 * 
+		 */
 		void StopSavingImages();
 
+		/**
+		 * @brief Update the viewer with the new frame and the current model
+		 * 
+		 * @param frameID current frame ID (used for saving images and printing it on the frame)
+		 * @param fps     current fps (used for printing it on the frame)
+		 */
 		void UpdateViewer(int frameID, int fps) override;
 
 	private:
+		/**
+		 * @brief Draw the rendering of the model on the frame
+		 * 
+		 * @param view 		view instance
+		 * @param object 	model instance
+		 * @param frame 	frame to draw the model on
+		 * @return cv::Mat 	
+		 */
 		cv::Mat DrawOverlay(View *view, std::shared_ptr<ttool::tslet::Model> object, const cv::Mat &frame);
 
 	protected:

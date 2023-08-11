@@ -22,6 +22,10 @@
 
 namespace ttool::tslet
 {
+	/**
+	 * @brief This class is used to search line used by the SLET algorithm
+	 * 
+	 */
 	class SearchLine
 	{
 	public:

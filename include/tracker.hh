@@ -31,6 +31,10 @@ class Viewer;
 
 namespace ttool::tslet
 {
+	/**
+	 * @brief This class is the base class for all 6DoF trackers.
+	 * 
+	 */
 	class Tracker {
 	public:
 		Tracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
@@ -66,6 +70,10 @@ namespace ttool::tslet
 		std::stringstream m_trackingStatus;
 	};
 
+	/**
+	 * @brief This class is the base class for edge-based 6DoF trackers.
+	 * 
+	 */
 	class TrackerBase : public Tracker {
 	public:
 		TrackerBase(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
@@ -79,6 +87,10 @@ namespace ttool::tslet
 		ttool::tslet::Histogram* m_Histogram;
 	};
 
+	/**
+	 * @brief This class implements the edge-based SL tracker.
+	 * 
+	 */
 	class SLTracker: public TrackerBase {
 	public:
 		SLTracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object);
@@ -98,7 +110,7 @@ namespace ttool::tslet
 	}
 
 	/**
-	 *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+	 *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
 	 *  computations. Within the corresponding for loop, the RGB values per pixel
 	 *  of a color input image are converted to their corresponding histogram bin
 	 *  index.

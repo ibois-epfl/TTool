@@ -28,7 +28,7 @@
 namespace ttool::tslet
 {
   /**
-   *  This class implements an statistical image segmentation model based on temporary
+   *  @brief This class implements an statistical image segmentation model based on temporary
    *  consistent, local color histograms (tclc-histograms). Here, each histogram corresponds
    *  to a 3D vertex of a given 3D model.
    */
@@ -36,7 +36,7 @@ namespace ttool::tslet
   {
   public:
       /**
-       *  Constructor that allocates both normalized and not normalized foreground
+       *  @brief Constructor that allocates both normalized and not normalized foreground
        *  and background histograms for each vertex of the given 3D model.
        *
        *  @param  model The 3D model for which the histograms are being created.
@@ -49,7 +49,7 @@ namespace ttool::tslet
       virtual ~TCLCHistograms();
       
       /**
-       *  Updates the histograms from a given camera frame by projecting all histogram
+       *  @brief Updates the histograms from a given camera frame by projecting all histogram
        *  centers into the image and selecting those close or on the object's contour.
        *
        *  @param  frame The color frame to be used for updating the histograms.
@@ -62,7 +62,7 @@ namespace ttool::tslet
       virtual void update(const cv::Mat &frame, const cv::Mat &mask, const cv::Mat &depth, cv::Matx33f &K, float zNear, float zFar, float afg, float abg);
       
       /**
-       *  Computes updated center locations and IDs of all histograms that project onto or close
+       *  @brief Computes updated center locations and IDs of all histograms that project onto or close
        *  to the contour based on the current object pose at a specified image pyramid level.
        *
        *  @param  mask The binary shilhouette mask of the object.
@@ -75,21 +75,21 @@ namespace ttool::tslet
       void updateCentersAndIds(const cv::Mat &mask, const cv::Mat &depth, const cv::Matx33f &K, float zNear, float zFar, int level);
       
       /**
-       *  Returns all normalized forground histograms in their current state.
+       *  @brief Returns all normalized forground histograms in their current state.
        *
        *  @return The normalized foreground histograms.
        */
       cv::Mat getLocalForegroundHistograms();
       
       /**
-       *  Returns all normalized background histograms in their current state.
+       *  @brief Returns all normalized background histograms in their current state.
        *
        *  @return The normalized background histograms.
        */
       cv::Mat getLocalBackgroundHistograms();
       
       /**
-       *  Returns the locations and IDs of all histogram centers that where used for the last
+       *  @brief Returns the locations and IDs of all histogram centers that where used for the last
        *  update() or updateCentersAndIds() call.
        *
        *  @return The list of all current center locations on or close to the contour and their corresponding IDs [(x_0, y_0, id_0), (x_1, y_1, id_1), ...].
@@ -97,7 +97,7 @@ namespace ttool::tslet
       std::vector<cv::Point3i> getCentersAndIDs();
       
       /**
-       *  Returns a 1D binary mask of all histograms where a '1' means that the histograms
+       *  @brief Returns a 1D binary mask of all histograms where a '1' means that the histograms
        *  corresponding to the index has been intialized before.
        *
        *  @return A 1D binary mask telling wheter each histogram has been initialized or not.
@@ -105,21 +105,21 @@ namespace ttool::tslet
       cv::Mat getInitialized();
       
       /**
-       *  Returns the number of histogram bin per image channel as specified in the constructor.
+       *  @brief Returns the number of histogram bin per image channel as specified in the constructor.
        *
        *  @return The number of histogram bins per channel.
        */
       int getNumBins();
       
       /**
-       *  Returns the number of histograms, i.e. verticies of the corresponding 3D model.
+       *  @brief Returns the number of histograms, i.e. verticies of the corresponding 3D model.
        *
        *  @return The number of histograms.
        */
       int getNumHistograms();
       
       /**
-       *  Returns the radius of the local image region in pixels used for updating the
+       *  @brief Returns the radius of the local image region in pixels used for updating the
        *  histograms as specified in the constructor.
        *
        *  @return The minumum distance between two projected histogram centers in pixels.
@@ -127,7 +127,7 @@ namespace ttool::tslet
       int getRadius();
       
       /**
-       *  Returns the minumum distance between two projected histogram centers during an update
+       *  @brief Returns the minumum distance between two projected histogram centers during an update
        *  as specified in the constructor.
        *
        *  @return The minumum distance between two projected histogram centers in pixels.
@@ -135,7 +135,7 @@ namespace ttool::tslet
       float getOffset();
       
       /**
-       *  Clears all histograms by resetting them to zero and setting their status to
+       *  @brief Clears all histograms by resetting them to zero and setting their status to
        *  uninitialized
        */
       void clear();
@@ -177,6 +177,10 @@ namespace ttool::tslet
       void filterHistogramCenters(int numHistograms, float offset);
   };
 
+  /**
+   * @brief The WTCLCHistograms class, I think, it is not used anymore...
+   * 
+   */
   class WTCLCHistograms: public TCLCHistograms {
   public:
     WTCLCHistograms(std::shared_ptr<ttool::tslet::Model> model, int numBins, int radius, float offset);

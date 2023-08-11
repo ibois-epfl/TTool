@@ -33,6 +33,11 @@
 
 namespace ttool
 {
+    /**
+     * @brief This class is used to store the configuration data.
+     * It handles different types of data in the configuration and provides setters and getters for them.
+     * 
+     */
     struct ConfigData
     {
         public:
@@ -185,6 +190,10 @@ namespace ttool
             }
     };
 
+    /**
+     * @brief This class handles the configuration of the program.
+     * 
+     */
     class Config
     {
         public:

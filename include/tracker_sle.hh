@@ -23,6 +23,10 @@
 
 namespace ttool::tslet
 {
+	/**
+	 * @brief This class implement the SLET algorithm. This is what ttool::TTool uses.
+	 * 
+	 */
 	class SLETracker: public SLTracker {
 	public:
 		SLETracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> objects);

@@ -26,6 +26,10 @@ class View;
 
 namespace ttool::tslet
 {
+	/**
+	 * @brief This class is a histogram used by the SLET algorithm
+	 * 
+	 */
 	class Histogram {
 	public:
 		Histogram();
@@ -40,6 +44,10 @@ namespace ttool::tslet
 		
 	};
 
+	/**
+	 * @brief This class is a histogram used by the SLET algorithm
+	 * 
+	 */
 	class RBOTHist : public Histogram {
 	public:
 		RBOTHist(const std::shared_ptr<ttool::tslet::Object3D> object);

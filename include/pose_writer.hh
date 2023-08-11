@@ -27,6 +27,12 @@
 
 namespace ttool
 {
+    /**
+     * @brief This class is used to write the pose to a file.
+     * It can write a pose with or without an image.
+     * The pose information comes with the object ID and the object name.   
+     * 
+     */
     class PoseWriter
     {
         public:

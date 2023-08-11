@@ -22,7 +22,12 @@
 #include <opencv2/opencv.hpp>
 
 namespace ttool::ML
+
 {
+    /**
+     * @brief This class is the ML classifier for tool head.
+     * 
+     */
     class Classifier
     {
         public:

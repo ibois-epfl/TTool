@@ -28,7 +28,7 @@
 namespace ttool::tslet
 {
     /**
-     *  This class implements a signed 2D Euclidean distance transform
+     *  @brief This class implements a signed 2D Euclidean distance transform
      *  of an arbitrary binary image (e.g. an object silhouette mask).
      *  Parts of this code are based on an open souce C-implementation
      *  available here:
@@ -43,7 +43,7 @@ namespace ttool::tslet
     {
     public:
         /**
-         *  Initializes the an instance with a specified maximum distance at wich the
+         *  @brief Initializes the an instance with a specified maximum distance at wich the
          *  clostest contour points for every pixel are still computed.
          *
          *  @param  maxDist The maximal absolute distance at which the closest contour points are being comuted.
@@ -53,7 +53,7 @@ namespace ttool::tslet
         ~SignedDistanceTransform2D();
         
         /**
-         *  Computes the 2D Euclidean signed distance transform of a given input image as
+         *  @brief Computes the 2D Euclidean signed distance transform of a given input image as
          *  well as the coordinates of the clostest contour location for every pixel with
          *  CPU multi-threading.
          *
@@ -66,7 +66,7 @@ namespace ttool::tslet
         void computeTransform(const cv::Mat &src, cv::Mat &sdt, cv::Mat &xyPos, int threads, uchar key = 0);
         
         /**
-         *  Computes the first order derivatives of a given 2D Euclidean signed distance
+         *  @brief Computes the first order derivatives of a given 2D Euclidean signed distance
          *  level-set in x- and y- direction at each pixel using central differences with
          *  CPU multi-threading.
          *
@@ -84,7 +84,7 @@ namespace ttool::tslet
 
 
     /**
-     *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+     *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
      *  computations. Within the corresponding for loop, for every row in a binary input image
      *  the per pixel 1D signed distance transform is computed. Here, also the x locations of
      *  the closest contour points per pixel are calculated.
@@ -194,7 +194,7 @@ namespace ttool::tslet
     };
 
     /**
-     *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+     *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
      *  computations. Within the corresponding for loop, for every row in a input image
      *  the per pixel 1D signed distance transform is computed based on a given key value
      *  that specifies the intensitiy of the foreground region. Here, also the x locations of
@@ -310,7 +310,7 @@ namespace ttool::tslet
 
 
     /**
-     *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+     *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
      *  computations. Within the corresponding for loop, the per pixel 2D signed distance
      *  transform is computed for every column based on the previously transformed rows.
      *  Here, also the 2D locations of the closest contour points per pixel are calculated.
@@ -564,7 +564,7 @@ namespace ttool::tslet
 
 
     /**
-     *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+     *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
      *  computations. Within the corresponding for loop, for each pixel the central differences
      *  in x-direction are computed from a given 2D Euclidean singed distance transform.
      */
@@ -636,7 +636,7 @@ namespace ttool::tslet
 
 
     /**
-     *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+     *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
      *  computations. Within the corresponding for loop, for each pixel the central differences
      *  in y-direction are computed from a given 2D Euclidean singed distance transform.
      */

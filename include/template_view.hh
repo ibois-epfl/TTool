@@ -31,33 +31,33 @@
 
 namespace ttool::tslet {
     /**
-     *  The template view data per pixel.
+     *  @brief The template view data per pixel.
      */
     struct PixelData
     {
-        // The original 2D pixel location.
+        /// @brief The original 2D pixel location.
         int x;
         int y;
         
-        // The Heaviside value.
+        /// @brief The Heaviside value.
         float hsVal;
         
-        // The number of tclc-histograms the pixel lies within.
+        /// @brief The number of tclc-histograms the pixel lies within.
         int ids_size;
         
-        // The IDs of all tclc-histograms the pixel lies within.
+        /// @brief The IDs of all tclc-histograms the pixel lies within.
         int* ids;
     };
 
     /**
-     *  A class representing a single template view at multiple image scales
+     *  @brief A class representing a single template view at multiple image scales
      *  for region-based object pose detection using tclc-histograms.
      */
     class TemplateView {
         
     public:
         /**
-         *  Constructor for the template view at a given object rotation and
+         *  @brief Constructor for the template view at a given object rotation and
          *  distance to the camera.
          *
          *  @param  object The 3D object for which the template view is to be created.
@@ -73,7 +73,7 @@ namespace ttool::tslet {
         ~TemplateView();
         
         /**
-         *  Returns the 6DOF object pose coresponding to the
+         *  @brief Returns the 6DOF object pose coresponding to the
          *  template view in form of a 4x4 float matrix
          *  T_cm = [r11 r12 r13 tx]
          *         [r21 r22 r23 ty]
@@ -87,7 +87,7 @@ namespace ttool::tslet {
         cv::Matx44f getPoseMatrix();
         
         /**
-         *  Returns the Euler angle of the object's rotation around the
+         *  @brief Returns the Euler angle of the object's rotation around the
          *  x-axis coresponding to the template.
          *
          *  @return  The object's rotation around the x-axis within the template (in degrees).
@@ -95,7 +95,7 @@ namespace ttool::tslet {
         float getAlpha();
         
         /**
-         *  Returns the Euler angle of the object's rotation around the
+         *  @brief Returns the Euler angle of the object's rotation around the
          *  y-axis coresponding to the template.
          *
          *  @return  The object's rotation around the y-axis within the template (in degrees).
@@ -103,7 +103,7 @@ namespace ttool::tslet {
         float getBeta();
         
         /**
-         *  Returns the Euler angle of the object's rotation around the
+         *  @brief Returns the Euler angle of the object's rotation around the
          *  z-axis coresponding to the template.
          *
          *  @return  The object's rotation around the z-axis within the template (in degrees).
@@ -111,7 +111,7 @@ namespace ttool::tslet {
         float getGamma();
         
         /**
-         *  Returns the object's distance to the camera coresponding to
+         *  @brief Returns the object's distance to the camera coresponding to
          *  the template.
          *
          *  @return  The object's distance to the camera within the template.
@@ -119,7 +119,7 @@ namespace ttool::tslet {
         float getDistance();
         
         /**
-         *  Returns the total number of pixels in the object region at a given
+         *  @brief Returns the total number of pixels in the object region at a given
          *  pyramid level.
          *
          *  @param level The pyramid level to be used.
@@ -128,7 +128,7 @@ namespace ttool::tslet {
         int getEtaF(int level);
         
         /**
-         *  Returns the binary mask image of the template at a given pyramid
+         *  @brief Returns the binary mask image of the template at a given pyramid
          *  level.
          *
          *  @param level The pyramid level to be used.
@@ -137,7 +137,7 @@ namespace ttool::tslet {
         cv::Mat getMask(int level);
         
         /**
-         *  Returns the 2D signed distance transform of the binary mask of the
+         *  @brief Returns the 2D signed distance transform of the binary mask of the
          *  template at a given pyramid level.
          *
          *  @param level The pyramid level to be used.
@@ -146,7 +146,7 @@ namespace ttool::tslet {
         cv::Mat getSDT(int level);
         
         /**
-         *  Returns the smoothed Heaviside representation of the 2D signed distance
+         *  @brief Returns the smoothed Heaviside representation of the 2D signed distance
          *  transform of the template at a given pyramid level.
          *
          *  @param level The pyramid level to be used.
@@ -155,7 +155,7 @@ namespace ttool::tslet {
         cv::Mat getHeaviside(int level);
         
         /**
-         *  Returns the 2D region of interest around the object in the template at
+         *  @brief Returns the 2D region of interest around the object in the template at
          *  a given pyramid level.
          *
          *  @param level The pyramid level to be used.
@@ -164,7 +164,7 @@ namespace ttool::tslet {
         cv::Rect getROI(int level);
         
         /**
-         *  Returns the 2D (x, y) offset at which the template currently matches
+         *  @brief Returns the 2D (x, y) offset at which the template currently matches
          *  best with the corresponding matching score at a given pyramid level.
          *
          *  @param level The pyramid level to be used.
@@ -173,7 +173,7 @@ namespace ttool::tslet {
         cv::Point3f getCurrentOffset(int level);
         
         /**
-         *  Sets the 2D (x, y) offset at which the template currently matches
+         *  @brief Sets the 2D (x, y) offset at which the template currently matches
          *  best with the corresponding matching score at a given pyramid level.
          *
          *  @param offset The 2D offset with the matching score (x, y, score).
@@ -182,7 +182,7 @@ namespace ttool::tslet {
         void setCurrentOffset(cv::Point3f &offset, int level);
         
         /**
-         *  Returns the 2D centers and IDs of all tclc-histograms in the
+         *  @brief Returns the 2D centers and IDs of all tclc-histograms in the
          *  template at a given pyramid level.
          *
          *  @param level The pyramid level to be used.
@@ -191,7 +191,7 @@ namespace ttool::tslet {
         std::vector<cv::Point3i> getCentersAndIDs(int level);
         
         /**
-         *  Returns a linearized representation of the template at a given pyramid
+         *  @brief Returns a linearized representation of the template at a given pyramid
          *  level.
          *
          *  @param level The pyramid level to be used.
@@ -200,14 +200,14 @@ namespace ttool::tslet {
         std::vector<PixelData> &getCompressedPixelData(int level);
         
         /**
-         *  Adds a neighboring template view to this template.
+         *  @brief Adds a neighboring template view to this template.
          *
          *  @param kv The neighboring template view to be added.
          */
         void addNeighborTemplate(std::shared_ptr<TemplateView> kv);
         
         /**
-         *  Returns the set of all neighboring templates of this template.
+         *  @brief Returns the set of all neighboring templates of this template.
          *
          *  @return  The set of all neighboring templates of this template.
          */
@@ -248,7 +248,7 @@ namespace ttool::tslet {
 
 
     /**
-     *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+     *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
      *  computations. Within the corresponding for loop, every pixel of a given 2D
      *  signed distance transform is mapped to its correspoding value in the
      *  smoothed Heaviside function representation.

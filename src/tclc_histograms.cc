@@ -55,7 +55,7 @@ ttool::tslet::TCLCHistograms::~TCLCHistograms()
 namespace ttool::tslet
 {
   /**
-   *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+   *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
    *  computations. Within the corresponding for loop, for every projected histogram center on or
    *  close to the object's contour, a new foreground and background color histogram are computed
    *  within a local circular image region is computed using the Bresenham algorithm to scan the
@@ -285,7 +285,7 @@ namespace ttool::tslet
   };
 
   /**
-   *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+   *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
    *  computations. Within the corresponding for loop, each previously computed local foreground
    *  and background color histogram is merged with their normalized temporally consistent
    *  representation based on respective learning rates.
@@ -417,7 +417,7 @@ namespace ttool::tslet
   };
 
   /**
-   *  This class extends the OpenCV ParallelLoopBody for efficiently parallelized
+   *  @brief This class extends the OpenCV ParallelLoopBody for efficiently parallelized
    *  computations. Within the corresponding for loop, every 3D histogram center is projected
    *  into the image plane. Those that do not project on or close to the object's contour are
    *  being filtered based on a given binary silhouette mask and depth map at a specified image

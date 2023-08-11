@@ -38,6 +38,11 @@
 
 namespace ttool
 {
+	/**
+	 * @brief This class is used to render the model and get the depth map
+	 * It is a singleton class and can be accessed by View::Instance()
+	 * 
+	 */
 	class View
 	{
 	public:

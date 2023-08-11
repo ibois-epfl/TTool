@@ -28,7 +28,7 @@ namespace ttool::tslet
   class TemplateView;
 
   /**
-   *  A representation of a 3D object that provides all nessecary information
+   *  @brief A representation of a 3D object that provides all nessecary information
    *  for region-based pose estimation using tclc-histograms. It extends the
    *  basic model class by including a set of tclc-histograms and a list of
    *  all corresponding templates used for pose detection.
@@ -37,7 +37,7 @@ namespace ttool::tslet
   {
   public:
       /**
-       *  Constructor creating a 3D object class from a specified initial 6DOF pose, a
+       *  @brief Constructor creating a 3D object class from a specified initial 6DOF pose, a
        *  scaling factor, a tracking quality threshhold and a set of distances to the
        *  camera for template generation used within pose detection. Here, also the set
        *  of n tclc-histograms is initialized, with n being the total number of 3D model
@@ -61,7 +61,7 @@ namespace ttool::tslet
       void Init(float qualityThreshold, std::vector<float> &templateDistances);
       
       /**
-       *  Returns the set of tclc-histograms associated with this object.
+       *  @brief Returns the set of tclc-histograms associated with this object.
        *
        *  @return  The set of tclc-histograms associated with this object.
        */
@@ -69,7 +69,7 @@ namespace ttool::tslet
       void SetTCLCHistograms(std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms);
 
       /**
-       *  Generates all base and neighboring templates required for
+       *  @brief Generates all base and neighboring templates required for
        *  the pose detection algorithm after a tracking loss.
        *  Must be called after the rendering buffers of the
        *  corresponding 3D model have been initialized and while
@@ -78,7 +78,7 @@ namespace ttool::tslet
       void generateTemplates();
       
       /**
-       *  Returns the set of all pre-generated base and neighboring template views
+       *  @brief Returns the set of all pre-generated base and neighboring template views
        *  of this object used during pose detection.
        *
        *  @return  The set of all template views for this object.
@@ -86,7 +86,7 @@ namespace ttool::tslet
       std::vector<std::shared_ptr<TemplateView>> getTemplateViews();
       
       /**
-       *  Returns the number of Z-distances used during template view generation
+       *  @brief Returns the number of Z-distances used during template view generation
        *  for this object.
        *
        *  @return  The number of Z-distances of the template views for this object.
@@ -94,7 +94,7 @@ namespace ttool::tslet
       int getNumDistances();
       
       /**
-       *  Clears all tclc-histograms and resets the pose of the object to the initial
+       *  @brief Clears all tclc-histograms and resets the pose of the object to the initial
        *  configuration.
        */
       void reset();

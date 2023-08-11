@@ -36,6 +36,11 @@
 namespace ttool::standaloneUtils
 {
 	class VideoLoaderCamera;
+	/**
+	 * @brief This class is the base class for all cameras and used for a live camera.
+	 * The current frame can be accessed by calling Image()
+	 * 
+	 */
 	class Camera
 	{
 	public:
@@ -104,6 +109,10 @@ namespace ttool::standaloneUtils
 		int m_PreprocessHeight;
 	};
 
+	/**
+	 * @brief This class is a camera that loads frames from a video file
+	 * 
+	 */
 	class VideoLoaderCamera: public Camera {
 	public:
 		VideoLoaderCamera(const std::string& frames)
@@ -160,6 +169,10 @@ namespace ttool::standaloneUtils
 		return strcoll((*pa)->d_name, (*pb)->d_name);
 	}
 
+	/**
+	 * @brief This class is a camera that loads frames from a directory of images
+	 * 
+	 */
 	class ImageLoaderCamera: public Camera
 	{
 	public:

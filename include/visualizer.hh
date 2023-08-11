@@ -27,6 +27,10 @@
 
 namespace ttool::standaloneUtils
 {
+    /**
+     * @brief This class is used to visualize UI for the standalone version of TTool
+     * 
+     */
     struct Visualizer
     {
     public:

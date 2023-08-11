@@ -25,7 +25,8 @@
 namespace ttool::utils
 {
     /**
-     *  A collection of geometric transformations implemented using the OpenCV matrix types.
+     * @brief A collection of geometric transformations implemented using the OpenCV matrix types.
+     * 
      */
     class Transformations
     {
