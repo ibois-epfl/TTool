@@ -26,5 +26,3 @@ jobs:
         ghpagesbranch: gh-pages
         # GitHub Pages directory path
         ghpagesdir: ./
-        # Toggle dark mode CSS
-        darkmode: true
