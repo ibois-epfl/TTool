@@ -1,5 +1,4 @@
 #include <opencv2/highgui.hpp>
-#include "global_param.hh"
 #include "view.hh"
 #include "search_line.hh"
 #include "histogram.hh"
@@ -10,28 +9,23 @@ Histogram::Histogram() {
 
 Histogram::~Histogram() {}
 
-RBOTHist::RBOTHist(const std::vector<std::shared_ptr<Object3D>>& objects) {
-	objs = objects;
-	std::cout << "RBOTHist::RBOTHist" << std::endl;
-	for (int i = 0; i < objects.size(); ++i) {
-		if (objects[i]->getTCLCHistograms() == nullptr)
-			objects[i]->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(objects[i], 32, 40, 10.0f)));
-		else
-			std::cout << "RBOTHist::RBOTHist: TCLCHistograms already exists!" << std::endl;
-	}
-	std::cout << "RBOTHist::RBOTHist done!" << std::endl;
+RBOTHist::RBOTHist(const std::shared_ptr<Object3D> object) {
+	if (object->getTCLCHistograms() == nullptr)
+		object->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(object, 32, 40, 10.0f)));
+	else
+		std::cout << "RBOTHist::RBOTHist: TCLCHistograms already exists!" << std::endl;
 }
 
-void RBOTHist::Update(const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, int oid, float afg, float abg){
-	float zNear = view->getZNear();
-	float zFar = view->getZFar();
+void RBOTHist::Update(std::shared_ptr<Object3D> object, const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, float afg, float abg){
+	float zNear = view->GetZNear();
+	float zFar = view->GetZFar();
 	cv::Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
 
-	objs[oid]->getTCLCHistograms()->update(frame, mask_map, depth_map, K, zNear, zFar, afg, abg);
+	object->getTCLCHistograms()->update(frame, mask_map, depth_map, K, zNear, zFar, afg, abg);
 }
 
-void RBOTHist::GetPixelProb(uchar rc, uchar gc, uchar bc, int x, int y, int oid, float& ppf, float& ppb) {
-	std::shared_ptr<TCLCHistograms> tclcHistograms = objs[oid]->getTCLCHistograms();
+void RBOTHist::GetPixelProb(std::shared_ptr<Object3D> object, uchar rc, uchar gc, uchar bc, int x, int y, float& ppf, float& ppb) {
+	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	uchar* initializedData = tclcHistograms->getInitialized().data;
@@ -44,7 +38,7 @@ void RBOTHist::GetPixelProb(uchar rc, uchar gc, uchar bc, int x, int y, int oid,
 	float* histogramsFGData = (float*)localFG.ptr<float>();
 	float* histogramsBGData = (float*)localBG.ptr<float>();
 
-	int level = view->getLevel();
+	int level = view->GetLevel();
 	int upscale = pow(2, level);
 
 	int numHistograms = (int)centersIDs.size();
@@ -96,13 +90,13 @@ void RBOTHist::GetPixelProb(uchar rc, uchar gc, uchar bc, int x, int y, int oid,
 	}
 }
 
-void RBOTHist::GetRegionProb(const cv::Mat& frame, int oid, cv::Mat& prob_map) {
+void RBOTHist::GetRegionProb(std::shared_ptr<Object3D> object, const cv::Mat& frame, cv::Mat& prob_map) {
 	prob_map = cv::Mat(frame.size(), CV_8UC1);
 
-	int level = view->getLevel();
+	int level = view->GetLevel();
 	int upscale = pow(2, level);
-
-	std::shared_ptr<TCLCHistograms> tclcHistograms = objs[oid]->getTCLCHistograms();
+	
+	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();
 	int numBins = tclcHistograms->getNumBins();

@@ -1,0 +1,24 @@
+# ===================================================================================
+# TTOOL is developed at IBOIS, EPFL @ 2023
+# It is distributed under the GNU GPL license (https://www.gnu.org/licenses/gpl-3.0.en.html) and 
+# is build on top of TSlet (
+# ===================================================================================
+
+set(@PROJECT_NAME@_FOUND YES)
+set(@PROJECT_NAME@_FOUND "YES")
+set(@PROJECT_NAME@_VERSION        @PROJECT_VERSION@)
+set(@PROJECT_NAME@_VERSION_MAJOR  @PROJECT_VERSION_MAJOR@)
+set(@PROJECT_NAME@_VERSION_MINOR  @PROJECT_VERSION_MINOR@)
+set(@PROJECT_NAME@_VERSION_PATCH  @PROJECT_VERSION_PATCH@)
+
+set(TTool_INSTALL_PREFIX "${CMAKE_CURRENT_LIST_DIR}/../install" CACHE PATH "TTool installation prefix")
+set(TTool_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
+set(TTool_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
+set(TTool_LIBRARIES TTool)
+
+# zenodo direct doi link (to change if dataset us updated)
+set(__DSET_DOI__ "https://zenodo.org/record/8144251")
+
+# ttol config loader/unloader
+set(__TTOOL_CONFIG_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.yml")
+add_compile_definitions(__TTOOL_CONFIG_PATH__="${__TTOOL_CONFIG_PATH__}")

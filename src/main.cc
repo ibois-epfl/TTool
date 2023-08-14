@@ -1,94 +1,127 @@
-#include "camera.hh"
-#include "model.hh"
-#include "pose_io.hh"
-#include "visualizer.hh"
-#include "input.hh"
-#include "tracker.hh"
-#include "d_model_manager.hh"
-#include "object_tracker.hh"
-#include "config.hh"
-#include "event.hh"
-
-#include <algorithm>
 #include <iostream>
-#include <QApplication>
-#include <QThread>
 
+#include "camera.hh"
+#include "ttool.hh"
+#include "util.hh"
+
+#include "pose_writer.hh"
+
+
+using namespace ttool::standaloneUtils;
 
 int main(int argc, char **argv)
 {
-    QApplication a(argc, argv);
+    // parse args
+    std::string helpMsg = "Usage: ./ttool \n" \
+                               "[options]:\n" \
+                               "[-h,--help]: print this message\n" \
+                               "[-c,--camera]: camera index\n" \
+                               "[-l,--calib]: calibration file for the camera\n" \
+                               "[-s,--save]: record video of session\n" \
+                               "[-t,--trackPose]: it saves all poses and objects in a log file\n";
+    int cameraID = 0;
+    std::string calibFilePath;
+    bool trackPose = false;
+    bool isVideoRecording = false;
+    std::string saveImagePath = "./debug/";
+    if (argc == 1)
+    {
+        std::cout << helpMsg << std::endl;
+        return 0;
+    }
+    for (int i = 1; i < argc; ++i)
+    {
+        std::string arg = argv[i];
+        if (arg == "-h" || arg == "--help")
+        {
+            std::cout << helpMsg << std::endl;
+            return 0;
+        }
+        else if (arg == "-c" || arg == "--camera")
+        {
+            if (i + 1 < argc)
+            {
+                cameraID = std::stoi(argv[++i]);
+                std::cout << "\033[1;35m[Info]: Camera index: " << cameraID << "\033[0m" << std::endl;
+            }
+            else
+            {
+                std::cout << "\033[1;31m[Error]: camera index is not specified\033[0m" << std::endl;
+                std::cout << helpMsg << std::endl;
+                return 1;
+            }
+        }
+        else if (arg == "-l" || arg == "--calib")
+        {
+            if (i + 1 < argc)
+            {
+                calibFilePath = argv[++i];
+                std::cout << "\033[1;35m[Info]: Calibration file: " << calibFilePath << "\033[0m" << std::endl;
+            }
+            else
+            {
+                std::cout << "\033[1;31m[Error]: calibration file is not specified\033[0m" << std::endl;
+                std::cout << helpMsg << std::endl;
+                return 1;
+            }
+        }
+        else if (arg == "-s" || arg == "--save")
+        {
+            isVideoRecording = true;
+            if (i + 1 < argc)
+            {
+                saveImagePath = argv[++i];
+            }
+            std::cout << "\033[1;35m[Info]: Save video path: " << saveImagePath << "\033[0m" << std::endl;
+        }
+        else if (arg == "-t" || arg == "--trackPose")
+        {
+            trackPose = true;
+            std::cout << "\033[1;35m[Info]: output pose recording to log\033[0m" << std::endl;
+        }
+        else
+        {
+            std::cout << "\033[1;31m[Error]: unkown argument\033[0m" << arg << std::endl;
+            std::cout << helpMsg << std::endl;
+            return 1;
+        }
+    }
 
-    std::string config_file = __TTOOL_CONFIG_PATH__;
+    // Intiailizing GLFW
+    auto GLFWWindow = ttool::standaloneUtils::InitializeStandalone();
 
-    // Initialize the camera
-    // TODO: this part shpuld be refactored to read directly frames from a camera cv::VideoCapture
-    std::shared_ptr<ttool::Config> config = std::make_shared<ttool::Config>(config_file);
+    // ttool setup
+    std::shared_ptr<ttool::TTool> ttool = std::make_shared<ttool::TTool>(__TTOOL_CONFIG_PATH__, calibFilePath);
+
+    std::shared_ptr<ttool::Config> configPtr = ttool->GetConfig();
+
+    // Set standalone console components
     std::shared_ptr<Camera> cameraPtr;
-    if (config->GetConfigData().Frames == "")
-    {
-        std::cout << "Using camera: " << config->GetConfigData().CameraID << std::endl;
-        cameraPtr.reset(Camera::BuildCamera(config->GetConfigData().CameraID));
-    }
-    else
-    {
-        std::cout << "Using frames: " << config->GetConfigData().Frames << std::endl;
-        cameraPtr.reset(Camera::BuildCamera(config->GetConfigData().Frames));
-    }
+    cameraPtr.reset(Camera::BuildCamera(cameraID));
+    cameraPtr->ReadFromFile(calibFilePath);
 
-    cameraPtr->ReadFromFile(config->GetConfigData().CameraConfigFile);
-
-    // Set the pose reader 
-    // TODO: this should also happen under the hood
-    std::vector<cv::Matx44f> gtPoses;
-    for (std::vector<float> gtPose : config->GetConfigData().GroundTruthPoses)
-    {
-        float m00 = gtPose[0];
-        float m01 = gtPose[1];
-        float m02 = gtPose[2];
-        float m10 = gtPose[3];
-        float m11 = gtPose[4];
-        float m12 = gtPose[5];
-        float m20 = gtPose[6];
-        float m21 = gtPose[7];
-        float m22 = gtPose[8];
-        float m03 = gtPose[9];
-        float m13 = gtPose[10];
-        float m23 = gtPose[11];
-
-        gtPoses.push_back(cv::Matx44f(
-        m00, m01, m02, m03,
-        m10, m11, m12, m13,
-        m20, m21, m22, m23,
-        0, 0, 0, 1));
-    }
-
-    std::shared_ptr<ttool::DModelManager> modelManagerPtr = std::make_shared<ttool::DModelManager>(config->GetConfigData().ModelFiles, gtPoses, config);
-
-    // Initialize the visualizer
-    std::shared_ptr<ttool::Visualizer> visualizerPtr = std::make_shared<ttool::Visualizer>(cameraPtr, modelManagerPtr, config->GetConfigData().Zn, config->GetConfigData().Zf);
+    std::shared_ptr<Visualizer> visualizerPtr = std::make_shared<Visualizer>(cameraPtr,
+                                                                            ttool->GetModelManager(),
+                                                                            configPtr->GetConfigData().Zn,
+                                                                            configPtr->GetConfigData().Zf);
+    if (isVideoRecording) {visualizerPtr->SetSaveImagePath(saveImagePath);}
     cameraPtr->UpdateCamera();
+    ttool::InputVisualizer inputVisualizer(visualizerPtr);
 
-    ttool::Input input(modelManagerPtr, visualizerPtr);
-
-    // Initialize the tracker
-    tslet::ObjectTracker objectTracker;
-    for (int i = 0; i < modelManagerPtr->GetNumObjects(); ++i)
-    {
-        objectTracker.Consume(modelManagerPtr->GetObject()->getModelID(), modelManagerPtr->GetObject(), cameraPtr->GetK());
-        modelManagerPtr->IncreaseObjectID();
-    }
+    PoseWriter poseWriter = PoseWriter("trackingPose.log", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
 
     // main thread
-    while (true)
+    bool exit = false;
+    if (isVideoRecording) {visualizerPtr->ToggleSavingImages();}
+    while (!exit)
     {
-        int oid = modelManagerPtr->GetObject()->getModelID();
         int fid = 0;
-        int key = cv::waitKey(1);
+
         // 2b UI pose input
         std::cout << "Please input the pose of the object" << std::endl;
+        visualizerPtr->SetModels();
         visualizerPtr->UpdateEvent(ttool::EventType::PoseInput);
-        while (oid == modelManagerPtr->GetObject()->getModelID())
+        while (!exit)
         {
             visualizerPtr->UpdateVisualizer(fid);
             cameraPtr->UpdateCamera();
@@ -98,45 +131,56 @@ int main(int argc, char **argv)
             {
                 break;
             }
-            objectTracker.SetPose(modelManagerPtr->GetObject()->getModelID(), input.GetPose());
-
-            input.ConsumeKey(key);
+            if (27 == key)
+            {
+                exit = true;
+                break;
+            }
+            ttool->ManipulateModel(key);
+            inputVisualizer.ConsumeKey(key);
+            visualizerPtr->SetModels();
         }
-        // 3 TSlet
+
+        // 3 Pose refiner
         visualizerPtr->UpdateEvent(ttool::EventType::Tracking);
-        objectTracker.FeedNewFrame(oid, cameraPtr->image());
-        while (oid == modelManagerPtr->GetObject()->getModelID())
+        while (!exit)
         {
             int key = cv::waitKey(1);
 
-            auto ti = cv::getTickCount();
 
             if ('q' == key)
             {
                 break;
             }
-            // Break before the new object's gtID is used to estimate the pose of the previous object (snapshotted by the tracker)
-            if (oid != modelManagerPtr->GetObject()->getModelID())
+            if (27 == key)
             {
+                exit = true;
                 break;
             }
 
-            objectTracker.EstimatePose(oid, cameraPtr->image());
+            auto ti = cv::getTickCount();
+
+            ttool->RunOnAFrame(cameraPtr->Image());
+
             auto tf = cv::getTickCount();
             auto t = (tf - ti) / cv::getTickFrequency();
             int fps = 1 / t;
 
             visualizerPtr->UpdateVisualizer(fid, fps);
             cameraPtr->UpdateCamera();
-            objectTracker.FeedNewFrame(oid, cameraPtr->image());
+            inputVisualizer.ConsumeKey(key);
             ++fid;
 
-            input.ConsumeKey(key);
+            cv::Matx44f pose = ttool->GetPose();
+
+            if (trackPose) { poseWriter.write(pose, ttool->GetCurrentObjectID()); }
         }
-        std::cout << "Restarting Object " << oid << " changed to >> ";
-        oid = modelManagerPtr->GetObject()->getModelID();
-        std::cout << oid << std::endl;
     }
 
+    cv::destroyAllWindows();
+    if (isVideoRecording) {ttool::standaloneUtils::makeVideoFromAllSavedImages(saveImagePath);}
+
+    // Terminate GLFW
+    ttool::standaloneUtils::TerminateStandalone(GLFWWindow);
     return 0;
 }
