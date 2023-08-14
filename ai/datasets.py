@@ -1,6 +1,8 @@
 import pathlib
 
+import numpy as np
 import pandas as pd
+import skimage
 import torch
 import torchvision
 
@@ -185,6 +187,32 @@ class ToolheadDemoDataset(torch.utils.data.Dataset):
         label = mapping[label]
 
         image = torchvision.io.read_image(str(img_path))
+        image = image.float() / 255
+        if self.transform:
+            image = self.transform(image)
+        if self.target_transform:
+            label = self.target_transform(label)
+        return image, label
+
+
+class SyntheticDataset(torch.utils.data.Dataset):
+    def __init__(self, data_dir, transform, target_transform, subdir):
+        self.data_dir = pathlib.Path(data_dir)
+        self.img_paths = list(self.data_dir.glob(f"*/kept_images/{subdir}/*.png"))
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __len__(self):
+        return len(self.img_paths)
+
+    def __getitem__(self, idx):
+        img_path = self.img_paths[idx]
+        label = img_path.parents[2].stem
+        label = mapping[label]
+
+        image = skimage.io.imread(str(img_path))
+        image = np.rollaxis(image, 2, 0)
+        image = torch.tensor(image)
         image = image.float() / 255
         if self.transform:
             image = self.transform(image)

@@ -119,6 +119,7 @@ if __name__ == "__main__":
         [datasets.augmentation_transforms, normalization_transform]
     )
 
+    # First dataset (hand held by Naravich)
     tool_train_dataset = datasets.ToolDataset(
         img_dir / "train",
         transform=transform,
@@ -131,6 +132,8 @@ if __name__ == "__main__":
         target_transform=datasets.label_transform,
         # subsampling=20,
     )
+
+    # Labled fabrication videos
     img_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images")
     fabrication_train_dataset = datasets.FabricationDataset(
         img_dir,
@@ -150,22 +153,43 @@ if __name__ == "__main__":
         videos=[2, 20],
         # subsampling=20,
     )
+
+    # Dataset with tools attached acquired by Naravich
     img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images")
     test_train_dataset = datasets.ToolDataset(
         img_dir / "train",
         transform=transform,
         target_transform=datasets.label_transform,
+        subsampling=40,
     )
     test_val_dataset = datasets.ToolDataset(
         img_dir / "val",
         transform=normalization_transform,
         target_transform=datasets.label_transform,
     )
-    # train_dataset = fabrication_train_dataset
-    # val_dataset = fabrication_val_dataset
-    train_dataset = torch.utils.data.ConcatDataset(
-        [tool_train_dataset, fabrication_train_dataset, test_train_dataset]
+    synthetic_train_dataset = datasets.SyntheticDataset(
+        pathlib.Path("/data/ENAC/iBOIS/ToolheadSyntheticDataset"),
+        transform=transform,
+        target_transform=datasets.label_transform,
+        subdir="train",
     )
+    synthetic_val_dataset = datasets.SyntheticDataset(
+        pathlib.Path("/data/ENAC/iBOIS/ToolheadSyntheticDataset"),
+        transform=normalization_transform,
+        target_transform=datasets.label_transform,
+        subdir="val",
+    )
+
+    # train_dataset = torch.utils.data.ConcatDataset(
+    #     [tool_train_dataset, fabrication_train_dataset, test_train_dataset]
+    # )
+    print(len(synthetic_train_dataset))
+    print(len(test_train_dataset))
+    quit()
+    train_dataset = test_train_dataset
+    # train_dataset = torch.utils.data.ConcatDataset(
+    #    [synthetic_train_dataset, test_train_dataset]
+    # )
     val_dataset = torch.utils.data.ConcatDataset(
         [tool_val_dataset, fabrication_val_dataset, test_val_dataset]
     )
@@ -186,6 +210,7 @@ if __name__ == "__main__":
             ModelCheckpoint(mode="max", monitor="val_acc"),
             LearningRateMonitor("epoch"),
         ],
+        default_root_dir="/data/ENAC/iBOIS/lightning_logs",
     )
     trainer.logger._log_graph = (True,)
     trainer.fit(

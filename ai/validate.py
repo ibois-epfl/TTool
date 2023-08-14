@@ -29,7 +29,7 @@ if model_type == "ResNet":
     train_stds = train_means_stds["STD"].values
     image_transform = transforms.Normalize(train_means, train_stds)
     image_transform = transforms.Normalize(train_means, train_stds)
-    ckpt = "./lightning_logs/version_0/checkpoints/epoch=199-step=22800.ckpt"
+    ckpt = "/data/ENAC/iBOIS/lightning_logs/version_0/checkpoints/epoch=199-step=22800.ckpt"
     network = models.ResNet()
 if model_type == "ResNet222":
     train_means_stds = pd.read_csv("train_means_stds.csv")
@@ -37,24 +37,31 @@ if model_type == "ResNet222":
     train_stds = train_means_stds["STD"].values
     image_transform = transforms.Normalize(train_means, train_stds)
     image_transform = transforms.Normalize(train_means, train_stds)
-    ckpt = "./lightning_logs/version_1/checkpoints/epoch=184-step=21090.ckpt"
+    ckpt = "/data/ENAC/iBOIS/lightning_logs/version_1/checkpoints/epoch=184-step=21090.ckpt"
     network = models.ResNet(nun_blocks=[2, 2, 2])
 elif model_type == "TransferResNet":
     image_transform = torchvision.models.ResNet18_Weights.DEFAULT.transforms()
-    ckpt = "./lightning_logs/version_2/checkpoints/epoch=88-step=10146.ckpt"
+    ckpt = (
+        "/data/ENAC/iBOIS/lightning_logs/version_2/checkpoints/epoch=88-step=10146.ckpt"
+    )
     network = models.TransferResNet()
 elif model_type == "TransferEfficientNet":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
-    ckpt = "./lightning_logs/version_3/checkpoints/epoch=176-step=20178.ckpt"
+    ckpt = "/data/ENAC/iBOIS/lightning_logs/version_3/checkpoints/epoch=176-step=20178.ckpt"
     network = models.TransferEfficientNet()
 elif model_type == "TransferEfficientNetNewSplit":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
-    ckpt = "./lightning_logs/version_61/checkpoints/epoch=45-step=28934.ckpt"
+    ckpt = "/data/ENAC/iBOIS/lightning_logs/version_61/checkpoints/epoch=45-step=28934.ckpt"
     network = models.TransferEfficientNet()
 elif model_type == "TransferEfficientNetAugmentationTwoDataSets":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
-    ckpt = "./lightning_logs/version_148/checkpoints/epoch=19-step=3840.ckpt"
-    # ckpt = "./lightning_logs/version_181/checkpoints/epoch=41-step=8064.ckpt"  # Extra augmentation
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/version_148/checkpoints/epoch=19-step=3840.ckpt"
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/version_181/checkpoints/epoch=41-step=8064.ckpt"  # Extra augmentation
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/version_187/checkpoints/epoch=8-step=900.ckpt"  # Trained on synthetic data only
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_0/checkpoints/epoch=33-step=5270.ckpt"  # trained on synthetic + test_train dataset
+    ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_1/checkpoints/epoch=41-step=2520.ckpt"  # trained on test_train dataset
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_3/checkpoints/epoch=32-step=3201.ckpt"  # trained on synthetic + test_train dataset subsampled by a factor of 40
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_9/checkpoints/epoch=44-step=90.ckpt"  # trained on test_train dataset subsampled by a factor of 40
     network = models.TransferEfficientNet(num_classes=len(datasets.labels))
 
 # img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
@@ -63,6 +70,10 @@ elif model_type == "TransferEfficientNetAugmentationTwoDataSets":
 #     transform=image_transform,
 #     target_transform=datasets.label_transform,
 # )
+#
+# for i in range(10):
+#     img, label = val_dataset[i]
+#     torchvision.utils.save_image(img, f"hand_held_img_{i}_{label}.png")
 # data_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images/")
 # val_dataset = datasets.FabricationDataset(
 #     data_dir,
@@ -70,25 +81,35 @@ elif model_type == "TransferEfficientNetAugmentationTwoDataSets":
 #     target_transform=datasets.label_transform,
 #     subsampling=100,
 # )
-# img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images/val")
-# val_dataset = datasets.ToolDataset(
-#     img_dir,
+img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images/val")
+val_dataset = datasets.ToolDataset(
+    img_dir,
+    transform=image_transform,
+    target_transform=datasets.label_transform,
+)
+# data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo")
+# val_dataset = datasets.ToolheadDemoDataset(
+#     data_dir,
 #     transform=image_transform,
 #     target_transform=datasets.label_transform,
 # )
-data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo")
-val_dataset = datasets.ToolheadDemoDataset(
-    data_dir,
-    transform=image_transform,
-    target_transform=datasets.label_transform,
-)
-data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo2")
-val_dataset2 = datasets.ToolheadDemoDataset(
-    data_dir,
-    transform=image_transform,
-    target_transform=datasets.label_transform,
-)
-val_dataset = torch.utils.data.ConcatDataset([val_dataset, val_dataset2])
+# data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo2")
+# val_dataset2 = datasets.ToolheadDemoDataset(
+#     data_dir,
+#     transform=image_transform,
+#     target_transform=datasets.label_transform,
+# )
+# val_dataset = torch.utils.data.ConcatDataset([val_dataset, val_dataset2])
+# val_dataset = datasets.SyntheticDataset(
+#     pathlib.Path("/data/ENAC/iBOIS/ToolheadSyntheticDataset"),
+#     transform=image_transform,
+#     target_transform=datasets.label_transform,
+#     subdir="val",
+# )
+# for i in range(10):
+#     img, label = val_dataset[i]
+#     torchvision.utils.save_image(img, f"synthetic_img_{i}_{label}.png")
+# quit()
 val_dataloader = DataLoader(val_dataset, batch_size=25, num_workers=8)
 
 model = train.LitClassifier.load_from_checkpoint(
@@ -97,7 +118,9 @@ model = train.LitClassifier.load_from_checkpoint(
 )
 model.eval()
 
-trainer = pl.Trainer(accelerator="gpu", logger=None)
+trainer = pl.Trainer(
+    accelerator="gpu", logger=None, default_root_dir="/data/ENAC/iBOIS/lightning_logs"
+)
 val_result = trainer.test(model, dataloaders=val_dataloader, verbose=True)
 res = trainer.predict(model, dataloaders=val_dataloader)
 y_hats = [i[0] for i in res]
@@ -120,6 +143,9 @@ ax.tick_params(axis="both", which="major", labelsize=6)
 ax.tick_params(axis="both", which="minor", labelsize=6)
 plt.xticks(rotation=90)
 plt.tight_layout()
-plt.title(f"{model_type} acc={acc:.2f}")
-plt.savefig(f"confusion_matrix_{model_type}_toolhead_demo_dataset.pdf")
+# plt.title(f"{model_type} acc={acc:.2f}")
+plt.title(f"acc={acc:.2f}")
+plt.savefig(
+    f"confusion_matrix_{model_type}_trained_on_test_train_dataset_validated_on_test_dataset.pdf"
+)
 plt.close()
