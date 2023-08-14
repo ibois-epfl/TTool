@@ -1,3 +1,7 @@
+"""
+Script for training a network using pytorch lightning.
+"""
+
 import pathlib
 
 import lightning.pytorch as pl
@@ -18,6 +22,9 @@ import models
 
 class LitClassifier(pl.LightningModule):
     def __init__(self, network):
+        """
+        Lightning module used to "interact" with the network.
+        """
         super().__init__()
         self.net = network
         self.loss_function = nn.CrossEntropyLoss()
@@ -27,8 +34,13 @@ class LitClassifier(pl.LightningModule):
         return self.net(x)
 
     def training_step(self, batch, batch_idx):
+        """
+        Function exectued for each step during training.
+        """
         x, y = batch
         y_hat = self.net(x)
+
+        # Calculate and log loss as well as accuracy
         loss = self.loss_function(y_hat, y)
         acc = self.acc_function(y_hat, y)
         self.log("train_loss", loss)
@@ -36,8 +48,13 @@ class LitClassifier(pl.LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
+        """
+        Function exectued for each step during validation.
+        """
         x, y = batch
         y_hat = self.net(x)
+
+        # Calculate and log loss as well as accuracy
         loss = self.loss_function(y_hat, y)
         acc = self.acc_function(y_hat, y)
         self.log("val_loss", loss)
@@ -45,28 +62,31 @@ class LitClassifier(pl.LightningModule):
         return loss
 
     def test_step(self, batch, batch_idx):
+        """
+        Function exectued for each step during testing.
+        """
         x, y = batch
         y_hat = self.net(x)
+        # Calculate and log loss as well as accuracy
         loss = self.loss_function(y_hat, y)
         acc = self.acc_function(y_hat, y)
         self.log("test_loss", loss)
         self.log("test_acc", acc)
 
     def predict_step(self, batch, batch_idx):
+        """
+        Function exectued when predicting.
+        """
         x, y = batch
         y_hat = self.net(x).argmax(dim=-1)
         return y_hat, y
 
     def configure_optimizers(self):
+        # Use stochatic gradient descent
         optimizer = torch.optim.SGD(
             self.parameters(), lr=0.1, momentum=0.9, weight_decay=1e-4
         )
-        # scheduler = torch.optim.lr_scheduler.MultiStepLR(
-        #     optimizer, milestones=[100, 150], gamma=0.1
-        # )
-        # scheduler = torch.optim.lr_scheduler.MultiStepLR(
-        #     optimizer, milestones=[30, 45], gamma=0.1
-        # )
+        # Decrease learning rate over time
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer, milestones=[15, 30], gamma=0.1
         )
@@ -76,14 +96,14 @@ class LitClassifier(pl.LightningModule):
 if __name__ == "__main__":
     torch.set_float32_matmul_precision("high")
 
-    # MODEL_TYPE = "TransferResNet"
-    # MODEL_TYPE = "ResNet"
+    # Select one of the following model types: "ResNet", "TransferResNet", "TransferEfficientNet"
     MODEL_TYPE = "TransferEfficientNet"
-
-    img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
 
     if MODEL_TYPE == "ResNet":
         # Determine the mean and std for the training data
+        # in order to z-score the images.
+
+        img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
         train_dataset = datasets.ToolDataset(
             img_dir / "train",
             transform=lambda x: x.float(),
@@ -101,8 +121,14 @@ if __name__ == "__main__":
         df.to_csv("train_means_stds.csv")
 
         normalization_transform = transforms.Normalize(train_means, train_stds)
+
+        # Get ResNet instance
         network = models.ResNet(num_blocks=[2, 2, 2], num_classes=len(datasets.labels))
+
     elif MODEL_TYPE == "TransferResNet":
+        # In order for the transfer learning to work properly,
+        # we  have to use the same normalization used during
+        # the training of the initial weights.
         normalization_transform = (
             torchvision.models.ResNet18_Weights.DEFAULT.transforms()
         )
@@ -119,7 +145,8 @@ if __name__ == "__main__":
         [datasets.augmentation_transforms, normalization_transform]
     )
 
-    # First dataset (hand held by Naravich)
+    # First data set (hand held by Naravich)
+    img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
     tool_train_dataset = datasets.ToolDataset(
         img_dir / "train",
         transform=transform,
@@ -133,7 +160,7 @@ if __name__ == "__main__":
         # subsampling=20,
     )
 
-    # Labled fabrication videos
+    # Data set using the labled fabrication videos
     img_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images")
     fabrication_train_dataset = datasets.FabricationDataset(
         img_dir,
@@ -154,19 +181,21 @@ if __name__ == "__main__":
         # subsampling=20,
     )
 
-    # Dataset with tools attached acquired by Naravich
+    # Data set with tools attached acquired by Naravich
     img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images")
-    test_train_dataset = datasets.ToolDataset(
+    attached_train_dataset = datasets.ToolDataset(
         img_dir / "train",
         transform=transform,
         target_transform=datasets.label_transform,
         subsampling=40,
     )
-    test_val_dataset = datasets.ToolDataset(
+    attached_val_dataset = datasets.ToolDataset(
         img_dir / "val",
         transform=normalization_transform,
         target_transform=datasets.label_transform,
     )
+
+    # Synthetic data set
     synthetic_train_dataset = datasets.SyntheticDataset(
         pathlib.Path("/data/ENAC/iBOIS/ToolheadSyntheticDataset"),
         transform=transform,
@@ -180,18 +209,16 @@ if __name__ == "__main__":
         subdir="val",
     )
 
+    # Select what data to use for training and validation
     # train_dataset = torch.utils.data.ConcatDataset(
-    #     [tool_train_dataset, fabrication_train_dataset, test_train_dataset]
+    #     [tool_train_dataset, fabrication_train_dataset, attached_train_dataset]
     # )
-    print(len(synthetic_train_dataset))
-    print(len(test_train_dataset))
-    quit()
-    train_dataset = test_train_dataset
-    # train_dataset = torch.utils.data.ConcatDataset(
-    #    [synthetic_train_dataset, test_train_dataset]
-    # )
+    # train_dataset = attached_train_dataset
+    train_dataset = torch.utils.data.ConcatDataset(
+        [synthetic_train_dataset, attached_train_dataset]
+    )
     val_dataset = torch.utils.data.ConcatDataset(
-        [tool_val_dataset, fabrication_val_dataset, test_val_dataset]
+        [tool_val_dataset, fabrication_val_dataset, attached_val_dataset]
     )
 
     # Create data loaders
@@ -217,5 +244,4 @@ if __name__ == "__main__":
         model=classifier,
         train_dataloaders=train_loader,
         val_dataloaders=val_loader,
-        # ckpt_path="lightning_logs/version_4/checkpoints/epoch=199-step=22800.ckpt",
     )

@@ -1,9 +1,16 @@
+"""
+Collection of models
+"""
+
 import torch.nn as nn
 import torchvision
 
 
 class ResNetBlock(nn.Module):
     def __init__(self, c_in, act_fn, subsample=False, c_out=-1):
+        """
+        Block used for constructing the ResNet.
+        """
         super().__init__()
         if not subsample:
             c_out = c_in
@@ -36,6 +43,10 @@ class ResNetBlock(nn.Module):
 
 class ResNet(nn.Module):
     def __init__(
+        """
+        Implementaiton of the ResNet model.
+        The parameters can be used to change the architecture.
+        """
         self,
         num_classes=14,
         num_blocks=[3, 3, 3],
@@ -94,6 +105,11 @@ class TransferResNet(nn.Module):
         num_classes=14,
         **kwargs,
     ):
+        """
+        ResNet18 model with default weights from torchvision
+        and a custom classification head to match the number
+        of classes we have.
+        """
         super().__init__()
         backbone = torchvision.models.resnet18(weights="DEFAULT")
         num_filters = backbone.fc.in_features
@@ -118,6 +134,11 @@ class TransferEfficientNet(nn.Module):
         num_classes=14,
         **kwargs,
     ):
+        """
+        EfficientNet model with default weights from torchvision
+        and a custom classification head to match the number
+        of classes we have.
+        """
         super().__init__()
         backbone = torchvision.models.efficientnet_v2_s(weights="DEFAULT")
         layers = list(backbone.children())

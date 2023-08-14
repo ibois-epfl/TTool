@@ -1,3 +1,7 @@
+"""
+Script for validating the model and computing the confusion matrix.
+"""
+
 import pathlib
 
 import lightning.pytorch as pl
@@ -16,13 +20,16 @@ import train
 
 torch.set_float32_matmul_precision("high")
 
-# model_type = "ResNet"
-# model_type = "ResNet222"
-# model_type = "TransferResNet"
-# model_type = "TransferEfficientNet"
-# model_type = "TransferEfficientNetNewSplit"
+# Select one of the following model types:
+# "ResNet"
+# "ResNet222"
+# "TransferResNet"
+# "TransferEfficientNet"
+# "TransferEfficientNetNewSplit"
+# "TransferEfficientNetAugmentationTwoDataSets"
 model_type = "TransferEfficientNetAugmentationTwoDataSets"
 
+# Get the correct normalization transform, checkpoint and network based on the model type
 if model_type == "ResNet":
     train_means_stds = pd.read_csv("train_means_stds.csv")
     train_means = train_means_stds["Mean"].values
@@ -55,61 +62,80 @@ elif model_type == "TransferEfficientNetNewSplit":
     network = models.TransferEfficientNet()
 elif model_type == "TransferEfficientNetAugmentationTwoDataSets":
     image_transform = torchvision.models.EfficientNet_V2_S_Weights.DEFAULT.transforms()
+
     # ckpt = "/data/ENAC/iBOIS/lightning_logs/version_148/checkpoints/epoch=19-step=3840.ckpt"
-    # ckpt = "/data/ENAC/iBOIS/lightning_logs/version_181/checkpoints/epoch=41-step=8064.ckpt"  # Extra augmentation
-    # ckpt = "/data/ENAC/iBOIS/lightning_logs/version_187/checkpoints/epoch=8-step=900.ckpt"  # Trained on synthetic data only
-    # ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_0/checkpoints/epoch=33-step=5270.ckpt"  # trained on synthetic + test_train dataset
-    ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_1/checkpoints/epoch=41-step=2520.ckpt"  # trained on test_train dataset
-    # ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_3/checkpoints/epoch=32-step=3201.ckpt"  # trained on synthetic + test_train dataset subsampled by a factor of 40
-    # ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_9/checkpoints/epoch=44-step=90.ckpt"  # trained on test_train dataset subsampled by a factor of 40
+
+    # Extra augmentation
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/version_181/checkpoints/epoch=41-step=8064.ckpt"
+
+    # Trained on synthetic data only
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/version_187/checkpoints/epoch=8-step=900.ckpt"
+
+    # trained on synthetic + test_train dataset
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_0/checkpoints/epoch=33-step=5270.ckpt"
+
+    # trained on test_train dataset
+    ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_1/checkpoints/epoch=41-step=2520.ckpt"
+
+    # trained on synthetic + test_train dataset subsampled by a factor of 40
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_3/checkpoints/epoch=32-step=3201.ckpt"
+
+    # trained on test_train dataset subsampled by a factor of 40
+    # ckpt = "/data/ENAC/iBOIS/lightning_logs/lightning_logs/version_9/checkpoints/epoch=44-step=90.ckpt"
+
     network = models.TransferEfficientNet(num_classes=len(datasets.labels))
 
-# img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
-# val_dataset = datasets.ToolDataset(
-#     img_dir / "val",
-#     transform=image_transform,
-#     target_transform=datasets.label_transform,
-# )
-#
-# for i in range(10):
-#     img, label = val_dataset[i]
-#     torchvision.utils.save_image(img, f"hand_held_img_{i}_{label}.png")
-# data_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images/")
-# val_dataset = datasets.FabricationDataset(
-#     data_dir,
-#     transform=image_transform,
-#     target_transform=datasets.label_transform,
-#     subsampling=100,
-# )
+# First data set (hand held by Naravich)
+img_dir = pathlib.Path("/data/ENAC/iBOIS/images")
+tool_val_dataset = datasets.ToolDataset(
+    img_dir / "val",
+    transform=image_transform,
+    target_transform=datasets.label_transform,
+)
+
+# Data set using the labeled fabrication videos
+data_dir = pathlib.Path("/data/ENAC/iBOIS/labeled_fabrication_images/")
+fabrication_val_dataset = datasets.FabricationDataset(
+    data_dir,
+    transform=image_transform,
+    target_transform=datasets.label_transform,
+    subsampling=100,
+)
+
+# Data set with tool attached
 img_dir = pathlib.Path("/data/ENAC/iBOIS/test_dataset/images/val")
-val_dataset = datasets.ToolDataset(
+attached_val_dataset = datasets.ToolDataset(
     img_dir,
     transform=image_transform,
     target_transform=datasets.label_transform,
 )
-# data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo")
-# val_dataset = datasets.ToolheadDemoDataset(
-#     data_dir,
-#     transform=image_transform,
-#     target_transform=datasets.label_transform,
-# )
-# data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo2")
-# val_dataset2 = datasets.ToolheadDemoDataset(
-#     data_dir,
-#     transform=image_transform,
-#     target_transform=datasets.label_transform,
-# )
-# val_dataset = torch.utils.data.ConcatDataset([val_dataset, val_dataset2])
-# val_dataset = datasets.SyntheticDataset(
-#     pathlib.Path("/data/ENAC/iBOIS/ToolheadSyntheticDataset"),
-#     transform=image_transform,
-#     target_transform=datasets.label_transform,
-#     subdir="val",
-# )
-# for i in range(10):
-#     img, label = val_dataset[i]
-#     torchvision.utils.save_image(img, f"synthetic_img_{i}_{label}.png")
-# quit()
+
+# Demo data sets
+data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo")
+demo1_val_dataset = datasets.ToolheadDemoDataset(
+    data_dir,
+    transform=image_transform,
+    target_transform=datasets.label_transform,
+)
+data_dir = pathlib.Path("/data/ENAC/iBOIS/toolhead_demo2")
+demo2_val_dataset = datasets.ToolheadDemoDataset(
+    data_dir,
+    transform=image_transform,
+    target_transform=datasets.label_transform,
+)
+demo_val_dataset = torch.utils.data.ConcatDataset(
+    [demo1_val_dataset, demo2_val_dataset]
+)
+
+# Synthetic data set
+synthetic_val_dataset = datasets.SyntheticDataset(
+    pathlib.Path("/data/ENAC/iBOIS/ToolheadSyntheticDataset"),
+    transform=image_transform,
+    target_transform=datasets.label_transform,
+    subdir="val",
+)
+
+val_dataset = demo_val_dataset
 val_dataloader = DataLoader(val_dataset, batch_size=25, num_workers=8)
 
 model = train.LitClassifier.load_from_checkpoint(
@@ -122,17 +148,23 @@ trainer = pl.Trainer(
     accelerator="gpu", logger=None, default_root_dir="/data/ENAC/iBOIS/lightning_logs"
 )
 val_result = trainer.test(model, dataloaders=val_dataloader, verbose=True)
+
+# Do prediction and split results into ground truth and prediction
 res = trainer.predict(model, dataloaders=val_dataloader)
 y_hats = [i[0] for i in res]
 ys = [i[1] for i in res]
 y_hat = torch.cat(y_hats)
 y = torch.cat(ys)
 
+# Compute accuracy
 acc = (y == y_hat).float().mean()
 
+# Compute confusion matrix
 confusion_matrix = sklearn.metrics.confusion_matrix(
     y, y_hat, labels=np.argsort(datasets.labels), normalize="true"
 )
+
+# Plot confusion matrix
 disp = sklearn.metrics.ConfusionMatrixDisplay(
     confusion_matrix=confusion_matrix,
     display_labels=np.sort(np.array(datasets.labels)),  # [np.unique(y)]),
