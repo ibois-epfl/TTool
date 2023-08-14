@@ -1,3 +1,7 @@
+"""
+Split first data set into train, validation, and test data.
+"""
+
 import pathlib
 import shutil
 

@@ -1,3 +1,8 @@
+"""
+Turn labels for fabrication data into individual videos.
+This allows assesing the quality of the labels more easily.
+"""
+
 import pathlib
 import subprocess
 

@@ -1,3 +1,8 @@
+"""
+Combine all of the fabrication labels into one file
+and shift them forward by 90 frames and limit them to 60 frames.
+"""
+
 import pathlib
 
 import numpy as np

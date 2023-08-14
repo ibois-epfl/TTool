@@ -1,3 +1,8 @@
+"""
+Extract features from images for classical classification
+approach.
+"""
+
 import pathlib
 import pickle
 

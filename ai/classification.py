@@ -1,3 +1,7 @@
+"""
+Classical approach with a linear stochastic gradient descent classifier.
+"""
+
 import pickle
 
 import matplotlib.pyplot as plt

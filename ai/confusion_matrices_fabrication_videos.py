@@ -1,3 +1,9 @@
+"""
+Cross-validation for fabrication training videos.
+This revealed some typos in the annotations of the
+fabrication data.
+"""
+
 import pathlib
 
 import lightning.pytorch as pl

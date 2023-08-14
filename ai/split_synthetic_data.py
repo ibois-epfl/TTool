@@ -1,3 +1,7 @@
+"""
+Split synthetic data into train and validation data.
+"""
+
 import pathlib
 
 import numpy as np
