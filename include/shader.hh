@@ -26,8 +26,8 @@
 #include <algorithm>
 #include <sstream>
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include "assert.h"
 
 namespace ttool::GLutils
@@ -118,4 +118,3 @@ namespace ttool::GLutils
 
 		return ProgramID;
 	}
-}

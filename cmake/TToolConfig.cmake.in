@@ -3,26 +3,30 @@
 # It is distributed under the GNU GPL license (https://www.gnu.org/licenses/gpl-3.0.en.html) and 
 # is build on top of TSlet (
 # ===================================================================================
+set(TTOOL_VERSION @PROJECT_VERSION@)
+@PACKAGE_INIT@
 
-set(@PROJECT_NAME@_FOUND YES)
-set(@PROJECT_NAME@_FOUND "YES")
-set(@PROJECT_NAME@_VERSION        @PROJECT_VERSION@)
-set(@PROJECT_NAME@_VERSION_MAJOR  @PROJECT_VERSION_MAJOR@)
-set(@PROJECT_NAME@_VERSION_MINOR  @PROJECT_VERSION_MINOR@)
-set(@PROJECT_NAME@_VERSION_PATCH  @PROJECT_VERSION_PATCH@)
+get_filename_component(TTOOL_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
-set(TTool_INSTALL_PREFIX "${CMAKE_CURRENT_LIST_DIR}/../install" CACHE PATH "TTool installation prefix")
-set(TTool_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
-set(TTool_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
-set(TTool_LIBRARIES TTool)
+if(EXISTS "${TTOOL_CMAKE_DIR}/CMakeCache.txt")
+  # In build tree
+else()
+  # In install tree
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${TTOOL_CMAKE_DIR}")
+endif()
 
-# zenodo direct doi link (to change if dataset us updated)
-set(__DSET_DOI__ "https://zenodo.org/record/8229361")
+include("${TTOOL_CMAKE_DIR}/TToolTargets.cmake")
 
-# ttool config loader/unloader
-set(__TTOOL_CONFIG_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.yml")
-add_compile_definitions(__TTOOL_CONFIG_PATH__="${__TTOOL_CONFIG_PATH__}")
+set(TTOOL_DSET_DOI @TTOOL_DSET_DOI@)
+check_required_components(@PROJECT_NAME@)
 
-# ttool root path
-set(__TTOOL_ROOT_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}")
-add_compile_definitions(__TTOOL_ROOT_PATH__="${__TTOOL_ROOT_PATH__}")
+include(CMakeFindDependencyMacro)
+find_dependency(OpenCV)
+find_dependency(glog)
+find_dependency(GLEW)
+find_dependency(GLUT)
+find_dependency(Torch)
+
+if(NOT @TTool_USE_EXTERNAL_GLM@)
+  find_dependency(glm)
+endif()
