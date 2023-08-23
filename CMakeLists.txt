@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.21)
 project(TTool VERSION "0.1.0" LANGUAGES CXX)
 
 # zenodo direct doi link (to change if dataset us updated)
-set(TTOOL_DSET_DOI "https://zenodo.org/record/8186077" CACHE INTERNAL "")
+set(TTOOL_DSET_DOI "https://zenodo.org/record/8229361" CACHE INTERNAL "")
 include(cmake/dataset.cmake)
 
 file(GLOB glsl_SOURCES src/shader/*.glsl)
