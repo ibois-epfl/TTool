@@ -1,3 +1,22 @@
+/**
+ * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
+ * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *                     
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <memory>
 
 #include "object3d.hh"
@@ -12,7 +31,7 @@ bool sortDistance(std::pair<float, int> a, std::pair<float, int> b)
     return a.first < b.first;
 }
 
-void Object3D::Init(float qualityThreshold, std::vector<float> &templateDistances) {
+void ttool::tslet::Object3D::Init(float qualityThreshold, std::vector<float> &templateDistances) {
     this->trackingLost = false;
     this->qualityThreshold = qualityThreshold;
     this->templateDistances = templateDistances;
@@ -78,20 +97,20 @@ void Object3D::Init(float qualityThreshold, std::vector<float> &templateDistance
     subdivIcosahedron.push_back(Vec3f(1.00074, -1.61923, 0));
 }
 
-Object3D::Object3D(const std::string objFilename, const cv::Matx44f& Ti, float scale, float qualityThreshold, std::vector<float> &templateDistances) 
+ttool::tslet::Object3D::Object3D(const std::string objFilename, const cv::Matx44f& Ti, float scale, float qualityThreshold, std::vector<float> &templateDistances) 
 	: Model(objFilename, Ti, scale)
 {
 	Init(qualityThreshold, templateDistances);
 }
 
-Object3D::Object3D(const string objFilename, float tx, float ty, float tz, float alpha, float beta, float gamma, float scale, float qualityThreshold,  vector<float> &templateDistances) 
+ttool::tslet::Object3D::Object3D(const string objFilename, float tx, float ty, float tz, float alpha, float beta, float gamma, float scale, float qualityThreshold,  vector<float> &templateDistances) 
 	: Model(objFilename, tx, ty, tz, alpha, beta, gamma, scale)
 {
 	Init(qualityThreshold, templateDistances);
 }
 
 
-Object3D::~Object3D()
+ttool::tslet::Object3D::~Object3D()
 {
     baseTemplates.clear();
     
@@ -99,16 +118,16 @@ Object3D::~Object3D()
 }
 
 
-std::shared_ptr<TCLCHistograms> Object3D::getTCLCHistograms()
+std::shared_ptr<ttool::tslet::TCLCHistograms> ttool::tslet::Object3D::getTCLCHistograms()
 {
     return tclcHistograms;
 }
 
-void Object3D::SetTCLCHistograms(std::shared_ptr<TCLCHistograms> histograms) {
+void ttool::tslet::Object3D::SetTCLCHistograms(std::shared_ptr<ttool::tslet::TCLCHistograms> histograms) {
     tclcHistograms = histograms;
 }
 
-void Object3D::generateTemplates()
+void ttool::tslet::Object3D::generateTemplates()
 {
     int numLevels = 4;
     
@@ -127,7 +146,7 @@ void Object3D::generateTemplates()
         {
             for(int d = 0; d < numDistances; d++)
             {
-                baseTemplates.push_back(std::make_shared<TemplateView>(std::static_pointer_cast<Object3D>(shared_from_this()), alpha, beta, gamma, templateDistances[d], numLevels, true));
+                baseTemplates.push_back(std::make_shared<ttool::tslet::TemplateView>(std::static_pointer_cast<ttool::tslet::Object3D>(shared_from_this()), alpha, beta, gamma, templateDistances[d], numLevels, true));
             }
         }
     }
@@ -147,7 +166,7 @@ void Object3D::generateTemplates()
         {
             for(int d = 0; d < numDistances; d++)
             {
-                neighboringTemplates.push_back(std::make_shared<TemplateView>(std::static_pointer_cast<Object3D>(shared_from_this()), alpha, beta, gamma, templateDistances[d], numLevels, true));
+                neighboringTemplates.push_back(std::make_shared<ttool::tslet::TemplateView>(std::static_pointer_cast<ttool::tslet::Object3D>(shared_from_this()), alpha, beta, gamma, templateDistances[d], numLevels, true));
             }
         }
     }
@@ -177,7 +196,7 @@ void Object3D::generateTemplates()
             {
                 for(int d = 0; d < numDistances; d++)
                 {
-                    std::shared_ptr<TemplateView> kv = baseTemplates[i*numBaseRotations*numDistances + numDistances*g + d];
+                    std::shared_ptr<ttool::tslet::TemplateView> kv = baseTemplates[i*numBaseRotations*numDistances + numDistances*g + d];
                     float gamma1 = kv->getGamma();
                     
                     int g2 = gamma1/gamma2Precision;
@@ -199,19 +218,19 @@ void Object3D::generateTemplates()
 }
 
 
-vector<std::shared_ptr<TemplateView>> Object3D::getTemplateViews()
+vector<std::shared_ptr<ttool::tslet::TemplateView>> ttool::tslet::Object3D::getTemplateViews()
 {
     return baseTemplates;
 }
 
 
-int Object3D::getNumDistances()
+int ttool::tslet::Object3D::getNumDistances()
 {
     return numDistances;
 }
 
 
-void Object3D::reset()
+void ttool::tslet::Object3D::reset()
 {
     Model::reset();
     

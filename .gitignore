@@ -1,3 +1,5 @@
+html/
+latex/
 ## >>>>>>>>> ttool >>>>>>>>>
 
 /debug/*
@@ -13,6 +15,9 @@ ai/torchscripts/*
 !ai/torchscripts/efficientnet.pt
 
 deps/libtorch
+
+# ttool pose log
+TToolOutput/*
 
 ## >>>>>>>>> cmake >>>>>>>>>
 # Compiled Object files

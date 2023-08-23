@@ -1,28 +1,45 @@
+/**
+ * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
+ * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *                     
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <opencv2/highgui.hpp>
 
 #include "viewer.hh"
 #include "view.hh"
 
 
-using namespace ttool::standaloneUtils;
-
-void Viewer::StartSavingImages(const std::filesystem::path &path)
+void ttool::standaloneUtils::Viewer::StartSavingImages(const std::filesystem::path &path)
 {
 	m_SaveImages = true;
 	m_SavePath = path;
 }
 
-void Viewer::StopSavingImages()
+void ttool::standaloneUtils::Viewer::StopSavingImages()
 {
 	m_SaveImages = false;
 }
 
-void Viewer::SetDisplayImage(bool dispalyImages)
+void ttool::standaloneUtils::Viewer::SetDisplayImage(bool dispalyImages)
 {
 	m_DisplayImages = dispalyImages;
 }
 
-void Viewer::DrawInterface(cv::Mat frame)
+void ttool::standaloneUtils::Viewer::DrawInterface(cv::Mat frame)
 	{
 		cv::Scalar color(25, 25, 125);
 
@@ -42,29 +59,37 @@ void Viewer::DrawInterface(cv::Mat frame)
 
 		if (m_ShowKeymaps)
 		{
-			cv::putText(frame, "Keymaps:", cv::Point(5, 60), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			int offset = 3;
+			int scale = 20;
+			cv::putText(frame, "Keymaps:", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
 			// Translation
-			cv::putText(frame, "W: Move model up", cv::Point(5, 80), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "S: Move model down", cv::Point(5, 100), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "A: Move model left", cv::Point(5, 120), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "D: Move model right", cv::Point(5, 140), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "Q: Move model forward", cv::Point(5, 160), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "E: Move model backward", cv::Point(5, 180), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "W: Move model up", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "S: Move model down", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "A: Move model left", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "D: Move model right", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "Q: Move model forward", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "E: Move model backward", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
 			// Rotation
-			cv::putText(frame, "I: Rotate model up", cv::Point(5, 200), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "K: Rotate model down", cv::Point(5, 220), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "J: Rotate model left", cv::Point(5, 240), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "L: Rotate model right", cv::Point(5, 260), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "U: Rotate model clockwise", cv::Point(5, 280), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "O: Rotate model counterclockwise", cv::Point(5, 300), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "I: Rotate model up", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "K: Rotate model down", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "J: Rotate model left", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "L: Rotate model right", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "U: Rotate model clockwise", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "O: Rotate model counterclockwise", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			// Scale
+			cv::putText(frame, "1: scale down the translation and rotation by 2", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "2: scale up the translation and rotation by 2", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+		
 			// Model Management
-			cv::putText(frame, "UP: Change model", cv::Point(5, 320), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "R: Reset model to ground truth", cv::Point(5, 340), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "P: Set current model pose as initial", cv::Point(5, 360), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "Y: Set current model pose as initial, and save to config file", cv::Point(5, 380), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "UP: Change model", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "R: Reset model to ground truth", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "T: Reset model to the last saved pose", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "P: Set current model pose as initial", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "Y: Set current model pose as initial, and save to config file", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			
 			// Tracking
-			cv::putText(frame, "Q: Stop tracking (while tracking)", cv::Point(5, 400), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
-			cv::putText(frame, "P: Start tracking (while not tracking)", cv::Point(5, 420), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "Q: Stop tracking (while tracking)", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
+			cv::putText(frame, "P: Start tracking (while not tracking)", cv::Point(5, scale * offset++), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, color, 1);
 		}
 		else
 		{
@@ -72,21 +97,21 @@ void Viewer::DrawInterface(cv::Mat frame)
 		}
 	}
 
-void Viewer::PrintID(int fid, cv::Mat &frame)
+void ttool::standaloneUtils::Viewer::PrintID(int fid, cv::Mat &frame)
 {
 	std::stringstream sstr;
 	sstr << "#" << std::setw(3) << std::setfill('0') << fid;
 	cv::putText(frame, sstr.str(), cv::Point(5, 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(0, 255, 0), 1);
 }
 
-void Viewer::PrintFPS(int fps, cv::Mat &frame)
+void ttool::standaloneUtils::Viewer::PrintFPS(int fps, cv::Mat &frame)
 {
 	std::stringstream sstr;
 	sstr << "FPS" << std::setw(3) << std::setfill('0') << fps;
 	cv::putText(frame, sstr.str(), cv::Point(frame.size[1] - 150, 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(0, 255, 0), 1);
 }
 
-void Viewer::ShowImage(const cv::Mat &frame)
+void ttool::standaloneUtils::Viewer::ShowImage(const cv::Mat &frame)
 {
 	if (frame.cols > 1440)
 	{
@@ -100,7 +125,7 @@ void Viewer::ShowImage(const cv::Mat &frame)
 	}
 }
 
-void UnifiedViewer::Init(const std::string &name, View *view, std::shared_ptr<Model> object, std::shared_ptr<Camera> camera_ptr)
+void ttool::standaloneUtils::UnifiedViewer::Init(const std::string &name, View *view, std::shared_ptr<ttool::tslet::Model> object, std::shared_ptr<Camera> camera_ptr)
 {
 	m_CameraPtr = std::move(camera_ptr);
 	renderer_ = view;
@@ -109,14 +134,14 @@ void UnifiedViewer::Init(const std::string &name, View *view, std::shared_ptr<Mo
 	m_IsInitialzed = true;
 }
 
-void UnifiedViewer::StopSavingImages()
+void ttool::standaloneUtils::UnifiedViewer::StopSavingImages()
 {
 	m_SaveImages = false;
 	m_SaveIndex = 0;
 }
 
 
-void UnifiedViewer::UpdateViewer(int frameID, int fps)
+void ttool::standaloneUtils::UnifiedViewer::UpdateViewer(int frameID, int fps)
 {
 	const cv::Mat &frame = m_CameraPtr->Image();
 	auto res_img = DrawOverlay(renderer_, objects_, frame);
@@ -137,7 +162,7 @@ void UnifiedViewer::UpdateViewer(int frameID, int fps)
 	}
 }
 
-cv::Mat UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<Model> object, const cv::Mat &frame)
+cv::Mat ttool::standaloneUtils::UnifiedViewer::DrawOverlay(View *view, std::shared_ptr<ttool::tslet::Model> object, const cv::Mat &frame)
 {
 	// render the models with phong shading
 	view->SetLevel(0);

@@ -1,3 +1,22 @@
+/**
+ * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
+ * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *                     
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "model.hh"
 
 #include <limits>
@@ -6,27 +25,24 @@
 #include <assimp/scene.h>
 #include <assimp/mesh.h>
 #include <assimp/postprocess.h>
-#include "util.hh" // for tk::IsFileExist
+#include "util.hh" // for ttool::utils::IsFileExist
 
-using namespace std;
-using namespace cv;
-
-Model::Model(const string modelFilename, float tx, float ty, float tz, float alpha, float beta, float gamma, float scale)
+ttool::tslet::Model::Model(const std::string modelFilename, float tx, float ty, float tz, float alpha, float beta, float gamma, float scale)
 {
-	Matx44f Ti = Transformations::translationMatrix(tx, ty, tz)
-	*Transformations::rotationMatrix(alpha, Vec3f(1, 0, 0))
-	*Transformations::rotationMatrix(beta, Vec3f(0, 1, 0))
-	*Transformations::rotationMatrix(gamma, Vec3f(0, 0, 1))
-	*Matx44f::eye();
+	cv::Matx44f Ti = ttool::utils::Transformations::translationMatrix(tx, ty, tz)
+	*ttool::utils::Transformations::rotationMatrix(alpha, cv::Vec3f(1, 0, 0))
+	*ttool::utils::Transformations::rotationMatrix(beta, cv::Vec3f(0, 1, 0))
+	*ttool::utils::Transformations::rotationMatrix(gamma, cv::Vec3f(0, 0, 1))
+	*cv::Matx44f::eye();
 
 	Init(modelFilename, Ti, scale);
 }
 
-Model::Model(const std::string modelFilename, const cv::Matx44f& Ti, float scale) {
+ttool::tslet::Model::Model(const std::string modelFilename, const cv::Matx44f& Ti, float scale) {
 	Init(modelFilename, Ti, scale);
 }
 
-void Model::Init(const std::string modelFilename, const cv::Matx44f& Ti, float scale) {
+void ttool::tslet::Model::Init(const std::string modelFilename, const cv::Matx44f& Ti, float scale) {
 	m_id = 0;
     
 	initialized = false;
@@ -40,14 +56,14 @@ void Model::Init(const std::string modelFilename, const cv::Matx44f& Ti, float s
 
 	scaling = scale;
     
-	T_n = Matx44f::eye();
+	T_n = cv::Matx44f::eye();
     
 	hasNormals = false;
     
   loadModel(modelFilename);
 }
 
-Model::~Model()
+ttool::tslet::Model::~Model()
 {
     vertices.clear();
     normals.clear();
@@ -56,7 +72,7 @@ Model::~Model()
     offsets.clear();
 }
 
-void Model::initBuffers()
+void ttool::tslet::Model::initBuffers()
 {
   	glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -74,19 +90,19 @@ void Model::initBuffers()
 }
 
 
-void Model::initialize()
+void ttool::tslet::Model::initialize()
 {
     initialized = true;
 }
 
 
-bool Model::isInitialized()
+bool ttool::tslet::Model::isInitialized()
 {
     return initialized;
 }
 
 
-void Model::draw(GLint program, GLint primitives)
+void ttool::tslet::Model::draw(GLint program, GLint primitives)
 {
     auto aPosition = glGetAttribLocation(program, "aPosition");
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -113,86 +129,86 @@ void Model::draw(GLint program, GLint primitives)
 }
 
 
-Matx44f Model::getPose()
+cv::Matx44f ttool::tslet::Model::getPose()
 {
     return T_cm;
 }
 
-void Model::setPose(const Matx44f &T_cm)
+void ttool::tslet::Model::setPose(const cv::Matx44f &T_cm)
 {
     this->T_cm = T_cm;
 }
 
-Matx44f Model::getPrePose()
+cv::Matx44f ttool::tslet::Model::getPrePose()
 {
     return T_pm;
 }
 
-void Model::setPrePose(const Matx44f &T_cm)
+void ttool::tslet::Model::setPrePose(const cv::Matx44f &T_cm)
 {
     this->T_pm = T_cm;
 }
 
-void Model::setInitialPose(const Matx44f &Ti)
+void ttool::tslet::Model::setInitialPose(const cv::Matx44f &Ti)
 {
     this->T_i = Ti;
 }
 
-Matx44f Model::getNormalization()
+cv::Matx44f ttool::tslet::Model::getNormalization()
 {
     return T_n;
 }
 
 
-Vec3f Model::getLBN()
+cv::Vec3f ttool::tslet::Model::getLBN()
 {
     return lbn;
 }
 
-Vec3f Model::getRTF()
+cv::Vec3f ttool::tslet::Model::getRTF()
 {
     return rtf;
 }
 
-float Model::getScaling() {
+float ttool::tslet::Model::getScaling() {
     
     return scaling;
 }
 
 
-vector<glm::vec3> Model::getVertices()
+std::vector<glm::vec3> ttool::tslet::Model::getVertices()
 {
     return vertices;
 }
 
-vector<glm::vec3> Model::getSimpleVertices()
+std::vector<glm::vec3> ttool::tslet::Model::getSimpleVertices()
 {
     return svertices;
 }
 
-int Model::getNumVertices()
+int ttool::tslet::Model::getNumVertices()
 {
     return (int)vertices.size();
 }
 
-int Model::getNumSimpleVertices()
+int ttool::tslet::Model::getNumSimpleVertices()
 {
     return (int)svertices.size();
 }
 
-int Model::getModelID()
+int ttool::tslet::Model::getModelID()
 {
     return m_id;
 }
 
 
-void Model::setModelID(int i)
+void ttool::tslet::Model::setModelID(int i)
 {
     m_id = i;
 }
 
 
-void Model::reset()
+void ttool::tslet::Model::reset()
 {
     initialized = false;
     T_cm = T_i;
@@ -207,7 +223,7 @@ void IdenInsert(std::vector<aiVector3D>& verts, const aiVector3D& vert) {
   verts.push_back(vert);
 }
 
-void IdentAdd(std::vector<Vec3f>& vertices, aiVector3D* aiv, unsigned int num) {
+void IdentAdd(std::vector<cv::Vec3f>& vertices, aiVector3D* aiv, unsigned int num) {
   vertices.clear();
 
   std::vector<aiVector3D> setv;
@@ -217,11 +233,11 @@ void IdentAdd(std::vector<Vec3f>& vertices, aiVector3D* aiv, unsigned int num) {
   }
 
   for (auto vert : setv) {
-    vertices.push_back(Vec3f(vert.x, vert.y, vert.z));
+    vertices.push_back(cv::Vec3f(vert.x, vert.y, vert.z));
   }
 }
 
-void Model::loadModel(const string modelFilename)
+void ttool::tslet::Model::loadModel(const std::string modelFilename)
 {
     Assimp::Importer importer;
     
@@ -231,7 +247,7 @@ void Model::loadModel(const string modelFilename)
     
     hasNormals = mesh->HasNormals();
     
-    float inf = numeric_limits<float>::infinity();
+    float inf = std::numeric_limits<float>::infinity();
     lbn = cv::Vec3f(inf, inf, inf);
     rtf = cv::Vec3f(-inf, -inf, -inf);
     
@@ -279,11 +295,11 @@ void Model::loadModel(const string modelFilename)
     // the center of the 3d bounding box
     cv::Vec3f bbCenter = (rtf + lbn) / 2.0f;
     // compute a normalization transform that moves the object to the center of its bounding box and scales it according to the prescribed factor
-    T_n = Transformations::scaleMatrix(scaling)*Transformations::translationMatrix(-bbCenter[0], -bbCenter[1], -bbCenter[2]);
+    T_n = ttool::utils::Transformations::scaleMatrix(scaling)*ttool::utils::Transformations::translationMatrix(-bbCenter[0], -bbCenter[1], -bbCenter[2]);
 
 //#define DELETE_EXTRA_VERTEX
 #ifdef DELETE_EXTRA_VERTEX
-    if (tk::IsFileExist(modelFilename + 's')) {
+    if (ttool::utils::IsFileExist(modelFilename + 's')) {
       //loadSimpleModel(modelFilename + 's');
       Assimp::Importer importer;
       const aiScene* scene = importer.ReadFile(modelFilename, aiProcessPreset_TargetRealtime_Fast);
@@ -294,7 +310,7 @@ void Model::loadModel(const string modelFilename)
       IdentAdd(svertices, mesh->mVertices, mesh->mNumVertices);
     }
 #else
-    if (tk::IsFileExist(modelFilename + 's')) {
+    if (ttool::utils::IsFileExist(modelFilename + 's')) {
       loadSimpleModel(modelFilename + 's');
     } else {
       svertices = vertices;
@@ -340,7 +356,7 @@ void Model::loadModel(const string modelFilename)
 #endif
 }
 
-void Model::loadSimpleModel(const string modelFilename) {
+void ttool::tslet::Model::Model::loadSimpleModel(const std::string modelFilename) {
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelFilename, aiProcessPreset_TargetRealtime_Fast);
   aiMesh *mesh = scene->mMeshes[0];

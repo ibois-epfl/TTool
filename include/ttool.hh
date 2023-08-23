@@ -1,3 +1,21 @@
+/**
+ * TTool
+ * Copyright (C) 2023  Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef __TTOOL_H__
 #define __TTOOL_H__
 
@@ -11,12 +29,24 @@
 #include "view.hh"
 #include "config.hh"
 #include "classifier.hh"
+#include "pose_writer.hh"
 
 namespace ttool
 {
+    /**
+     * @brief This class is the main class of the TTool library.
+     * 
+     */
     class TTOOL_API TTool
     {
     public:
+        /**
+         * @brief Construct a new TTool object from a configuration file and a camera calibration file
+         * 
+         * @param ttoolRootPath absolute path to the root folder of the TTool library
+         * @param configFile 
+         * @param cameraCalibFile 
+         */
         TTool(std::string ttoolRootPath, std::string configFile, std::string cameraCalibFile)
         {
             InitializeConfig(ttoolRootPath, configFile);
@@ -45,6 +75,12 @@ namespace ttool
             RunOnAFrame(emptyMat);
         }
 
+        /**
+         * @brief Construct a new TTool object from a configuration file and a camera calibration file
+         * 
+         * @param configFile 
+         * @param cameraCalibFile 
+         */
         TTool(std::string configFile, std::string cameraCalibFile)
         {
             InitializeConfig("", configFile);
@@ -75,6 +111,14 @@ namespace ttool
             CheckObjectChange();
         };
 
+        /**
+         * @brief Construct a new TTool object from a configuration file and a camera matrix and camera size
+         * 
+         * @param ttoolRootPath an absolute path to the root folder of the TTool library
+         * @param configFile 
+         * @param cameraMatrix 
+         * @param cameraSize 
+         */
         TTool(std::string ttoolRootPath, std::string configFile, cv::Mat cameraMatrix, cv::Size cameraSize)
         {
             InitializeConfig(ttoolRootPath, configFile);
@@ -120,6 +164,26 @@ namespace ttool
         }
 
         /**
+         * @brief Set the Model Manipulation Translation Scale object
+         * 
+         * @param scale 
+         */
+        void SetModelManipulationTranslationScale(float scale)
+        {
+            m_Input.SetTranslationScale(scale);
+        }
+        
+        /**
+         * @brief Set the Model Manipulation Rotation Scale object
+         * 
+         * @param scale 
+         */
+        void SetModelManipulationRotationScale(float scale)
+        {
+            m_Input.SetRotationScale(scale);
+        }
+
+        /**
          * @brief Run the object tracker on a frame
          * 
          * @param frame 
@@ -131,15 +195,38 @@ namespace ttool
             m_ObjectTracker.CallEstimatePose(m_ModelManagerPtr->GetObject(), m_CurrentObjectID, frame);
         }
 
+        /**
+         * @brief Classify the tool based on the camera frame
+         * 
+         * @param frame 
+         * @return std::string the name of the tool
+         */
         std::string Classify(cv::Mat frame)
         {
             int prediction = m_Classifier->Classify(frame);
             return m_Classifier->GetLabel(prediction);
         }
 
+        /**
+         * @brief Get the Classifier Log object
+         * 
+         * @return std::string 
+         */
         std::string GetClassifierLog()
         {
             return m_Classifier->ClassifierLog.str();
+        }
+
+        /**
+         * @brief Get the top k labels of the classification of the image frame of a tool head
+         * 
+         * @param frame 
+         * @return std::vector<std::string> 
+         */
+        std::vector<std::string> ClassifyWithSortedLabels(cv::Mat frame)
+        {
+            return m_Classifier->ClassifyTopK(frame, m_Classifier->GetTotalClass());
+
         }
 
         /**
@@ -178,6 +265,44 @@ namespace ttool
                 cv::drawContours(frame, contours, i, color, 2);
         }
 
+        /**
+         * @brief Draw the shaded of the model on the camera frame
+         * 
+         * @param frame camera frame
+         * @param clr color of the silhouette
+         */
+        void DrawShaded(cv::Mat& frame)
+        {
+            View *view = View::Instance();
+
+            view->RenderSilhouette(m_ModelManagerPtr->GetObject(), GL_FILL);
+
+            cv::Mat depth = view->DownloadFrame(View::DEPTH); // This is the depth map of the model 0.0f and 1.0f are the min and max depth
+
+            view->RenderShaded(m_ModelManagerPtr->GetObject(), GL_FILL);
+            cv::Mat rgb = view->DownloadFrame(View::RGB); // This is the rendered image of the model
+
+            float alpha = 0.5f;
+            for (int y = 0; y < frame.rows; y++)
+            {
+                for (int x = 0; x < frame.cols; x++)
+                {
+                    if (depth.at<float>(y, x) != 0.0f)
+                    {
+                        frame.at<cv::Vec3b>(y, x) = alpha * rgb.at<cv::Vec3b>(y, x) + (1.0f - alpha) * frame.at<cv::Vec3b>(y, x);
+                    }
+                }
+            }
+
+            cv::Mat maskCvt;
+            view->ConvertMask(depth, maskCvt, m_ModelManagerPtr->GetObject()->getModelID());
+            std::vector<std::vector<cv::Point>> contours;
+            cv::findContours(maskCvt, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+            cv::Vec3b color = cv::Vec3b(30, 255, 0);
+            for (int i = 0; i < contours.size(); i++)
+                cv::drawContours(frame, contours, i, color, 2);
+        }
+
         /// @brief Destroy the View object
         void DestrolView()
         {
@@ -200,7 +325,7 @@ namespace ttool
          * 
          * @return std::shared_ptr<ttool::Model> 
          */
-        std::shared_ptr<Object3D> GetModel()
+        std::shared_ptr<ttool::tslet::Object3D> GetModel()
         {
             CheckObjectChange();
             return m_ModelManagerPtr->GetObject();
@@ -245,10 +370,53 @@ namespace ttool
             view->Initialize(CameraMatrix, CamSize.width, CamSize.height, zn, zf, 4);
         }
 
+        /**
+         * @brief Get the Tracking Status object from the object tracker
+         * 
+         * @return std::string 
+         */
         std::string GetTrackingStatus()
         {
             return m_ObjectTracker.GetTrackingStatus();
         }
+
+        /**
+         * @brief Write the pose of the object to a file with a corresponding image
+         * 
+         * @param image 
+         */
+        void WritePoseToFile(cv::Mat image)
+        {
+            if (m_PoseWriter == nullptr)
+            {
+                std::time_t time = std::time({});
+                char timeString[std::size("YYYY-MM-DD_HH-MM-SS")];
+                std::strftime(timeString, sizeof(timeString), "%Y-%m-%d_%H-%M-%S", std::localtime(&time));
+
+                std::string outputParentDir = m_ConfigPtr->GetTToolRootPath() + "/TToolOutput/";
+
+                std::string outputDir = outputParentDir + timeString;
+                std::filesystem::create_directories(outputDir);
+                
+                std::string outputLogFile = outputDir + "/PoseLog.txt";
+
+                std::filesystem::create_directory(outputDir);
+
+                m_PoseWriter = std::make_unique<ttool::PoseWriter>(outputLogFile, m_ConfigFile, m_ConfigPtr->GetConfigData().ModelFiles);
+                
+                // Make directory for the images, create "TToolOutput/<CurrentDate>__<CurrentTime>" directory
+                m_PoseWriter->SetImageDir(outputDir);
+            }
+            auto pose = GetPose();
+            m_PoseWriter->Write(pose, GetCurrentObjectID(), m_ModelManagerPtr->GetObjectName(), image);
+        }
+
+        /**
+         * @brief Reset the pose writer
+         * This will make the pose writer to create a new directory for the next pose writing
+         * 
+         */
+        void ResetPoseWriter() { m_PoseWriter = nullptr; }
 
     public:
         std::shared_ptr<ttool::Config> GetConfig() { return m_ConfigPtr; };
@@ -256,12 +424,23 @@ namespace ttool
         int GetCurrentObjectID() { return m_CurrentObjectID; };
 
     private:
+        /**
+         * @brief Initialize the config class with the TTool Root Path and the config file
+         * 
+         * @param ttoolRootPath path to the TTool root directory
+         * @param configFile    path to the config file
+         */
         void InitializeConfig(std::string ttoolRootPath, std::string configFile)
         {
+            m_ConfigFile = configFile;
             m_ConfigPtr = std::make_shared<ttool::Config>(configFile);
             m_ConfigPtr->SetTToolRootPath(ttoolRootPath);
         }
 
+        /**
+         * @brief Initialize the tool head classifier
+         * 
+         */
         void InitializeClassifier()
         {
             m_Classifier = std::make_unique<ttool::ML::Classifier>(m_ConfigPtr->GetConfigData().ClassifierModelPath,
@@ -272,6 +451,7 @@ namespace ttool
                                                                    m_ConfigPtr->GetConfigData().ClassifierStd);
         }
 
+        /// @brief Check if the current object has changed. If yes, initialize the object tracker
         void CheckObjectChange()
         {
             if (m_ModelManagerPtr->GetObject()->getModelID() != m_CurrentObjectID)
@@ -316,7 +496,18 @@ namespace ttool
         }
 
         /**
-         * @brief 
+         * @brief Transoform the ground truth poses of 
+         * r11 r12 r13
+         * r21 r22 r23
+         * r31 r32 r33
+         * t1  t2  t3
+         * 
+         * to
+         * 
+         * r11 r12 r13 t1
+         * r21 r22 r23 t2
+         * r31 r32 r33 t3
+         * 0   0   0   1
          * 
          * @param groundTruthPoses 
          * @return std::vector<cv::Matx44f> 
@@ -354,6 +545,7 @@ namespace ttool
         cv::Size CamSize;
     
     private:
+        std::string m_ConfigFile;
         std::shared_ptr<ttool::Config> m_ConfigPtr;
         std::string m_CameraCalibFile;
 
@@ -361,9 +553,11 @@ namespace ttool
 
         std::unique_ptr<ttool::ML::Classifier> m_Classifier;
 
-        tslet::ObjectTracker m_ObjectTracker;
+        ttool::tslet::ObjectTracker m_ObjectTracker;
         ttool::InputModelManager m_Input;
         int m_CurrentObjectID = 0;
+
+        std::unique_ptr<ttool::PoseWriter> m_PoseWriter;
     };
 }
 

@@ -130,7 +130,15 @@ def main(dataset_path : str, config_path : str) -> None:
     for i in range(len(model_obj_paths)):
         # load the model path from the file
         new_model_path : str = ""
-        new_lines_modelFiles.append("   - \"{}\"\n".format(model_obj_paths[i]))
+
+
+
+        # trunc everything that is before /assets
+        rel_obj_paths = model_obj_paths[i].split("/TTool")[1]
+        rel_init_pose_paths = model_init_pose_paths[i].split("/TTool")[1]
+        rel_acit_paths = model_acit_paths[i].split("/TTool")[1]
+
+        new_lines_modelFiles.append("   - \"{}\"\n".format(rel_obj_paths))
 
         # load the pose from the file
         with open(model_init_pose_paths[i], "r") as f:
@@ -140,7 +148,7 @@ def main(dataset_path : str, config_path : str) -> None:
         new_lines_gtPoses.append("{}\n".format(new_model_path))
 
         # load the acit file
-        new_lines_acitFiles.append("   - \"{}\"\n".format(model_acit_paths[i]))
+        new_lines_acitFiles.append("   - \"{}\"\n".format(rel_acit_paths))
 
     with open(config_path, "r+") as f:
         lines = f.readlines()

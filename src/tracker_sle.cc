@@ -1,3 +1,22 @@
+/**
+ * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
+ * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *                     
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <iostream>
 #include <fstream>
 #include <opencv2/highgui.hpp>
@@ -12,12 +31,12 @@ enum {
 	RUN_DEBUG = 1,
 };
 
-SLETracker::SLETracker(const cv::Matx33f& K, std::shared_ptr<Object3D> objects)
+ttool::tslet::SLETracker::SLETracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> objects)
 	: SLTracker(K, objects)
 {}
 
-void SLETracker::ComputeJac(
-	std::shared_ptr<Object3D> object,
+void ttool::tslet::SLETracker::ComputeJac(
+	std::shared_ptr<ttool::tslet::Object3D> object,
 	int m_id, 
 	const cv::Mat& frame,
 	const cv::Mat& depth_map,
@@ -124,7 +143,7 @@ void SLETracker::ComputeJac(
 	}
 }
 
-void SLETracker::FindMatchPointMaxProb(float diff) {
+void ttool::tslet::SLETracker::FindMatchPointMaxProb(float diff) {
 	std::vector<std::vector<cv::Point> >& search_points = search_line->search_points;
 	const std::vector<std::vector<cv::Point2f> >& bundle_prob = search_line->bundle_prob;
 	scores.resize(search_points.size());
@@ -180,7 +199,7 @@ void SLETracker::FindMatchPointMaxProb(float diff) {
 	}
 }
 
-void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<Object3D> object, int runs, cv::Matx44f& init_pose)
+void ttool::tslet::SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<ttool::tslet::Object3D> object, int runs, cv::Matx44f& init_pose)
 {
     for (int iter = 0; iter < runs * 4; iter++) {
         RunIteration(object, imagePyramid, 2, 12, 2, init_pose);
@@ -195,7 +214,7 @@ void SLETracker::Track(std::vector<cv::Mat>& imagePyramid, std::shared_ptr<Objec
     }
 }
 
-void SLETracker::RunIteration(std::shared_ptr<Object3D> object, const std::vector<cv::Mat>& imagePyramid, int level, int sl_len, int sl_seg, cv::Matx44f& init_pose)
+void ttool::tslet::SLETracker::RunIteration(std::shared_ptr<ttool::tslet::Object3D> object, const std::vector<cv::Mat>& imagePyramid, int level, int sl_len, int sl_seg, cv::Matx44f& init_pose)
 {
 	m_trackingStatus.str(std::string()); // Clearing the string
 	m_trackingStatus.precision(4);
@@ -273,7 +292,7 @@ void SLETracker::RunIteration(std::shared_ptr<Object3D> object, const std::vecto
 	cv::Matx61f JT;
 	ComputeJac(object, m_id, imagePyramid[level], depth_map, depth_inv_map, wJTJ, JT);
 
-	auto deltaT = Transformations::exp(-wJTJ.inv(cv::DECOMP_CHOLESKY) * JT);
+	auto deltaT = ttool::utils::Transformations::exp(-wJTJ.inv(cv::DECOMP_CHOLESKY) * JT);
 	cv::Matx44f T_cm = deltaT * object->getPose();
 
 	if (avg < 0.0125 / 2)
@@ -292,7 +311,7 @@ void SLETracker::RunIteration(std::shared_ptr<Object3D> object, const std::vecto
 	}
 }
 
-void SLETracker::EstimatePoses(std::shared_ptr<Object3D> object, cv::Matx44f& init_pose, cv::Mat& frame) {
+void ttool::tslet::SLETracker::EstimatePoses(std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx44f& init_pose, cv::Mat& frame) {
     std::vector<cv::Mat> imagePyramid;
     imagePyramid.push_back(frame);
 

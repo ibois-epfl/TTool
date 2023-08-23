@@ -1,3 +1,22 @@
+/**
+ * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
+ * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *                     
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <iomanip>
 #include <glog/logging.h>
 #include <opencv2/highgui.hpp>
@@ -9,7 +28,7 @@
 #include "tracker_sle.hh"
 #include "viewer.hh"
 
-Tracker::Tracker(const cv::Matx33f& K, std::shared_ptr<Object3D> object) {
+ttool::tslet::Tracker::Tracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object) {
 	initialized = false;
 
 	view = View::Instance();
@@ -25,16 +44,16 @@ Tracker::Tracker(const cv::Matx33f& K, std::shared_ptr<Object3D> object) {
 	object->reset();
 }
 
-Tracker* Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<Object3D> objects) {
-	Tracker* poseEstimator = NULL;
-	poseEstimator = new SLETracker(K, objects);
+ttool::tslet::Tracker* ttool::tslet::Tracker::GetTracker(int id, const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::shared_ptr<ttool::tslet::Object3D> objects) {
+	ttool::tslet::Tracker* poseEstimator = NULL;
+	poseEstimator = new ttool::tslet::SLETracker(K, objects);
 
 	CHECK(poseEstimator) << "Check |tracker_mode| in yml file";
 	return poseEstimator;
 }
 
 
-void Tracker::ToggleTracking(std::shared_ptr<Object3D> object) {
+void ttool::tslet::Tracker::ToggleTracking(std::shared_ptr<ttool::tslet::Object3D> object) {
 	if (!object->isInitialized()) {
 		object->initialize();
 		initialized = true;
@@ -46,7 +65,7 @@ void Tracker::ToggleTracking(std::shared_ptr<Object3D> object) {
 	}
 }
 
-cv::Rect Tracker::Compute2DROI(std::shared_ptr<Object3D> object, const cv::Size& maxSize, int offset) {
+cv::Rect ttool::tslet::Tracker::Compute2DROI(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Size& maxSize, int offset) {
 	// PROJECT THE 3D BOUNDING BOX AS 2D ROI
 	cv::Rect boundingRect;
 	std::vector<cv::Point2f> projections;
@@ -77,7 +96,7 @@ cv::Rect Tracker::Compute2DROI(std::shared_ptr<Object3D> object, const cv::Size&
 	return roi;
 }
 
-cv::Rect Tracker::computeBoundingBox(const std::vector<cv::Point3i>& centersIDs, int offset, int level, const cv::Size& maxSize) {
+cv::Rect ttool::tslet::Tracker::computeBoundingBox(const std::vector<cv::Point3i>& centersIDs, int offset, int level, const cv::Size& maxSize) {
 	int minX = INT_MAX, minY = INT_MAX;
 	int maxX = -1, maxY = -1;
 
@@ -104,7 +123,7 @@ cv::Rect Tracker::computeBoundingBox(const std::vector<cv::Point3i>& centersIDs,
 	return {minX, minY, maxX - minX, maxY - minY};
 }
 
-void Tracker::ConvertMask(const cv::Mat& src_mask, uchar oid, cv::Mat& mask) {
+void ttool::tslet::Tracker::ConvertMask(const cv::Mat& src_mask, uchar oid, cv::Mat& mask) {
 	mask = cv::Mat(src_mask.size(), CV_8UC1, cv::Scalar(0));
 	uchar depth = src_mask.type() & CV_MAT_DEPTH_MASK;
 
@@ -126,7 +145,7 @@ void Tracker::ConvertMask(const cv::Mat& src_mask, uchar oid, cv::Mat& mask) {
 	}
 }
 
-void Tracker::ConvertMask(const cv::Mat& src_mask, uchar oid, cv::Rect& roi, cv::Mat& mask) {
+void ttool::tslet::Tracker::ConvertMask(const cv::Mat& src_mask, uchar oid, cv::Rect& roi, cv::Mat& mask) {
 	mask = cv::Mat(src_mask.size(), CV_8UC1, cv::Scalar(0));
 	uchar depth = src_mask.type() & CV_MAT_DEPTH_MASK;
 
@@ -150,7 +169,7 @@ void Tracker::ConvertMask(const cv::Mat& src_mask, uchar oid, cv::Rect& roi, cv:
 	}
 }
 
-void Tracker::ShowMask(const cv::Mat& masks, cv::Mat& buf) {
+void ttool::tslet::Tracker::ShowMask(const cv::Mat& masks, cv::Mat& buf) {
 	uchar depth = masks.type() & CV_MAT_DEPTH_MASK;
 
 	if (CV_8U == depth) {
@@ -172,13 +191,13 @@ void Tracker::ShowMask(const cv::Mat& masks, cv::Mat& buf) {
 	}
 }
 
-TrackerBase::TrackerBase(const cv::Matx33f& K, std::shared_ptr<Object3D> object) 
+ttool::tslet::TrackerBase::TrackerBase(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> object) 
 : Tracker(K, object) 
 {
-	m_Histogram = new RBOTHist(object);
+	m_Histogram = new ttool::tslet::RBOTHist(object);
 }
 
-void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
+void ttool::tslet::TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
 	static const double CANNY_LOW_THRESH = 10;
 	static const double CANNY_HIGH_THRESH = 20;
 
@@ -187,7 +206,7 @@ void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
 	cv::Canny(img_gray, img_edge, CANNY_LOW_THRESH, CANNY_HIGH_THRESH);
 }
 
-void TrackerBase::UpdateHistogram(cv::Mat frame, std::shared_ptr<Object3D> object) {
+void ttool::tslet::TrackerBase::UpdateHistogram(cv::Mat frame, std::shared_ptr<ttool::tslet::Object3D> object) {
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
 		view->SetLevel(0);
@@ -199,20 +218,20 @@ void TrackerBase::UpdateHistogram(cv::Mat frame, std::shared_ptr<Object3D> objec
 	}
 }
 
-SLTracker::SLTracker(const cv::Matx33f& K, std::shared_ptr<Object3D> objects)
+ttool::tslet::SLTracker::SLTracker(const cv::Matx33f& K, std::shared_ptr<ttool::tslet::Object3D> objects)
 	: TrackerBase(K, objects)
 {
-	search_line = std::make_shared<SearchLine>();
+	search_line = std::make_shared<ttool::tslet::SearchLine>();
 }
 
-void SLTracker::GetBundleProb(std::shared_ptr<Object3D> object, const cv::Mat& frame) {
+void ttool::tslet::SLTracker::GetBundleProb(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Mat& frame) {
 	std::vector<std::vector<cv::Point> >& search_points = search_line->search_points;
 	std::vector<std::vector<cv::Point2f> >& bundle_prob = search_line->bundle_prob;
 	bundle_prob.clear();
 
 	int level = view->GetLevel();
 	int upscale = pow(2, level);
-	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
+	std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();
 	int numBins = tclcHistograms->getNumBins();
@@ -287,7 +306,7 @@ void SLTracker::GetBundleProb(std::shared_ptr<Object3D> object, const cv::Mat& f
 	} // for rows
 }
 
-void SLTracker::FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth) {
+void ttool::tslet::SLTracker::FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth) {
 	const std::vector<std::vector<cv::Point> >& search_points = search_line->search_points;
 
 	for (int r = 0; r < search_points.size(); ++r) {

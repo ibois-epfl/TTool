@@ -1,21 +1,39 @@
+/**
+ * SLET
+ * Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <iostream>
 #include <opencv2/core.hpp>
 #include <glog/logging.h>
 #include "tclc_histograms.hh"
 #include "search_line.hh"
 
-SearchLine::SearchLine() {
+ttool::tslet::SearchLine::SearchLine() {
 	//line_len = Nr;
 }
 
-void SearchLine::FindContours(const cv::Mat& projection_mask, int seg, bool all_contours) {
+void ttool::tslet::SearchLine::FindContours(const cv::Mat& projection_mask, int seg, bool all_contours) {
 	if (all_contours)
 		cv::findContours(projection_mask, contours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
 	else
 		cv::findContours(projection_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
 }
 
-void SearchLine::DrawContours(cv::Mat& buf) const {
+void ttool::tslet::SearchLine::DrawContours(cv::Mat& buf) const {
 	// std::cout << "contour size: " << contours.size() << std::endl;
 
 	CHECK(!buf.empty());
@@ -42,7 +60,7 @@ void SearchLine::DrawContours(cv::Mat& buf) const {
 	}
 }
 
-void SearchLine::DrawSearchLine(cv::Mat& buf) const {
+void ttool::tslet::SearchLine::DrawSearchLine(cv::Mat& buf) const {
 	float alpha = 0.3f;
 	for (int i = 0; i < search_points.size(); i++) {
 		if (actives[i])
@@ -57,7 +75,7 @@ void SearchLine::DrawSearchLine(cv::Mat& buf) const {
 	}
 }
 
-void SearchLine::FindSearchLine(const cv::Mat& mask, const cv::Mat& frame, int line_len, int seg, bool use_all) {
+void ttool::tslet::SearchLine::FindSearchLine(const cv::Mat& mask, const cv::Mat& frame, int line_len, int seg, bool use_all) {
 	FindContours(mask, seg, use_all);
 
 	search_points.clear();
@@ -127,7 +145,7 @@ static bool PtInFrame(const cv::Point& pt, int width, int height) {
 	return (pt.x < width && pt.y < height && pt.x >= 0 && pt.y >= 0);
 }
 
-void SearchLine::getLine(float k, const cv::Point& center, int line_len, const cv::Mat& fill_img, std::vector<cv::Point>& points, cv::Point2f& norm) {
+void ttool::tslet::SearchLine::getLine(float k, const cv::Point& center, int line_len, const cv::Mat& fill_img, std::vector<cv::Point>& points, cv::Point2f& norm) {
 	static std::vector<cv::Point> decrease;
 	static std::vector<cv::Point> increase;
 	decrease.resize(0);

@@ -1,3 +1,21 @@
+/**
+ * TTool
+ * Copyright (C) 2023  Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <iostream>
 
 #include "camera.hh"
@@ -108,7 +126,7 @@ int main(int argc, char **argv)
     cameraPtr->UpdateCamera();
     ttool::InputVisualizer inputVisualizer(visualizerPtr);
 
-    PoseWriter poseWriter = PoseWriter("trackingPose.log", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
+    ttool::PoseWriter poseWriter = ttool::PoseWriter("trackingPose.log", __TTOOL_CONFIG_PATH__, configPtr->GetConfigData().ModelFiles);
 
     // main thread
     bool exit = false;
@@ -187,7 +205,7 @@ int main(int argc, char **argv)
 
             cv::Matx44f pose = ttool->GetPose();
 
-            if (trackPose) { poseWriter.write(pose, ttool->GetCurrentObjectID()); }
+            if (trackPose) { poseWriter.Write(pose, ttool->GetCurrentObjectID()); }
         }
     }
 

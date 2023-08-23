@@ -42,17 +42,17 @@ using namespace cv;
 using namespace std;
 
 
-SignedDistanceTransform2D::SignedDistanceTransform2D(float maxDist)
+ttool::tslet::SignedDistanceTransform2D::SignedDistanceTransform2D(float maxDist)
 {
     this->maxDist = maxDist;
 }
 
-SignedDistanceTransform2D::~SignedDistanceTransform2D()
+ttool::tslet::SignedDistanceTransform2D::~SignedDistanceTransform2D()
 {
     
 }
 
-void SignedDistanceTransform2D::computeTransform(const Mat &src, Mat &sdt, Mat &xyPos, int threads, uchar key)
+void ttool::tslet::SignedDistanceTransform2D::computeTransform(const Mat &src, Mat &sdt, Mat &xyPos, int threads, uchar key)
 {
     sdt.create(src.size(), CV_32FC1);
     Mat dd(src.size(), CV_32SC1);
@@ -100,7 +100,7 @@ void SignedDistanceTransform2D::computeTransform(const Mat &src, Mat &sdt, Mat &
 }
 
 
-void SignedDistanceTransform2D::computeDerivatives(const cv::Mat &sdt, cv::Mat &dX, cv::Mat &dY, int threads)
+void ttool::tslet::SignedDistanceTransform2D::computeDerivatives(const cv::Mat &sdt, cv::Mat &dX, cv::Mat &dY, int threads)
 {
     dX.create(sdt.size(), CV_32FC1);
     dY.create(sdt.size(), CV_32FC1);

@@ -1,3 +1,22 @@
+/**
+ * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
+ * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *                     
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <iostream>
 
 #include <glog/logging.h>
@@ -8,20 +27,20 @@
 using namespace std;
 using namespace cv;
 
-View *View::m_Instance;
+ttool::View *ttool::View::m_Instance;
 
-View::View(void)
+ttool::View::View(void)
 {
 	m_CalibrationMatrices.push_back(Matx44f::eye());
 
-	m_ProjectionMatrix = Transformations::perspectiveMatrix(40, 4.0f / 3.0f, 0.1, 1000.0);
+	m_ProjectionMatrix = ttool::utils::Transformations::perspectiveMatrix(40, 4.0f / 3.0f, 0.1, 1000.0);
 
-	m_LookAtMatrix = Transformations::lookAtMatrix(0, 0, 0, 0, 0, 1, 0, -1, 0);
+	m_LookAtMatrix = ttool::utils::Transformations::lookAtMatrix(0, 0, 0, 0, 0, 1, 0, -1, 0);
 
 	m_CurrentLevel = 0;
 }
 
-View::~View(void)
+ttool::View::~View(void)
 {
 	glDeleteTextures(1, &m_ColorTextureID);
 	glDeleteTextures(1, &m_DepthTextureID);
@@ -33,7 +52,7 @@ View::~View(void)
 	// delete surface;
 }
 
-void View::Destroy()
+void ttool::View::Destroy()
 {
 	// doneCurrent();
 	m_ProjectionMatrix = Matx44f::eye();
@@ -49,12 +68,12 @@ void View::Destroy()
 	m_Instance = NULL;
 }
 
-Matx44f View::GetCalibrationMatrix()
+Matx44f ttool::View::GetCalibrationMatrix()
 {
 	return m_CalibrationMatrices[m_CurrentLevel];
 }
 
-void View::Initialize(const Matx33f &K, int width, int height, float zNear, float zFar, int numLevels)
+void ttool::View::Initialize(const Matx33f &K, int width, int height, float zNear, float zFar, int numLevels)
 {
 	if (m_IsInitialized)
 	{
@@ -73,7 +92,7 @@ void View::Initialize(const Matx33f &K, int width, int height, float zNear, floa
 
 	this->m_NumLevels = numLevels;
 
-	m_ProjectionMatrix = Transformations::perspectiveMatrix(K, width, height, this->m_Zn, this->m_Zf, true);
+	m_ProjectionMatrix = ttool::utils::Transformations::perspectiveMatrix(K, width, height, this->m_Zn, this->m_Zf, true);
 
 	// LOG(INFO) << "Projection matrix: " << endl
 	// 		  << m_ProjectionMatrix;
@@ -116,14 +135,14 @@ void View::Initialize(const Matx33f &K, int width, int height, float zNear, floa
 	char* vertexFilePath = (char*)"assets/opengl/Silhouette.vs";
 	char* fragmentFilePath = (char*)"assets/opengl/Silhouette.fs";
 
-	m_SilhouetteShaderProgram = LoadShaders(vertexFilePath, fragmentFilePath);
+	m_SilhouetteShaderProgram = ttool::GLutils::LoadShaders(vertexFilePath, fragmentFilePath);
 	// Get a handle for our "MVP" uniform
 	m_SilhouetteMatrixId = glGetUniformLocation(m_SilhouetteShaderProgram, "uMVPMatrix");
 	m_SilhouetteAlphaId = glGetUniformLocation(m_SilhouetteShaderProgram, "uAlpha");
 	m_SilhouetteColorId = glGetUniformLocation(m_SilhouetteShaderProgram, "uColor");
 
 	// Phongblinn Shader
-	m_PhongblinnShaderProgram		= LoadShaders((char*)"assets/opengl/Phongblinn.vs", (char*)"assets/opengl/Phongblinn.fs");
+	m_PhongblinnShaderProgram		= ttool::GLutils::LoadShaders((char*)"assets/opengl/Phongblinn.vs", (char*)"assets/opengl/Phongblinn.fs");
 	m_PhongblinnMVPMatrixID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uMVPMatrix");
 	m_PhongblinnMVMatrixID			= glGetUniformLocation(m_PhongblinnShaderProgram, "uMVMatrix");
 	m_PhongblinnNormalMatrixID		= glGetUniformLocation(m_PhongblinnShaderProgram, "uNormalMatrix");
@@ -137,7 +156,7 @@ void View::Initialize(const Matx33f &K, int width, int height, float zNear, floa
 	m_IsInitialized = true;
 }
 
-void View::SetLevel(int level)
+void ttool::View::SetLevel(int level)
 {
 	m_CurrentLevel = level;
 	int s = pow(2, m_CurrentLevel);
@@ -148,12 +167,12 @@ void View::SetLevel(int level)
 	m_Height += m_Height % 4;
 }
 
-int View::GetLevel()
+int ttool::View::GetLevel()
 {
 	return m_CurrentLevel;
 }
 
-bool View::InitRenderingBuffers()
+bool ttool::View::InitRenderingBuffers()
 {
 	glBindVertexArray(m_VAO);
 
@@ -192,7 +211,7 @@ static bool PtInFrame(const cv::Vec2f &pt, int width, int height)
 	return (pt(0) < width && pt(1) < height && pt(0) >= 0 && pt(1) >= 0);
 }
 
-void View::RenderSilhouette(shared_ptr<Model> model, GLenum polygonMode, bool invertDepth)
+void ttool::View::RenderSilhouette(shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, bool invertDepth)
 {
 	glBindVertexArray(m_VAO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
@@ -238,7 +257,7 @@ void View::RenderSilhouette(shared_ptr<Model> model, GLenum polygonMode, bool in
 	glFinish();
 }
 
-void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
+void ttool::View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 {
 	mask = cv::Mat(src_mask.size(), CV_8UC1, cv::Scalar(0));
 	uchar depth = src_mask.type() & CV_MAT_DEPTH_MASK;
@@ -267,7 +286,7 @@ void View::ConvertMask(const cv::Mat &src_mask, cv::Mat &mask, uchar oid)
 	}
 }
 
-void View::RenderShaded(std::shared_ptr<Model> model, GLenum polygonMode, const cv::Point3f color)
+void ttool::View::RenderShaded(std::shared_ptr<ttool::tslet::Model> model, GLenum polygonMode, const cv::Point3f color)
 {
 	glBindVertexArray(m_VAO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
@@ -312,7 +331,7 @@ void View::RenderShaded(std::shared_ptr<Model> model, GLenum polygonMode, const 
 }
 
 
-void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
+void ttool::View::ProjectBoundingBox(std::shared_ptr<ttool::tslet::Model> model, std::vector<cv::Point2f> &projections, cv::Rect &boundingRect)
 {
 	Vec3f lbn = model->getLBN();
 	Vec3f rtf = model->getRTF();
@@ -368,7 +387,7 @@ void View::ProjectBoundingBox(std::shared_ptr<Model> model, std::vector<cv::Poin
 	boundingRect.height = rb.y - lt.y;
 }
 
-Mat View::DownloadFrame(View::FrameType type)
+Mat ttool::View::DownloadFrame(ttool::View::FrameType type)
 {
 	glBindVertexArray(m_VAO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);

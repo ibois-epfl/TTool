@@ -1,3 +1,21 @@
+/**
+ * TTool
+ * Copyright (C) 2023  Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #define SET_UNORDERED_MAP_VALUE(unorderedMap, key, value) \
@@ -15,6 +33,11 @@
 
 namespace ttool
 {
+    /**
+     * @brief This class is used to store the configuration data.
+     * It handles different types of data in the configuration and provides setters and getters for them.
+     * 
+     */
     struct ConfigData
     {
         public:
@@ -167,6 +190,10 @@ namespace ttool
             }
     };
 
+    /**
+     * @brief This class handles the configuration of the program.
+     * 
+     */
     class Config
     {
         public:
@@ -340,6 +367,16 @@ namespace ttool
             void SetTToolRootPath(std::string ttoolRootPath)
             {
                 m_TToolRootPath = ttoolRootPath;
+            }
+
+            /**
+             * @brief Get the TTool Root Path
+             * 
+             * @return std::string 
+             */
+            std::string GetTToolRootPath()
+            {
+                return m_TToolRootPath;
             }
 
             /**

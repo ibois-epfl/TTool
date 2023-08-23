@@ -1,22 +1,41 @@
+/**
+ * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
+ * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *                     
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <opencv2/highgui.hpp>
 #include "view.hh"
 #include "search_line.hh"
 #include "histogram.hh"
 
-Histogram::Histogram() {
+ttool::tslet::Histogram::Histogram() {
 	view = View::Instance();
 }
 
-Histogram::~Histogram() {}
+ttool::tslet::Histogram::~Histogram() {}
 
-RBOTHist::RBOTHist(const std::shared_ptr<Object3D> object) {
+ttool::tslet::RBOTHist::RBOTHist(const std::shared_ptr<ttool::tslet::Object3D> object) {
 	if (object->getTCLCHistograms() == nullptr)
-		object->SetTCLCHistograms(std::make_shared<TCLCHistograms>(TCLCHistograms(object, 32, 40, 10.0f)));
+		object->SetTCLCHistograms(std::make_shared<ttool::tslet::TCLCHistograms>(ttool::tslet::TCLCHistograms(object, 32, 40, 10.0f)));
 	else
 		std::cout << "RBOTHist::RBOTHist: TCLCHistograms already exists!" << std::endl;
 }
 
-void RBOTHist::Update(std::shared_ptr<Object3D> object, const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, float afg, float abg){
+void ttool::tslet::RBOTHist::Update(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Mat& frame, cv::Mat& mask_map, cv::Mat& depth_map, float afg, float abg){
 	float zNear = view->GetZNear();
 	float zFar = view->GetZFar();
 	cv::Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
@@ -24,8 +43,8 @@ void RBOTHist::Update(std::shared_ptr<Object3D> object, const cv::Mat& frame, cv
 	object->getTCLCHistograms()->update(frame, mask_map, depth_map, K, zNear, zFar, afg, abg);
 }
 
-void RBOTHist::GetPixelProb(std::shared_ptr<Object3D> object, uchar rc, uchar gc, uchar bc, int x, int y, float& ppf, float& ppb) {
-	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
+void ttool::tslet::RBOTHist::GetPixelProb(std::shared_ptr<ttool::tslet::Object3D> object, uchar rc, uchar gc, uchar bc, int x, int y, float& ppf, float& ppb) {
+	std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	uchar* initializedData = tclcHistograms->getInitialized().data;
@@ -90,13 +109,13 @@ void RBOTHist::GetPixelProb(std::shared_ptr<Object3D> object, uchar rc, uchar gc
 	}
 }
 
-void RBOTHist::GetRegionProb(std::shared_ptr<Object3D> object, const cv::Mat& frame, cv::Mat& prob_map) {
+void ttool::tslet::RBOTHist::GetRegionProb(std::shared_ptr<ttool::tslet::Object3D> object, const cv::Mat& frame, cv::Mat& prob_map) {
 	prob_map = cv::Mat(frame.size(), CV_8UC1);
 
 	int level = view->GetLevel();
 	int upscale = pow(2, level);
 	
-	std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
+	std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
 	std::vector<cv::Point3i> centersIDs = tclcHistograms->getCentersAndIDs();
 	int numHistograms = (int)centersIDs.size();
 	int numBins = tclcHistograms->getNumBins();

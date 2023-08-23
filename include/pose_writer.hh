@@ -1,3 +1,23 @@
+/**
+ * TTool
+ * Copyright (C) 2023  Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -5,8 +25,14 @@
 #include <opencv2/core.hpp>
 
 
-namespace ttool::standaloneUtils
+namespace ttool
 {
+    /**
+     * @brief This class is used to write the pose to a file.
+     * It can write a pose with or without an image.
+     * The pose information comes with the object ID and the object name.   
+     * 
+     */
     class PoseWriter
     {
         public:
@@ -50,7 +76,7 @@ namespace ttool::standaloneUtils
              * @param pose 
              * @param objectID 
              */
-            void write(cv::Matx44f& pose, int objectID)
+            void Write(cv::Matx44f& pose, int objectID)
             {
                 m_OutputFile << "objectID: " << objectID << std::endl;
                 m_OutputFile << "pose: " << std::endl;
@@ -60,7 +86,34 @@ namespace ttool::standaloneUtils
                 m_OutputFile << '\t' << pose(3, 0) << ' ' << pose(3, 1) << ' ' << pose(3, 2) << ' ' << pose(3, 3) << std::endl;
             }
 
+            void SetImageDir(const std::string& imageDir)
+            {
+                m_ImageDir = imageDir;
+            }
+
+            /**
+             * @brief Write the pose to the file with an image
+             * 
+             * @param pose 
+             * @param objectID 
+             * @param image
+             */
+            void Write(cv::Matx44f& pose, int objectID, std::string objectName, cv::Mat image)
+            {
+                char buffer[9];
+                m_OutputFile << "\n";
+                std::snprintf(buffer, sizeof(buffer), "%08d", m_FrameID++);
+                std::string filename = m_ImageDir + "/" + buffer + ".png";
+                cv::imwrite(filename, image);
+
+                Write(pose, objectID);
+                m_OutputFile << "object_name: " << objectName << std::endl;
+                m_OutputFile << "image: " << filename << std::endl;
+            }
+
         private:
+            int m_FrameID = 0;
+            std::string m_ImageDir;
             std::ofstream m_OutputFile;
             std::vector<std::string> m_ModelFiles;
     };

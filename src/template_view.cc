@@ -1,11 +1,27 @@
+/**
+ * This file has been modified by Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL) 
+ * from SLET with Copyright (C) 2020  Hong Huang and Fan Zhong and Yuqing Sun and Xueying Qin (Shandong University)
+ *                     
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "template_view.hh"
 
-using namespace std;
-using namespace cv;
-
-TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float beta, float gamma, float distance, int numLevels, bool generateNeighbors)
+ttool::tslet::TemplateView::TemplateView(std::shared_ptr<ttool::tslet::Object3D> object, float alpha, float beta, float gamma, float distance, int numLevels, bool generateNeighbors)
 {
-    T_cm = Transformations::translationMatrix(0, 0, distance)*Transformations::rotationMatrix(gamma, Vec3f(0, 0, 1))*Transformations::rotationMatrix(alpha, Vec3f(1, 0, 0))*Transformations::rotationMatrix(beta, Vec3f(0, 1, 0));
+    T_cm = ttool::utils::Transformations::translationMatrix(0, 0, distance)*ttool::utils::Transformations::rotationMatrix(gamma, cv::Vec3f(0, 0, 1))*ttool::utils::Transformations::rotationMatrix(alpha, cv::Vec3f(1, 0, 0))*ttool::utils::Transformations::rotationMatrix(beta, cv::Vec3f(0, 1, 0));
     
     object->setPose(T_cm);
     
@@ -14,16 +30,16 @@ TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float 
     view->SetLevel(0);
     view->RenderSilhouette(object, GL_FILL, false);
     
-    Mat mask0 = view->DownloadFrame(View::MASK);
-    Mat depth0 = view->DownloadFrame(View::DEPTH);
+    cv::Mat mask0 = view->DownloadFrame(View::MASK);
+    cv::Mat depth0 = view->DownloadFrame(View::DEPTH);
     
-    Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
+    cv::Matx33f K = view->GetCalibrationMatrix().get_minor<3, 3>(0, 0);
     
     float zNear = view->GetZNear();
     float zFar = view->GetZFar();
     
     // std::cout << "template_view" << std::endl;
-    std::shared_ptr<TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
+    std::shared_ptr<ttool::tslet::TCLCHistograms> tclcHistograms = object->getTCLCHistograms();
     
     int m_id = object->getModelID();
     
@@ -43,9 +59,9 @@ TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float 
     heavisidePyramid.resize(_numLevels);
     pixelDataPyramid.resize(_numLevels);
     
-    SignedDistanceTransform2D SDT2D(8.0f);
+    ttool::tslet::SignedDistanceTransform2D SDT2D(8.0f);
     
-    Size maxSize = mask0.size();
+    cv::Size maxSize = mask0.size();
     
     for(int level = 2; level < _numLevels; level++)
     {
@@ -59,26 +75,26 @@ TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float 
     
         int offset = tclcHistograms->getRadius()/pow(2, level);
     
-        Rect roi = computeBoundingBox(centersIDs, offset, level, Size(maxSize.width/scale, maxSize.height/scale));
+        cv::Rect roi = computeBoundingBox(centersIDs, offset, level, cv::Size(maxSize.width/scale, maxSize.height/scale));
         
         roiPyramid[level] = roi;
     
         view->SetLevel(level);
         view->RenderSilhouette(object, GL_FILL, false);
         
-        Mat mask = view->DownloadFrame(View::MASK);
+        cv::Mat mask = view->DownloadFrame(View::MASK);
         mask = mask(roi).clone();
         
         etaFPyramid[level] = countNonZero(mask);
         
         maskPyramid[level] = mask*255;
         
-        Mat sdt, xyPos;
+        cv::Mat sdt, xyPos;
         SDT2D.computeTransform(mask, sdt, xyPos, 8);
     
         sdtPyramid[level] = sdt;
         
-        Mat heaviside;
+        cv::Mat heaviside;
         parallel_for_(cv::Range(0, 8), Parallel_For_convertToHeaviside(sdt, heaviside, 8));
         
         heavisidePyramid[level] = heaviside;
@@ -88,7 +104,7 @@ TemplateView::TemplateView(std::shared_ptr<Object3D> object, float alpha, float 
 }
 
 
-TemplateView::~TemplateView()
+ttool::tslet::TemplateView::~TemplateView()
 {
     for(int i = 0; i < pixelDataPyramid.size(); i++)
     {
@@ -101,88 +117,88 @@ TemplateView::~TemplateView()
     pixelDataPyramid.clear();
 }
 
-Matx44f TemplateView::getPoseMatrix()
+cv::Matx44f ttool::tslet::TemplateView::getPoseMatrix()
 {
     return T_cm;
 }
 
-float TemplateView::getAlpha()
+float ttool::tslet::TemplateView::getAlpha()
 {
     return _alpha;
 }
 
-float TemplateView::getBeta()
+float ttool::tslet::TemplateView::getBeta()
 {
     return _beta;
 }
 
-float TemplateView::getGamma()
+float ttool::tslet::TemplateView::getGamma()
 {
     return _gamma;
 }
 
-float TemplateView::getDistance()
+float ttool::tslet::TemplateView::getDistance()
 {
     return _distance;
 }
 
-int TemplateView::getEtaF(int level)
+int ttool::tslet::TemplateView::getEtaF(int level)
 {
     return etaFPyramid[level];
 }
 
-Mat TemplateView::getMask(int level)
+cv::Mat ttool::tslet::TemplateView::getMask(int level)
 {
     return maskPyramid[level];
 }
 
-Mat TemplateView::getSDT(int level)
+cv::Mat ttool::tslet::TemplateView::getSDT(int level)
 {
     return sdtPyramid[level];
 }
 
-Mat TemplateView::getHeaviside(int level)
+cv::Mat ttool::tslet::TemplateView::getHeaviside(int level)
 {
     return heavisidePyramid[level];
 }
 
-Rect TemplateView::getROI(int level)
+cv::Rect ttool::tslet::TemplateView::getROI(int level)
 {
     return roiPyramid[level];
 }
 
-Point3f TemplateView::getCurrentOffset(int level)
+cv::Point3f ttool::tslet::TemplateView::getCurrentOffset(int level)
 {
     return currentOffset;
 }
 
-void TemplateView::setCurrentOffset(Point3f &offset, int level)
+void ttool::tslet::TemplateView::setCurrentOffset(cv::Point3f &offset, int level)
 {
     currentOffset = offset;
 }
 
-vector<Point3i> TemplateView::getCentersAndIDs(int level)
+std::vector<cv::Point3i> ttool::tslet::TemplateView::getCentersAndIDs(int level)
 {
     return centersIDsPyramid[level];
 }
 
 
-std::vector<PixelData>& TemplateView::getCompressedPixelData(int level)
+std::vector<ttool::tslet::PixelData>& ttool::tslet::TemplateView::getCompressedPixelData(int level)
 {
     return pixelDataPyramid[level];
 }
 
-void TemplateView::addNeighborTemplate(std::shared_ptr<TemplateView> kv)
+void ttool::tslet::TemplateView::addNeighborTemplate(std::shared_ptr<ttool::tslet::TemplateView> kv)
 {
     neighbors.push_back(kv);
 }
 
-std::vector<std::shared_ptr<TemplateView>> TemplateView::getNeighborTemplates()
+std::vector<std::shared_ptr<ttool::tslet::TemplateView>> ttool::tslet::TemplateView::getNeighborTemplates()
 {
     return neighbors;
 }
 
-void TemplateView::compressTemplateData(const std::vector<cv::Point3i>& centersIDs, const cv::Mat &heaviside, const cv::Rect& roi, int radius, int level)
+void ttool::tslet::TemplateView::compressTemplateData(const std::vector<cv::Point3i>& centersIDs, const cv::Mat &heaviside, const cv::Rect& roi, int radius, int level)
 {
     int numHistograms = (int)centersIDs.size();
     int scale = pow(2, level);
@@ -200,7 +216,7 @@ void TemplateView::compressTemplateData(const std::vector<cv::Point3i>& centersI
             
             if(hsVal >= 0.0f)
             {
-                vector<int> ids;
+                std::vector<int> ids;
                 for(int h = 0; h < numHistograms; h++)
                 {
                     cv::Point3i centerID = centersIDs[h];
@@ -217,7 +233,7 @@ void TemplateView::compressTemplateData(const std::vector<cv::Point3i>& centersI
                 
                 if(ids.size() > 1)
                 {
-                    PixelData pixelData;
+                    ttool::tslet::PixelData pixelData;
                     pixelData.x = i;
                     pixelData.y = j;
                     pixelData.hsVal = hsVal;
@@ -236,7 +252,7 @@ void TemplateView::compressTemplateData(const std::vector<cv::Point3i>& centersI
     }
 }
 
-cv::Rect TemplateView::computeBoundingBox(const std::vector<cv::Point3i> &centersIDs, int offset, int level, const cv::Size &maxSize)
+cv::Rect ttool::tslet::TemplateView::computeBoundingBox(const std::vector<cv::Point3i> &centersIDs, int offset, int level, const cv::Size &maxSize)
 {
     int minX = INT_MAX, minY = INT_MAX;
     int maxX = -1, maxY = -1;
@@ -245,7 +261,7 @@ cv::Rect TemplateView::computeBoundingBox(const std::vector<cv::Point3i> &center
     
     for(int i = 0; i < centersIDs.size(); i++)
     {
-        Point3i p = centersIDs[i];
+        cv::Point3i p = centersIDs[i];
         int x = p.x/scale;
         int y = p.y/scale;
         
@@ -265,5 +281,5 @@ cv::Rect TemplateView::computeBoundingBox(const std::vector<cv::Point3i> &center
     if(maxX > maxSize.width) maxX = maxSize.width;
     if(maxY > maxSize.height) maxY = maxSize.height;
     
-    return Rect(minX, minY, maxX - minX, maxY - minY);
+    return cv::Rect(minX, minY, maxX - minX, maxY - minY);
 }

@@ -1,3 +1,21 @@
+/**
+ * TTool
+ * Copyright (C) 2023  Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include <opencv2/opencv.hpp>
@@ -5,7 +23,7 @@
 #include "tracker.hh"
 #include "object3d.hh"
 
-namespace tslet
+namespace ttool::tslet
 {
     /**
      * @brief This class is a wrapper around the tracker class. It is used to track a single object
@@ -22,7 +40,7 @@ namespace tslet
          * @param object  the object to be tracked
          * @param K       the camera matrix
          */
-        void Consume(int modelID, std::shared_ptr<Object3D> object, cv::Matx33f K);
+        void Consume(int modelID, std::shared_ptr<ttool::tslet::Object3D> object, cv::Matx33f K);
 
         /**
          * @brief Call the UpdateHistogram function of the tracker which update the TCLC histogram from the projected model on the frame
@@ -31,7 +49,7 @@ namespace tslet
          * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
          * @param frame   the current frame from the camera
          */
-        void UpdateHistogram(std::shared_ptr<Object3D> object, int modelID, cv::Mat frame);
+        void UpdateHistogram(std::shared_ptr<ttool::tslet::Object3D> object, int modelID, cv::Mat frame);
 
         /**
          * @brief Set the Pose object
@@ -48,7 +66,7 @@ namespace tslet
          * @param modelID the ID of the object to be tracked that should correspond to the ID in the ModelManager
          * @param frame   the current frame from the camera
          */
-        void CallEstimatePose(std::shared_ptr<Object3D>object, int modelID, cv::Mat frame);
+        void CallEstimatePose(std::shared_ptr<ttool::tslet::Object3D>object, int modelID, cv::Mat frame);
 
         /**
          * @brief Get the Tracking Status from the tracker

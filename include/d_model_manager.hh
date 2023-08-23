@@ -1,3 +1,21 @@
+/**
+ * TTool
+ * Copyright (C) 2023  Andrea Settimi, Naravich Chutisilp (IBOIS, EPFL)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include "object3d.hh"
@@ -39,14 +57,33 @@ namespace ttool
          * @brief Reset the object to ground truth (from a text file)
          * 
          */
-        void ResetObjectToInitialPose();
+        void ResetObjectToConfigInitialPose();
+
+        /**
+         * @brief Save the pose as model initial pose as well as keep the metadata on the model manager
+         * 
+         * @param initialPose the new initial pose to be save to the model and the mdoel manager
+        */
+       void SaveObjectInitialPose(cv::Matx44f initialPose);
+        /**
+         * @brief Reset the object to the initial pose (which may be saved by the user during the pose adjustment)
+         * 
+        */
+        void ResetObjectToLastSavePose();
 
         /**
          * @brief Get the current object
          * 
-         * @return std::shared_ptr<Object3D> 
+         * @return std::shared_ptr<ttool::tslet::Object3D> 
          */
-        std::shared_ptr<Object3D> GetObject() { return m_CurrentObjectPtr; }
+        std::shared_ptr<ttool::tslet::Object3D> GetObject() { return m_CurrentObjectPtr; }
+
+        /**
+         * @brief Get the object name
+         * 
+         * @return std::string 
+         */
+        std::string GetObjectName() { return m_ModelID2ModelName[m_CurrentObjectID]; }
 
         /**
          * @brief Set the object ID
@@ -108,6 +145,15 @@ namespace ttool
         */
         std::map<std::string, int> ConvertVectorToMapString(std::vector<cv::String> someVector);
 
+        
+        /**
+         * @brief Make a map with model ID as key and model name as value
+         * 
+         * @param modelFiles 
+         * @return std::map<int, std::string> 
+         */
+        std::map<int, std::string> MakeModelID2ModelName(std::vector<cv::String> modelFiles);
+
         /**
          * @brief Set the Current Object Ptr object to the current ID and initialize it
          * 
@@ -118,12 +164,14 @@ namespace ttool
         std::map<int, std::string> m_ModelID2ModelFiles;
         std::map<int, cv::Matx44f> m_ModelID2InitialPoses;
         std::map<int, cv::Matx44f> m_ModelID2ModelPoses;
+        std::map<int, cv::Matx44f> m_ModelID2LastSavedPoses;
 
         std::map<std::string, int> m_ModelName2ModelID;
+        std::map<int, std::string> m_ModelID2ModelName;
 
         std::shared_ptr<Config> m_ConfigPtr;
 
         int m_CurrentObjectID = 1; // 1 based indexing
-        std::shared_ptr<Object3D> m_CurrentObjectPtr;
+        std::shared_ptr<ttool::tslet::Object3D> m_CurrentObjectPtr;
     };
 }
