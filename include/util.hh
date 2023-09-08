@@ -30,17 +30,17 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include <iomanip>
+//#include <iomanip>
 #include <filesystem>
 #include <string_view>
-#include <glm/glm.hpp>
+//#include <glm/glm.hpp>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <glog/logging.h>
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 
 
 namespace ttool::GLutils

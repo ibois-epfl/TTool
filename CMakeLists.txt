@@ -20,10 +20,11 @@ include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
 add_library(ttool SHARED ${TTool_SOURCES} ${glsl_SOURCES})
-
+message("MESSAGE FROM TTOOL CMAKELISTS")
 add_library(TTool::ttool ALIAS ttool)
 
 target_compile_features(ttool PUBLIC cxx_std_17)
+message("TORCH LIBRARIES from TTOOL CMAKELISTS ${TORCH_LIBRARIES} ${TTOOL_TORCH_LIBRARIES}")
 target_link_libraries(ttool
     PUBLIC
       ${OpenCV_LIBS}
@@ -36,10 +37,18 @@ target_link_libraries(ttool
 
 set_property(TARGET ttool PROPERTY PUBLIC_HEADER ${TTOOL_PUBLIC_HDRS})
 target_include_directories(ttool
-    PUBLIC    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    INTERFACE $<INSTALL_INTERFACE:include/TTool>
+    PUBLIC
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+      INTERFACE $<INSTALL_INTERFACE:include/TTool>
 )
 
+
+message("TORCH VARIABLES=====================")
+message(STATUS "TOOL_TORCH_INCLUDE_DIRS: ${TTOOL_TORCH_INCLUDE_DIRS}")
+
+message("TORCH INCLUDE DIRS from TTOOL CMAKELISTS ${TORCH_INCLUDE_DIRS}")
+
+message("CMAKE PREFIX PATH" ${CMAKE_PREFIX_PATH})
 # Not sur it is a good idea, it will fail on installed version (NR)
 set(__TTOOL_CONFIG_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.yml")
 set(__TTOOL_ROOT_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}")

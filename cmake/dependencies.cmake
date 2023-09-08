@@ -20,4 +20,4 @@ if (TTOOL_BUILD_TTOOL_EXE)
 endif()
 
 add_external_package(glm)
-add_external_package(Torch)
+add_external_package(Torch IGNORE_SYSTEM)
