@@ -31,9 +31,10 @@ target_link_libraries(ttool
       GLEW::GLEW
       assimp
       glm::glm
-      glog::glog
+      glog
       torch
 )
+
 
 set_property(TARGET ttool PROPERTY PUBLIC_HEADER ${TTOOL_PUBLIC_HDRS})
 target_include_directories(ttool
