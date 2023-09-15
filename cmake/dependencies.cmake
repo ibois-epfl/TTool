@@ -14,7 +14,7 @@ if(NOT glog_FOUND)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(glog REQUIRED libglog)
 else ()
-    message(FATAL_ERROR "gLog not found")
+    message(FATAL_ERROR "glog not found")
 endif ()
 
 # find_package(glog REQUIRED)
