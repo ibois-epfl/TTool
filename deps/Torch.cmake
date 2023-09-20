@@ -11,7 +11,5 @@ download_external_project(libtorch
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/libtorch")
 find_package(Torch REQUIRED)
 
-message(STATUS "Directly after find_package -> TORCH_INCLUDE_DIRS: ${TORCH_INCLUDE_DIRS}")
-
 set(TTOOL_TORCH_INCLUDE_DIRS ${TORCH_INCLUDE_DIRS} CACHE INTERNAL "")
 set(TTOOL_TORCH_LIBRARIES ${TORCH_LIBRARIES} CACHE INTERNAL "")
