@@ -9,15 +9,7 @@ find_package(OpenCV 4.5.4 REQUIRED
       videoio
 )
 
-find_package(glog QUIET)
-if(NOT glog_FOUND)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(glog REQUIRED libglog)
-else ()
-    message(FATAL_ERROR "glog not found")
-endif ()
-
-# find_package(glog REQUIRED)
+find_package(glog REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLUT REQUIRED)
 
