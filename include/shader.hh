@@ -118,4 +118,4 @@ namespace ttool::GLutils
 
 		return ProgramID;
 	}
-} // ttool::GLutils
+}

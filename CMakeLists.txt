@@ -20,7 +20,6 @@ include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 
 add_library(ttool SHARED ${TTool_SOURCES} ${glsl_SOURCES})
-
 add_library(TTool::ttool ALIAS ttool)
 
 target_compile_features(ttool PUBLIC cxx_std_17)
@@ -30,14 +29,16 @@ target_link_libraries(ttool
       GLEW::GLEW
       assimp
       glm::glm
-      glog::glog
+      glog
       torch
 )
 
+
 set_property(TARGET ttool PROPERTY PUBLIC_HEADER ${TTOOL_PUBLIC_HDRS})
 target_include_directories(ttool
-    PUBLIC    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    INTERFACE $<INSTALL_INTERFACE:include/TTool>
+    PUBLIC
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+      INTERFACE $<INSTALL_INTERFACE:include/TTool>
 )
 
 # Not sur it is a good idea, it will fail on installed version (NR)
