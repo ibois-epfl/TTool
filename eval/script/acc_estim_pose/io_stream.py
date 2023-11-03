@@ -2,12 +2,6 @@ import numpy as np
 import csv
 import os
 
-def get_name(lines):
-    tool_name = next((parts[1] for parts in (line.split(',') for line in lines) if parts[0] == "Toolhead"), None)
-    hole_name = next((parts[1] for parts in (line.split(',') for line in lines) if parts[0] == "HOLE"), None)
-    return f"{tool_name},{hole_name}" if tool_name and hole_name else None
-
-
 def parse_log_data(data_path):
     # Open and read the log file
     with open(data_path, 'r') as log_file:
@@ -18,20 +12,18 @@ def parse_log_data(data_path):
     for entry in entries:
         lines = entry.split('\n')
         timestamp = lines[0]
-        combined_name = get_name(lines[1:])
+        name = lines[1].split(',')[1]
         points = {parts[2]: np.array([float(parts[3]), float(parts[4]), float(parts[5])])
                   for parts in (line.split(',') for line in lines[1:]) if len(parts) > 2}
 
-        parsed_data.append({"timestamp": timestamp, "name": combined_name, "points": points})
+        parsed_data.append({"timestamp": timestamp, "name": name, "points": points})
 
     return parsed_data
 
 
-def write_results_to_csv(results, filename='results.csv'):
+def dump_accuracy_to_csv(results, filename='results.csv'):
     csv_filename = os.path.join(filename, "results.csv")
-    # Define the header for your CSV
-    headers = ["Timestamp", "Name", "Tool Vector", "Hole Vector", "Position Difference Vector",
-              "Rotation Difference Angle"]
+    headers = ["Name", "Position Difference", "Rotation Difference"]
 
     with open(csv_filename, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
@@ -42,11 +34,24 @@ def write_results_to_csv(results, filename='results.csv'):
         # Write data
         for event in results:
             row = [
-                event["timestamp"],
                 event["name"],
-                ','.join(map(str, event["tool_vector"])),
-                ','.join(map(str, event["hole_vector"])),
                 event["position_difference"],
                 event["rotation_difference"],
             ]
+            csvwriter.writerow(row)
+
+
+def dump_stats_to_csv(stats_results, path, filename, entry_name):
+    csv_filename = os.path.join(path, filename)
+    with open(csv_filename, 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+
+        header = ["Name", "Max", "Min", "Mean", "Median", "Std", "First Quartile", "Fourth Quartile"]
+        csvwriter.writerow(header)
+
+        for entry in stats_results:
+            name = entry['name']
+            _entry = entry[entry_name]
+            row = [name, _entry['max'], _entry['min'], _entry['mean'], _entry['median'],
+                   _entry['std'], _entry['first_quartile'], _entry['fourth_quartile']]
             csvwriter.writerow(row)

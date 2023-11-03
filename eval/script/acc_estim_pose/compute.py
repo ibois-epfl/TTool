@@ -1,5 +1,7 @@
 import numpy as np
-from io_stream import parse_log_data, write_results_to_csv
+from io_stream import parse_log_data, dump_accuracy_to_csv, dump_stats_to_csv
+from collections import defaultdict
+
 
 def compute_vector(point1, point2):
     return point2 - point1
@@ -26,12 +28,15 @@ def angle_differences(vec1, vec2):
     return theta_degrees
 
 
+def vector_magnitude(vector):
+    return np.linalg.norm(vector)
+
+
 def compute_pose_estimation_accuracy(log_data):
     events = []
     for entry in log_data:
         points = entry["points"]
 
-        # Compute vectors for tools and holes
         tool_vector = None
         hole_vector = None
 
@@ -45,45 +50,49 @@ def compute_pose_estimation_accuracy(log_data):
             hole_vector = compute_vector(points["StartPoint"], points["EndPoint"])
 
         if tool_vector is not None and hole_vector is not None:
-            # Compute the difference in the vectors
             diff_vector = vector_difference(tool_vector, hole_vector)
-            diff_angle = angle_differences(tool_vector, hole_vector)
+            diff_position = vector_magnitude(diff_vector)
+            diff_rotation = angle_differences(tool_vector, hole_vector)
 
-            # Store in events
             events.append({
-                "timestamp": entry["timestamp"],
                 "name": entry["name"],
-                "tool_vector": tool_vector,
-                "hole_vector": hole_vector,
-                "position_difference": diff_vector,
-                "rotation_difference": diff_angle
+                "position_difference": diff_position,
+                "rotation_difference": diff_rotation
 
             })
     return events
 
 
-def compute_min(data):
-    return np.min(data)
+def stats(data):
+    print(data)
+    return {'max': np.max(data),
+            'min': np.min(data),
+            'mean': np.mean(data),
+            'median': np.median(data),
+            'std': np.std(data),
+            'first_quartile': np.percentile(data, 25),
+            'fourth_quartile': np.percentile(data, 75)
+            }
 
 
-def compute_max(data):
-    return np.max(data)
+def compute_stats(data, stats_diff_type):
+    # Group data by name
+    global position_diff_values
+    grouped_data = defaultdict(list)
+    for item in data:
+        name = item['name']
+        grouped_data[name].append(item)
 
+    # Compute statistics for each group
+    result = []
 
-def compute_mean(data):
-    return np.mean(data)
+    for name, group in grouped_data.items():
+        position_diff_values = [item[stats_diff_type] for item in group]
 
+        result.append({'name': name,
+                       stats_diff_type: stats(position_diff_values)})
 
-def compute_median(data):
-    return np.median(data)
-
-
-def compute_std(data):
-    return np.std(data)
-
-
-def compute_percentile(data, percentile):
-    return np.percentile(data, percentile)
+    return result
 
 
 if __name__ == '__main__':
@@ -93,5 +102,12 @@ if __name__ == '__main__':
     parser.add_argument('--out_path', type=str, help='The save path for resulted csv', required=True)
     args = parser.parse_args()
 
-    results = compute_pose_estimation_accuracy(parse_log_data(args.data_path))
-    write_results_to_csv(results, args.out_path)
+    acc_results = compute_pose_estimation_accuracy(parse_log_data(args.data_path))
+    dump_accuracy_to_csv(acc_results, args.out_path)
+    pos_stats_results = compute_stats(acc_results, stats_diff_type='position_difference')
+    rot_stats_results = compute_stats(acc_results, stats_diff_type='rotation_difference')
+
+    dump_stats_to_csv(pos_stats_results, args.out_path, filename='pos_diff.csv', entry_name='position_difference')
+    dump_stats_to_csv(rot_stats_results, args.out_path, filename='rot_diff.csv', entry_name='rotation_difference')
+
+
