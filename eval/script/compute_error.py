@@ -6,10 +6,6 @@ def v_compute(p1, p2):
     return p2 - p1
 
 
-def v_difference(vec1, vec2):
-    return vec1 - vec2
-
-
 def a_difference(vec1, vec2):
     dot_prod = np.dot(vec1, vec2)
     m_A = np.linalg.norm(vec1)
@@ -21,31 +17,31 @@ def a_difference(vec1, vec2):
     return theta_degrees
 
 
-def euclidean_dist(vec):
-    return np.sqrt(np.sum(vec ** 2))
+def euclidean_dist_p(p1, p2):
+    return np.sqrt(np.sum((p1 - p2) ** 2))
 
 
-def v_mean(vec):
-    return np.mean(vec, axis=0)
+def mean_dist(n1, n2):
+    return (n1 + n2) / 2
 
 
-def compute_pose_estimation_accuracy(data):
-    _v_tool = None
-    _v_hole = None
+def compute_pose_estim_error(data):
 
     results = list()
     for entry in data:
+        # {toolhead: [[toolbase, tooltip, holebase holeend],timestamp]}
         coords = list(entry.values())[0][0]
-        _v_tool = v_compute(np.array(coords[0]), np.array(coords[1]))  # the vector between toolbase and tooltip
-        _v_hole = v_compute(np.array(coords[2]), np.array(coords[3]))  # the vector between holebase and holeend
+        base_er = euclidean_dist_p(np.array(coords[0]), np.array(coords[2]))
+        tip_err = euclidean_dist_p(np.array(coords[1]), np.array(coords[3]))
+        mean_err = mean_dist(base_er, tip_err)
 
-        if _v_tool is not None and _v_hole is not None:
-            _v_diff_pos = v_difference(_v_tool, _v_hole)
-            _v_mean = v_mean([_v_tool, _v_hole])  # the mean vector between two vectors
-            _p_error = euclidean_dist(_v_diff_pos)  # the length of the line
-            _r_error = a_difference(_v_tool, _v_hole)  # the angle between two vectors
+        v_tool = v_compute(np.array(coords[0]), np.array(coords[1]))  # the vector between toolbase and tooltip
+        v_hole = v_compute(np.array(coords[2]), np.array(coords[3]))  # the vector between holebase and holeend
 
-            results.append({list(entry)[0]: [_p_error, [_v_diff_pos[0], _v_diff_pos[1], _v_diff_pos[2]], _r_error]})
+        if v_tool is not None and v_hole is not None:
+            rot_err = a_difference(v_tool, v_hole)  # the angle between two vectors
+
+            results.append({list(entry)[0]: [mean_err, base_er, tip_err, rot_err]})
     return results
 
 
@@ -64,22 +60,20 @@ def stats(data):
 def compute_stats(data):
     o_data = defaultdict(lambda: defaultdict(list))
 
-    for entry in data:
-        for name, values in entry.items():
-            o_data[name]['p_error'].append(values[0])
-            o_data[name]['diff_pos_X'].append(values[1][0])
-            o_data[name]['diff_pos_Y'].append(values[1][1])
-            o_data[name]['diff_pos_Z'].append(values[1][2])
-            o_data[name]['r_error'].append(values[2])
+    for ent in data:
+        for k, v in ent.items():
+            o_data[k]['mean_pos_err'].append(v[0])
+            o_data[k]['base_pos_err'].append(v[1])
+            o_data[k]['tip_pos_err'].append(v[2])
+            o_data[k]['rot_err'].append(v[3])
 
     o_stats = {}
     for name, value_dict in o_data.items():
         o_stats[name] = {
-            'position_error': stats(value_dict['p_error']),
-            'position_X_error': stats(value_dict['diff_pos_X']),
-            'position_Y_error': stats(value_dict['diff_pos_Y']),
-            'position_Z_error': stats(value_dict['diff_pos_Z']),
-            'rotation_error': stats(value_dict['r_error'])
+            'mean_pos_err': stats(value_dict['mean_pos_err']),
+            'base_pos_err': stats(value_dict['base_pos_err']),
+            'tip_pos_err': stats(value_dict['tip_pos_err']),
+            'rot_err': stats(value_dict['rot_err']),
         }
 
     return o_stats
