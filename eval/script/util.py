@@ -1,7 +1,7 @@
 import os
 
 
-def create_out_directory(out_path):
+def create_out_dir(out_path):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     default_path = os.path.abspath(os.path.join(script_dir, "..", ".."))
     if out_path is not None:

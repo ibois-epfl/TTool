@@ -50,7 +50,6 @@ def compute_pose_estimation_accuracy(data):
 
 
 def stats(data):
-    # adapt this to the new data format with xyz
     return {
         "max": np.max(data),
         "min": np.min(data),
@@ -58,7 +57,7 @@ def stats(data):
         "median": np.median(data),
         "std": np.std(data),
         "q1": np.percentile(data, 25),
-        "q4": np.percentile(data, 75),
+        "q3": np.percentile(data, 75),
     }
 
 
@@ -76,11 +75,11 @@ def compute_stats(data):
     o_stats = {}
     for name, value_dict in o_data.items():
         o_stats[name] = {
-            'p_error_stats': stats(value_dict['p_error']),
-            'diff_pos_X': stats(value_dict['diff_pos_X']),
-            'diff_pos_Y': stats(value_dict['diff_pos_Y']),
-            'diff_pos_Z': stats(value_dict['diff_pos_Z']),
-            'r_error_stats': stats(value_dict['r_error'])
+            'position_error': stats(value_dict['p_error']),
+            'position_X_error': stats(value_dict['diff_pos_X']),
+            'position_Y_error': stats(value_dict['diff_pos_Y']),
+            'position_Z_error': stats(value_dict['diff_pos_Z']),
+            'rotation_error': stats(value_dict['r_error'])
         }
 
     return o_stats
