@@ -6,18 +6,18 @@ import glob
 import numpy as np
 
 
-def export_box_plot(csv_save_path, out_path):
-    csv_files = glob.glob(os.path.join(csv_save_path, '*_error.csv'))
+def export_box_plot(csv_path, out_path):
+    csv_files = glob.glob(os.path.join(csv_path, '*_err.csv'))
     for csv_file in csv_files:
-        save_plot = os.path.join(out_path, "{}.png".format(csv_file.split('.')[0]))
+        save_plot = os.path.join(out_path, "{}.png".format(csv_file.split('/')[-1].split('.')[0]))
         box_plot = draw_boxplot_from_csv(csv_file=csv_file, _name="{}".format(csv_file.split('/')[-1].split('.')[0]))
         box_plot.savefig(save_plot)
 
 
-def export_latex_table(csv_save_path, out_path):
-    csv_files = glob.glob(os.path.join(csv_save_path, '*_error.csv'))
+def export_latex_table(csv_path, out_path):
+    csv_files = glob.glob(os.path.join(csv_path, '*_err.csv'))
     for csv_file in csv_files:
-        save_path = os.path.join(out_path, '{}.tex'.format(csv_file.split('.')[0]))
+        save_path = os.path.join(out_path, '{}.tex'.format(csv_file.split('/')[-1].split('.')[0]))
         data = pd.read_csv(csv_file)
         data_dict = data.to_dict(orient='records')
         latex_table = tabulate(data_dict, headers="keys", tablefmt="latex")
