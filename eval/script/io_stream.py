@@ -3,6 +3,7 @@ import os
 
 
 def parse_log_data(data_path):
+    ac_scale_factor = 50
     with open(data_path, 'r') as log_file:
         raw_data = log_file.read()
     entries = raw_data.strip().strip('\n').split('\n\n')
@@ -16,7 +17,7 @@ def parse_log_data(data_path):
         for l in lines[1:]:
             coords = l.split(',')
             if len(coords) > 2:
-                vals = float(coords[3]), float(coords[4]), float(coords[5])
+                vals = float(coords[3])/ac_scale_factor, float(coords[4])/ac_scale_factor, float(coords[5])/ac_scale_factor
                 points.append(vals)
         #{toolhead: [[toolbase, tooltip, holebase holeend],timestamp]}
         parsed_data.append({name: [points, timestamp]})
@@ -25,7 +26,7 @@ def parse_log_data(data_path):
 
 def export_to_csv(data, out_path):
     csv_filename = os.path.join(out_path, "results.csv")
-    headers = ["Name", "Position_Error", "Position_Diff_Vector" "Rotation_Error"]
+    headers = ["Name", "Mean_Pos_Error", "Base_Pos_Error" "Tip_Pos_Error", "Rot_Error"]
 
     with open(csv_filename, 'w', newline='') as csvfile:
         csvw = csv.writer(csvfile)
@@ -35,7 +36,8 @@ def export_to_csv(data, out_path):
                 list(event)[0],
                 list(event.values())[0][0],
                 list(event.values())[0][1],
-                list(event.values())[0][2]
+                list(event.values())[0][2],
+                list(event.values())[0][3]
             ]
             csvw.writerow(row)
 
