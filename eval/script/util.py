@@ -1,18 +1,24 @@
 import os
 
 
-def create_out_dir(out_path):
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    default_path = os.path.abspath(os.path.join(script_dir, ".."))  # Go up one level from the script directory
-    base_out_dir = os.path.join(out_path if out_path else default_path, 'out')
+def create_out_dir(out_path: str) -> dict[str, str, str]:
+    """
+        Creates the output directories for the csv, latex and boxplot files
 
-    # Create subdirectories for 'csv', 'latex', and 'boxplot'
+        Args:
+            out_path (str): The path to the output directory
+        Returns:
+            dict[str, str, str]: The paths of the output directories
+    """
     subdirs = ['csv', 'latex', 'boxplot']
     paths = {}
     for subdir in subdirs:
-        dir_path = os.path.join(base_out_dir, subdir)
-        os.makedirs(dir_path, exist_ok=True)
-        paths[subdir] = dir_path
-
+        dir_path = os.path.join(out_path, subdir)
+        try:
+            os.makedirs(dir_path, exist_ok=True)
+            paths[subdir] = dir_path
+        except OSError as e:
+            print(f"\033[91m[ERROR]: Could not create directories. Error:{e}\033[0m")
+            raise e
     return paths
 

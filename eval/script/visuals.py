@@ -6,15 +6,33 @@ import glob
 import numpy as np
 
 
-def export_box_plot(csv_path, out_path):
+def export_box_plot(csv_path: str, out_path: str) -> None:
+    """
+        Exports the boxplot of the statistics (mean, median, std, min, max, q1, q3)
+
+        Args:
+            csv_path (str): The path to the csv files
+        Returns:
+            None
+    """
     csv_files = glob.glob(os.path.join(csv_path, '*_err.csv'))
     for csv_file in csv_files:
         save_plot = os.path.join(out_path, "{}.png".format(csv_file.split('/')[-1].split('.')[0]))
         box_plot = draw_boxplot_from_csv(csv_file=csv_file, _name="{}".format(csv_file.split('/')[-1].split('.')[0]))
         box_plot.savefig(save_plot)
+        print(f"\033[90m[INFO]: Boxplot is exported to {save_plot}\033[0m")
 
 
-def export_latex_table(csv_path, out_path):
+
+def export_latex_table(csv_path: str, out_path: str) -> None:
+    """
+        Exports the latex table of the statistics (mean, median, std, min, max, q1, q3)
+
+        Args:
+            csv_path (str): The path to the csv files
+        Returns:
+            None
+    """
     csv_files = glob.glob(os.path.join(csv_path, '*_err.csv'))
     for csv_file in csv_files:
         save_path = os.path.join(out_path, '{}.tex'.format(csv_file.split('/')[-1].split('.')[0]))
@@ -23,9 +41,18 @@ def export_latex_table(csv_path, out_path):
         latex_table = tabulate(data_dict, headers="keys", tablefmt="latex")
         with open(save_path, 'w') as file:
             file.write(latex_table)
+        print(f"\033[90m[INFO]: Latex table is exported to {save_path}\033[0m")
 
 
-def draw_boxplot_from_csv(csv_file, _name):
+def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt:
+    """
+        Draws the boxplot of the statistics (mean, median, std, min, max, q1, q3)
+
+        Args:
+            csv_path (str): The path to the csv files
+        Returns:
+            plt: The boxplot
+    """
     data = pd.read_csv(csv_file)
     metrics_info = data[['Max', 'Min', 'Mean', 'Median', 'Std', 'Q1', 'Q3']]
 

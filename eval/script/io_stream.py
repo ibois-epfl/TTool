@@ -2,18 +2,28 @@ import csv
 import os
 
 
-def parse_log_data(data_path):
+def parse_log_data(data_path: str) -> list[dict[str, list[list[float]], str]]:
+    """
+        Processes the log file containing coordinates from AC,
+        converting it into a more usable format for further processing
+
+        Args:
+            data_path (str): The path of log file with coordinates from AC
+
+        Returns:
+            dict[str, str, str]: the parsed data
+    """
     ac_scale_factor = 50
     with open(data_path, 'r') as log_file:
         raw_data = log_file.read()
     entries = raw_data.strip().strip('\n').split('\n\n')
-    parsed_data = []
+    parsed_data = list()
 
     for ent in entries:
         lines = ent.split('\n')
         timestamp = lines[0]
         name = lines[1].split(',')[1]
-        points = []
+        points = list()
         for l in lines[1:]:
             coords = l.split(',')
             if len(coords) > 2:
@@ -24,7 +34,15 @@ def parse_log_data(data_path):
     return parsed_data
 
 
-def export_to_csv(data, out_path):
+def export_to_csv(data: list, out_path: str) -> None:
+    """
+        Exports the computed results to a csv file
+
+        Args:
+            data (list): The computed results
+        Returns:
+            None
+    """
     csv_filename = os.path.join(out_path, "results.csv")
     headers = ["Name", "Mean_Pos_Error", "Base_Pos_Error" "Tip_Pos_Error", "Rot_Error"]
 
@@ -40,9 +58,17 @@ def export_to_csv(data, out_path):
                 list(event.values())[0][3]
             ]
             csvw.writerow(row)
+    print(f"\033[90m[INFO]: Overall results exported to {csv_filename}\033[0m")
 
+def export_stats_to_csv(data: dict, out_path: str) -> None:
+    """
+        Exports the statistics of the computed results to a csv file
 
-def export_stats_to_csv(data, out_path):
+        Args:
+            data (dict): The computed statistics
+        Returns:
+            None
+    """
     stat_types = {f"{key}.csv": key for key in next(iter(data.values())).keys()}
     file_paths = {file_name: os.path.join(out_path, file_name) for file_name in stat_types.keys()}
 
@@ -59,3 +85,5 @@ def export_stats_to_csv(data, out_path):
                     row_data = {'Name': tool_name}
                     row_data.update({str(k).capitalize(): v for k, v in stats.items()})
                     csvw.writerow(row_data)
+
+        print(f"\033[90m[INFO]: Statistics results exported to {file_paths[file_name]}\033[0m")
