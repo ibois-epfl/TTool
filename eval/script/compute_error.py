@@ -76,6 +76,7 @@ def compute_pose_error(data: list) -> list:
                 - the computed position error of the mean of the base and tip coordinates of the toolhead and the hole
                 - the computed rotation error between the vectors of the toolhead and the hole
     """
+    scale_f = 50
     results = list()
     for entry in data:
         # {toolhead: [[toolbase, tooltip, holebase holeend],timestamp]}
@@ -90,7 +91,7 @@ def compute_pose_error(data: list) -> list:
         if v_tool is not None and v_hole is not None:
             rot_err: np.array(float) = a_difference(v_tool, v_hole)  # the angle between two vectors
 
-            results.append({list(entry)[0]: [mean_err, base_err, tip_err, rot_err]})
+            results.append({list(entry)[0]: [mean_err / scale_f, base_err/scale_f, tip_err/scale_f, rot_err]})
     return results
 
 
@@ -131,18 +132,18 @@ def compute_stats(data: list) -> dict:
 
     for ent in data:
         for k, v in ent.items():
-            o_data[k]['mean_pos_err'].append(v[0])
-            o_data[k]['base_pos_err'].append(v[1])
-            o_data[k]['tip_pos_err'].append(v[2])
-            o_data[k]['rot_err'].append(v[3])
+            o_data[k]['mean_position_error'].append(v[0])
+            o_data[k]['base_position_error'].append(v[1])
+            o_data[k]['tip_position_error'].append(v[2])
+            o_data[k]['rotation_error'].append(v[3])
 
     o_stats = {}
     for name, value_dict in o_data.items():
         o_stats[name] = {
-            'mean_pos_err': stats(value_dict['mean_pos_err']),
-            'base_pos_err': stats(value_dict['base_pos_err']),
-            'tip_pos_err': stats(value_dict['tip_pos_err']),
-            'rot_err': stats(value_dict['rot_err']),
+            'mean_position_error': stats(value_dict['mean_position_error']),
+            'base_position_error': stats(value_dict['base_position_error']),
+            'tip_position_error': stats(value_dict['tip_position_error']),
+            'rotation_error': stats(value_dict['rotation_error']),
         }
 
     return o_stats
