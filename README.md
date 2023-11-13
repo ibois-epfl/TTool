@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./img/logo_linux_green.png" width="200">
+    <img src="./img/logo_linux_green.png" width="140">
 </p>
 <p align="center">
     <img src="https://github.com/ibois-epfl/TTool/actions/workflows/docker-cmake-build.yml/badge.svg">
