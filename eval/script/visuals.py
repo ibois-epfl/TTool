@@ -4,7 +4,9 @@ import os
 from tabulate import tabulate
 import glob
 import numpy as np
+from matplotlib.lines import Line2D
 
+CYBERGREEN = '#2DDE98'
 
 def export_box_plot(csv_path: str, out_path: str) -> None:
     """
@@ -15,9 +17,9 @@ def export_box_plot(csv_path: str, out_path: str) -> None:
         Returns:
             None
     """
-    csv_files = glob.glob(os.path.join(csv_path, '*_err.csv'))
+    csv_files = glob.glob(os.path.join(csv_path, '*_error.csv'))
     for csv_file in csv_files:
-        save_plot = os.path.join(out_path, "{}.png".format(csv_file.split('/')[-1].split('.')[0]))
+        save_plot = os.path.join(out_path, "boxplot_{}_graph.png".format(csv_file.split('/')[-1].split('.')[0]))
         box_plot = draw_boxplot_from_csv(csv_file=csv_file, _name="{}".format(csv_file.split('/')[-1].split('.')[0]))
         box_plot.savefig(save_plot)
         print(f"\033[90m[INFO]: Boxplot is exported to {save_plot}\033[0m")
@@ -33,9 +35,9 @@ def export_latex_table(csv_path: str, out_path: str) -> None:
         Returns:
             None
     """
-    csv_files = glob.glob(os.path.join(csv_path, '*_err.csv'))
+    csv_files = glob.glob(os.path.join(csv_path, '*_error.csv'))
     for csv_file in csv_files:
-        save_path = os.path.join(out_path, '{}.tex'.format(csv_file.split('/')[-1].split('.')[0]))
+        save_path = os.path.join(out_path, 'latex_{}.tex'.format(csv_file.split('/')[-1].split('.')[0]))
         data = pd.read_csv(csv_file)
         data_dict = data.to_dict(orient='records')
         latex_table = tabulate(data_dict, headers="keys", tablefmt="latex")
@@ -44,27 +46,49 @@ def export_latex_table(csv_path: str, out_path: str) -> None:
         print(f"\033[90m[INFO]: Latex table is exported to {save_path}\033[0m")
 
 
-def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt:
+def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt.figure:
     """
         Draws the boxplot of the statistics (mean, median, std, min, max, q1, q3)
 
         Args:
             csv_path (str): The path to the csv files
+            _name (str): The name of the plot
         Returns:
-            plt: The boxplot
+            plt.figure: The boxplot
     """
     data = pd.read_csv(csv_file)
-    metrics_info = data[['Max', 'Min', 'Mean', 'Median', 'Std', 'Q1', 'Q3']]
 
+    _name = ' '.join([word.capitalize() for word in _name.split('_')])
+    metrics_info = data[['Max', 'Min', 'Mean', 'Median', 'Std', 'Q1', 'Q3']]
     transposed_data = metrics_info.T
-    plt.figure(figsize=(10, 6))
+
+    fig, ax = plt.subplots(figsize=(10., 6.))
+    ax.set_xlabel("Tools' names")
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(True)
+    ax.spines['bottom'].set_visible(True)
+
+    if _name.split(' ')[0] == 'Rotation':
+        ax.set_ylabel(f"Angular Error [deg]")
+    else:
+        ax.set_ylabel(f"Distance Error [m]")
 
     boxplot_elements = plt.boxplot(transposed_data.values, labels=data['Name'], notch=False, sym='+', vert=True,
-                                   whis=1.5)
+                                   whis=1.5,  positions=None, widths=None, bootstrap=None, usermedians=None,
+                                   conf_intervals=None)
     data_range = max(metrics_info.max()) - min(metrics_info.min())
     step = data_range * 0.03
 
-    for i, (box, median_line) in enumerate(zip(boxplot_elements['boxes'], boxplot_elements['medians'])):
+    for whisker in boxplot_elements['whiskers']:
+        whisker.set(color='black', linewidth=1)
+    for cap in boxplot_elements['caps']:
+        cap.set(color='black', linewidth=2)
+    for median in boxplot_elements['medians']:
+        median.set(color='black', linewidth=2)
+    for flier in boxplot_elements['fliers']:
+        flier.set(marker='+', color="black", alpha=0.5)
+    for i, box in enumerate(boxplot_elements['boxes']):
         x = box.get_xdata()[0]
         top_of_box = box.get_ydata()[2]
 
@@ -77,19 +101,16 @@ def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt:
         positions = np.linspace(start=top_of_box + step, stop=top_of_box + 6 * step, num=6)
 
         plt.text(x, positions[0], f"Mx={max_val:.2f}", ha='center', va='bottom', fontsize='x-small')
-        plt.text(x, positions[2], f"q3={q3_val:.2f}", ha='center', va='bottom', fontsize='x-small')
         plt.text(x, positions[1], f"mn={mean_val:.2f}", ha='center', va='bottom', fontsize='x-small')
+        plt.text(x, positions[2], f"q3={q3_val:.2f}", ha='center', va='bottom', fontsize='x-small')
         plt.text(x, positions[3], f"q1={q1_val:.2f}", ha='center', va='bottom', fontsize='x-small')
         plt.text(x, positions[4], f"M={min_val:.2f}", ha='center', va='bottom', fontsize='x-small')
 
-    means = metrics_info['Mean']
-    for i, mean in enumerate(means):
-        plt.plot([i + 1 - 0.25, i + 1 + 0.25], [mean, mean], color='green', linewidth=2)
+        plt.plot([i + 1 - 0.25, i + 1 + 0.25], [mean_val, mean_val], color=CYBERGREEN, linewidth=2)
 
-    plt.xlabel("Tools' names")
-    plt.ylabel("{}".format(_name.capitalize()))
-    plt.title("{}".format(_name.capitalize()))
-
+    mean_legend_entry = Line2D([0], [0], color=CYBERGREEN, linewidth=2, label='Mean')
+    plt.legend(handles=[mean_legend_entry], loc='upper right', fontsize='x-small')
     plt.xticks(rotation=10)
     plt.tight_layout()
+
     return plt
