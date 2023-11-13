@@ -1,0 +1,14 @@
+"Hole#1" --> auger_drill_bit_20_235
+"Hole#2" --> spade_drill_bit_25_150
+"Hole#3" --> auger_drill_bit_34_235
+"Hole#4" --> brad_point_drill_bit_20_150
+"Hole#5" --> self_feeding_bit_40_90
+"Hole#6" --> twist_drill_bit_32_165
+"Hole#7" --> self_feeding_bit_50_90
+"Hole#8" --> circular_saw_blade_makita_190
+"Hole#9" --> chainsaw
+"Hole#10" --> swordsaw
+
+NB:
+- for drilling: toolbase == start and tooltip == end
+- for cutting tools (chainsaw, swordsaw, circular): point on blade == start and toolbase == end
