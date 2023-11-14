@@ -12,6 +12,7 @@ def create_out_dir(out_path: str) -> dict[str, str, str]:
     """
     subdirs = ['csv', 'latex', 'boxplot']
     paths = {}
+    out_path = os.path.join(out_path, 'output')
     for subdir in subdirs:
         dir_path = os.path.join(out_path, subdir)
         try:
