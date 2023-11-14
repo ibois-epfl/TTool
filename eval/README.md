@@ -39,13 +39,14 @@ There are two main ways to run the evaluation: using the provided evaluate.sh sc
 
 Use the following command to automatically set up the Anaconda environment and run the evaluation:
 ```bash
-source evaluate.sh --data_path /home/user/coordinates.log --out_path ./output
+source evaluate.sh --data_path /home/user/coordinates.log --out_path .
 ```
 - `--data_path`: Specifies the path to the log file containing coordinates from AC.
 - `--out_path`: Defines the path for the exported data.
 
 This script will check if Anaconda is installed and if the required environment exists. If the environment exists, you'll be prompted to update it. 
-If not, it will be created using the `environment.yml` file.
+If not, it will be created using the `environment.yml` file. 
+Then it will run the evaluation and export the results to the **/output** directory within the specified path.
 
 ## Manual Setup
 
@@ -64,7 +65,7 @@ conda env update --name myenv --file environment.yml --prune
 After setting up the environment, run the evaluation with:
 
 ```bash
-python3 compute.py --data_path  /home/user/coordinates.log --out_path ../output
+python3 compute.py --data_path  /home/user/coordinates.log --out_path ..
 ```
 The `--data_path` and `--out_path` arguments function as previously described.
-
+The results are exported to the **/output** directory within the specified path.
