@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import sys
@@ -95,7 +95,7 @@ def main(dataset_path : str, config_path : str) -> None:
 
     with open(config_path, "r") as f:
         lines = f.readlines()
-        for i in range(len(lines)):
+    for i in range(len(lines)):
             if key_modelFiles_IDX_NEXT != None:
                 if dict_keys_lnnbr[key_modelFiles] < i < dict_keys_lnnbr[key_modelFiles_IDX_NEXT]:
                     lines[i] = ""
@@ -117,7 +117,7 @@ def main(dataset_path : str, config_path : str) -> None:
 
     with open(config_path, "w") as f:
         f.writelines(lines)
-    
+
     dict_keys_lnnbr : dict = get_keys_yml(config_path)
 
     for key in dict_keys_lnnbr.keys():

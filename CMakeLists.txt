@@ -4,6 +4,11 @@ project(TTool VERSION "0.1.0" LANGUAGES CXX)
 
 # zenodo direct doi link (to change if dataset us updated)
 set(TTOOL_DSET_DOI "https://zenodo.org/record/10014284" CACHE INTERNAL "")
+
+# Not sur it is a good idea, it will fail on installed version (NR)
+set(__TTOOL_CONFIG_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.yml")
+set(__TTOOL_ROOT_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}")
+
 include(cmake/dataset.cmake)
 
 file(GLOB glsl_SOURCES src/shader/*.glsl)
@@ -40,10 +45,6 @@ target_include_directories(ttool
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
       INTERFACE $<INSTALL_INTERFACE:include/TTool>
 )
-
-# Not sur it is a good idea, it will fail on installed version (NR)
-set(__TTOOL_CONFIG_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.yml")
-set(__TTOOL_ROOT_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # # create TTool executable
 if (TTOOL_BUILD_TTOOL_EXE)
