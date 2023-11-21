@@ -136,11 +136,11 @@
             <neighbors>-1</neighbors>
             <start>
                 <exposed>False</exposed>
-                <coordinates>-0.0192928260223 0.0919 0.121356043588</coordinates>
+                <coordinates>-0.0192928260223 0.0875 0.121356043588</coordinates>
                 </start>
             <end>
                 <exposed>False</exposed>
-                <coordinates>-0.0192928260223 0.1419 0.121356043588</coordinates>
+                <coordinates>-0.0192928260223 0.0375 0.121356043588</coordinates>
                 </end>
             <radius>0.020</radius>
             </hole>
