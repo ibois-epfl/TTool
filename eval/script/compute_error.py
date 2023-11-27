@@ -91,7 +91,7 @@ def compute_pose_error(data: list) -> list:
         if v_tool is not None and v_hole is not None:
             rot_err: np.array(float) = a_difference(v_tool, v_hole)  # the angle between two vectors
 
-            results.append({list(entry)[0]: [mean_err / scale_f, base_err/scale_f, tip_err/scale_f, rot_err]})
+            results.append({list(entry)[0]: [(mean_err / scale_f) * 1000, (base_err/scale_f) * 1000, (tip_err/scale_f) * 1000, rot_err]})
     return results
 
 
