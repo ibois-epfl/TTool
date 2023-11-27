@@ -19,11 +19,11 @@
 			<neighbors>-1</neighbors>
 			<start>
 				<exposed>False</exposed>
-				<coordinates>0.770090024392 1.00287178598 0.391966341213</coordinates>
+				<coordinates>0.0599099756076 0.243379497911 0.251966341213</coordinates>
 			</start>
 			<end>
 				<exposed>False</exposed>
-				<coordinates>0.770103183406 1.08429966210 0.168371921621</coordinates>
+				<coordinates>0.0598968165939 0.161951621793 0.0283719216214</coordinates>
 			</end>
 			<radius>0.020</radius>
 		</hole>
@@ -32,11 +32,11 @@
 			<neighbors>-1</neighbors>
 			<start>
 				<exposed>False</exposed>
-				<coordinates>0.656666897564 1.00093382696 0.391776298328</coordinates>
+				<coordinates>0.173333102436 0.245317456938 0.251776298328</coordinates>
 			</start>
 			<end>
 				<exposed>False</exposed>
-				<coordinates>0.656666897564 1.05271191443 0.24951717216</coordinates>
+				<coordinates>0.173333102436 0.19353936946 0.10951717216</coordinates>
 			</end>
 			<radius>0.020</radius>
 		</hole>
@@ -45,11 +45,11 @@
 			<neighbors>-1</neighbors>
 			<start>
 				<exposed>False</exposed>
-				<coordinates>0.543335902806 0.995951772613 0.391866539134</coordinates>
+				<coordinates>0.286664097194 0.250299511282 0.251866539134</coordinates>
 			</start>
 			<end>
 				<exposed>False</exposed>
-				<coordinates>0.543335902806 1.07632650629 0.171038773249</coordinates>
+				<coordinates>0.286664097194 0.1699247776 0.0310387732493</coordinates>
 			</end>
 			<radius>0.020</radius>
 		</hole>
@@ -58,11 +58,11 @@
 			<neighbors>-1</neighbors>
 			<start>
 				<exposed>False</exposed>
-				<coordinates>0.429999547865 1.00366199572 0.392020961653</coordinates>
+				<coordinates>0.400000452135 0.242589288175 0.252020961653</coordinates>
 			</start>
 			<end>
 				<exposed>False</exposed>
-				<coordinates>0.42999618163 1.05325084468 0.25567678704</coordinates>
+				<coordinates>0.40000381837 0.193000439215 0.11567678704</coordinates>
 			</end>
 			<radius>0.020</radius>
 		</hole>
@@ -71,11 +71,11 @@
 			<neighbors>-1</neighbors>
 			<start>
 				<exposed>False</exposed>
-				<coordinates>0.316666666667 1.00823778940 0.391804628021</coordinates>
+				<coordinates>0.513333333333 0.238013494492 0.251804628021</coordinates>
 			</start>
 			<end>
 				<exposed>False</exposed>
-				<coordinates>0.316666666667 1.03913623117 0.306911856967</coordinates>
+				<coordinates>0.513333333333 0.207115052724 0.166911856967</coordinates>
 			</end>
 			<radius>0.020</radius>
 		</hole>
@@ -84,11 +84,11 @@
 			<neighbors>-1</neighbors>
 			<start>
 				<exposed>False</exposed>
-				<coordinates>0.203333333333 1.00031695295 0.392142917365</coordinates>
+				<coordinates>0.626666666667 0.245934330941 0.252142917365</coordinates>
 			</start>
 			<end>
 				<exposed>False</exposed>
-				<coordinates>0.203333333333 1.05602553592 0.239084843598</coordinates>
+				<coordinates>0.626666666667 0.190225747976 0.0990848435984</coordinates>
 			</end>
 			<radius>0.020</radius>
 		</hole>
@@ -97,11 +97,11 @@
 			<neighbors>-1</neighbors>
 			<start>
 				<exposed>False</exposed>
-				<coordinates>0.0875326424086 0.995058143004 0.392697336011</coordinates>
+				<coordinates>0.742467357591 0.251193140891 0.252697336011</coordinates>
 			</start>
 			<end>
 				<exposed>False</exposed>
-				<coordinates>0.0875326424086 1.02716699406 0.304478992771</coordinates>
+				<coordinates>0.742467357591 0.219084289835 0.164478992771</coordinates>
 			</end>
 			<radius>0.020</radius>
 		</hole>
