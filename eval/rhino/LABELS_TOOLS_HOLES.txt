@@ -6,8 +6,8 @@
 "Hole#6" --> twist_drill_bit_32_165
 "Hole#7" --> self_feeding_bit_50_90
 "Hole#8" --> circular_saw_blade_makita_190
-"Hole#9" --> chainsaw
-"Hole#10" --> swordsaw
+"Hole#9" --> swordsaw
+"Hole#10" --> chainsaw
 
 NB:
 - for drilling: toolbase == start and tooltip == end
