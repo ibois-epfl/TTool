@@ -72,20 +72,20 @@ def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt.figure:
     if _name.split(' ')[0] == 'Rotation':
         ax.set_ylabel(f"Angular Error [deg]")
     else:
-        ax.set_ylabel(f"Distance Error [m]")
+        ax.set_ylabel(f"Distance Error [mm]")
 
     boxplot_elements = plt.boxplot(transposed_data.values, labels=data['Name'], notch=False, sym='+', vert=True,
                                    whis=1.5,  positions=None, widths=None, bootstrap=None, usermedians=None,
-                                   conf_intervals=None)
+                                   conf_intervals=None, showfliers=False)
     data_range = max(metrics_info.max()) - min(metrics_info.min())
-    step = data_range * 0.03
+    step = data_range * 0.025
 
     for whisker in boxplot_elements['whiskers']:
         whisker.set(color='black', linewidth=1)
     for cap in boxplot_elements['caps']:
         cap.set(color='black', linewidth=2)
     for median in boxplot_elements['medians']:
-        median.set(color='black', linewidth=2)
+        median.set(linewidth=0)
     for flier in boxplot_elements['fliers']:
         flier.set(marker='+', color="black", alpha=0.5)
     for i, box in enumerate(boxplot_elements['boxes']):
@@ -109,7 +109,7 @@ def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt.figure:
         plt.plot([i + 1 - 0.25, i + 1 + 0.25], [mean_val, mean_val], color=CYBERGREEN, linewidth=2)
 
     mean_legend_entry = Line2D([0], [0], color=CYBERGREEN, linewidth=2, label='Mean')
-    plt.legend(handles=[mean_legend_entry], loc='upper right', fontsize='x-small')
+    plt.legend(handles=[mean_legend_entry], loc='upper right', bbox_to_anchor=(1.1, 1.1), fontsize='x-small')
     plt.xticks(rotation=10)
     plt.tight_layout()
 
