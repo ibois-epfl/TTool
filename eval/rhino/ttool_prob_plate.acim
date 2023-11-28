@@ -114,7 +114,7 @@
 			</start>
 			<end>
 				<exposed>False</exposed>
-				<coordinates>0.6 0.041516875363 0.166989537483</coordinates>
+				<coordinates>0.6 0.141516875363 0.166989537483</coordinates>
 			</end>
 			<radius>0.020</radius>
 		</hole>
