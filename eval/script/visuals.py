@@ -76,7 +76,7 @@ def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt.figure:
 
     boxplot_elements = plt.boxplot(transposed_data.values, labels=data['Name'], notch=False, sym='+', vert=True,
                                    whis=1.5,  positions=None, widths=None, bootstrap=None, usermedians=None,
-                                   conf_intervals=None, showfliers=False)
+                                   conf_intervals=None, showfliers=True, showcaps=True, showbox=True)
     data_range = max(metrics_info.max()) - min(metrics_info.min())
     step = data_range * 0.025
 
@@ -90,7 +90,6 @@ def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt.figure:
         flier.set(marker='+', color="black", alpha=0.5)
     for i, box in enumerate(boxplot_elements['boxes']):
         x = box.get_xdata()[0]
-        top_of_box = box.get_ydata()[2]
 
         max_val = metrics_info['Max'].iloc[i]
         min_val = metrics_info['Min'].iloc[i]
@@ -98,19 +97,22 @@ def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt.figure:
         q1_val = metrics_info['Q1'].iloc[i]
         q3_val = metrics_info['Q3'].iloc[i]
 
-        positions = np.linspace(start=top_of_box + step, stop=top_of_box + 6 * step, num=6)
+        positions = np.linspace(start=max_val + step, stop=max_val + 6 * step, num=6)
 
-        plt.text(x, positions[0], f"Mx={max_val:.2f}", ha='center', va='bottom', fontsize='x-small')
-        plt.text(x, positions[1], f"mn={mean_val:.2f}", ha='center', va='bottom', fontsize='x-small')
-        plt.text(x, positions[2], f"q3={q3_val:.2f}", ha='center', va='bottom', fontsize='x-small')
-        plt.text(x, positions[3], f"q1={q1_val:.2f}", ha='center', va='bottom', fontsize='x-small')
-        plt.text(x, positions[4], f"M={min_val:.2f}", ha='center', va='bottom', fontsize='x-small')
+        plt.text(x, positions[0], f"Mx={max_val:.2f}", ha='left', va='bottom', fontsize='x-small')
+        plt.text(x, positions[1], f"mn={mean_val:.2f}", ha='left', va='bottom', fontsize='x-small')
+        plt.text(x, positions[2], f"q3={q3_val:.2f}", ha='left', va='bottom', fontsize='x-small')
+        plt.text(x, positions[3], f"q1={q1_val:.2f}", ha='left', va='bottom', fontsize='x-small')
+        plt.text(x, positions[4], f"M={min_val:.2f}", ha='left', va='bottom', fontsize='x-small')
 
         plt.plot([i + 1 - 0.25, i + 1 + 0.25], [mean_val, mean_val], color=CYBERGREEN, linewidth=2)
 
     mean_legend_entry = Line2D([0], [0], color=CYBERGREEN, linewidth=2, label='Mean')
     plt.legend(handles=[mean_legend_entry], loc='upper right', bbox_to_anchor=(1.1, 1.1), fontsize='x-small')
-    plt.xticks(rotation=10)
-    plt.tight_layout()
 
+    num_tools = len(data['Name'])
+    ax.set_xticks(np.arange(num_tools))
+    plt.xticks(rotation=15)
+
+    plt.tight_layout()
     return plt
