@@ -25,24 +25,41 @@ def export_box_plot(csv_path: str, out_path: str) -> None:
         print(f"\033[90m[INFO]: Boxplot is exported to {save_plot}\033[0m")
 
 
-
 def export_latex_table(csv_path: str, out_path: str) -> None:
     """
-        Exports the latex table of the statistics (mean, median, std, min, max, q1, q3)
+        Exports the latex table of the statistics of position and rotation errors
 
         Args:
             csv_path (str): The path to the csv files
+            out_path (str): The path to the output directory
         Returns:
             None
     """
+    num_of_operations = 18
     csv_files = glob.glob(os.path.join(csv_path, '*_error.csv'))
+    combined_df = pd.DataFrame()
+    new_df = pd.DataFrame()
     for csv_file in csv_files:
-        save_path = os.path.join(out_path, 'latex_{}.tex'.format(csv_file.split('/')[-1].split('.')[0]))
-        data = pd.read_csv(csv_file)
-        data_dict = data.to_dict(orient='records')
-        latex_table = tabulate(data_dict, headers="keys", tablefmt="latex")
-        with open(save_path, 'w') as file:
-            file.write(latex_table)
+        latex_header_l = csv_file.split('/')[-1].split('.')[0].split('_')[:-1]
+        latex_header = "_".join(latex_header_l)
+        df = pd.read_csv(csv_file)
+        if latex_header == "mean_position":
+            df['Mean Position Error'] = df['Mean'].astype(str) + ' ± ' + df['Std'].astype(str)
+            new_df = df[['Name', 'Mean Position Error']]
+            new_df.rename(columns={'Name': 'Tool Name'}, inplace=True)
+        if latex_header == "rotation":
+            df['Mean Rotation Error'] = df['Mean'].astype(str) + ' ± ' + df['Std'].astype(str)
+            new_df = df[['Name', 'Mean Rotation Error']]
+            new_df.rename(columns={'Name': 'Tool Name'}, inplace=True)
+        combined_df = pd.concat([combined_df, new_df], axis=1)
+
+    combined_df.insert(1, 'Number of operations', num_of_operations)
+    combined_df = combined_df.loc[:, ~combined_df.columns.duplicated()]
+    save_path = os.path.join(out_path, 'latex_table.tex')
+    data_dict = combined_df.to_dict(orient='records')
+    latex_table = tabulate(data_dict, headers="keys", tablefmt="latex")
+    with open(save_path, 'w') as file:
+        file.write(latex_table)
         print(f"\033[90m[INFO]: Latex table is exported to {save_path}\033[0m")
 
 
