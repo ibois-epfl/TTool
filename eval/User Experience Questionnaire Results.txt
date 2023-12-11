@@ -1,0 +1,106 @@
+**Section 1: Tool Selection**
+Q1: How effectively did the design of the ML (Machine Learning) in UI (User Interface) minimize unnecessary steps or interactions during tool selection?
+1 (Very Ineffective) / 2 / 3 / 4 / 5 (Very Effective)
+Rate: 5
+
+Q2: How would you rate the time efficiency of selecting tools using ML?
+1 (Very Time-Consuming) / 2 / 3 / 4 / 5 (Very Time-Efficient)
+Rate: 5
+
+Q3: How often would you choose to use the ML-integrated version of the UI for tool selection if you were to complete the same task regularly?
+1 (Never) / 2 / 3 / 4 / 5 (Always)
+Rate: 5
+
+Q4: Did you find the process of manually selecting tools straightforward or challenging compared to using the ML?
+1 (More Challenging) / 2 / 3 / 4 / 5 (More Straightforward)
+Rate: 3
+
+Q5: How would you rate the time efficiency of manually selecting tools without the assistance of the ML model's classification?
+1 (Very Time-Consuming) / 2 / 3 / 4 / 5 (Very Time-Efficient)
+Rate: 3
+
+Q6: How often would you choose to use the non-ML version of the UI for tool selection if you were to complete the same task regularly?
+1 (Never) / 2 / 3 / 4 / 5 (Always)
+Rate: 2
+
+
+**Section 2: Input Pose**
+Q1: How easy was it for you to achieve the desired level of precision in aligning the AR objects with the real physical objects?
+1 (Very Difficult) / 2 / 3 / 4 / 5 (Very Easy)
+Rate: 4
+
+Q2: How user-friendly and easy was the process of consistently adjusting the rotation?
+1 (Very Difficult) / 2 / 3 / 4 / 5 (Very Easy)
+Rate: 4
+
+Q3: How user-friendly and easy was the process of consistently adjusting the position?
+1 (Very Difficult) / 2 / 3 / 4 / 5 (Very Easy)
+Rate: 4
+
+Q4: How did the time it took to align the AR objects with the real physical objects compare to your expectations?
+1 (Much More Time-Consuming) / 2 / 3 / 4 / 5 (Much Quicker)
+Rate: 5
+
+Q5: Was it physically challenging for you to manipulate the tool while working with the AR system?
+1 (Extremely Challenging) / 2 / 3 / 4 / 5 (Very Easy)
+Rate: 5
+
+Q6: How easy was it for you to maintain focus on the display and ensure the alignment of AR pose with real-world tool?
+1 (Very Difficult) / 2 / 3 / 4 / 5 (Very Easy)
+Rate: 5
+
+
+**Section 3: Final Pose**
+Q1: How effective do you believe the refinement tool was in achieving the desired final pose of the AR objects?
+1 (Very Ineffective) / 2 / 3 / 4 / 5 (Very Effective)
+Rate: 5
+
+Q2: How often did you encounter challenges or uncertainty when deciding to start the refinement process for alignment enhancement?
+1 (Very Rarely) / 2 / 3 / 4 / 5 (Very Often)
+Rate: 2
+
+Q3: How confident were you in determining when to stop using the refinement tool after achieving the desired alignment enhancement?
+1 (Not Confident at All) / 2 / 3 / 4 / 5 (Very Confident)
+Rate: 4
+
+
+**Section 4: Tool Based Questions**
+Q1: Overall, how would you rate your experience with an Auger Drill Bit (d:20mm, L:235mm) using the TTool?
+1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
+Rate: 3
+
+Q2: Overall, how would you rate your experience with Auger Drill Bit (d:34mm, L:235mm) using the TTool?
+1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
+Rate: 4
+
+Q3: Overall, how would you rate your experience with Spade Drill Bit (d:25mm, L:150mm)  using the TTool?
+1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
+Rate: 4
+
+Q4: Overall, how would you rate your experience with Brad Point Drill Bit (d:20mm, L:150mm)  using the TTool?
+1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
+Rate: 5
+
+Q5: Overall, how would you rate your experience with the Self Feeding Bit (d:50mm, L:90mm) using the TTool?
+1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
+Rate: 5
+
+Q6: Overall, how would you rate your experience with the Twist Drill Bit (d:32mm, L:165mm) using the TTool?
+1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
+Rate: 5
+
+Q7: Overall, how would you rate your experience with Sword Saw using the TTool?
+1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
+Rate: 5
+
+Q8: Overall, how would you rate your experience with Circular Saw using the TTool?
+1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
+Rate: 4
+
+Q9: Overall, how would you rate your experience with Chain Saw using the TTool?
+1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
+Rate: 5
+
+
+
+
