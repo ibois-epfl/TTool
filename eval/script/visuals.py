@@ -158,7 +158,8 @@ def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt.figure:
     plt.legend(handles=[mean_legend_entry], loc='upper right', bbox_to_anchor=(1.1, 1.1), fontsize='x-small')
 
     num_tools = len(data['Name'])
-    ax.set_xticks(np.arange(num_tools))
+    ax.set_xticks(np.arange(0, num_tools + 1))
+
     plt.xticks(rotation=15)
 
     plt.tight_layout()
