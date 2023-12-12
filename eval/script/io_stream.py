@@ -1,8 +1,9 @@
 import csv
 import os
+from typing import Tuple, List, Dict, Any
 
 
-def parse_log_data(data_path: str) -> list[dict[str, list[list[float]], str]]:
+def parse_log_data(data_path: str) -> tuple[list[dict[Any, Any]], dict[str, int]]:
     """
         Processes the log file containing coordinates from AC,
         converting it into a more usable format for further processing
@@ -17,6 +18,7 @@ def parse_log_data(data_path: str) -> list[dict[str, list[list[float]], str]]:
         raw_data = log_file.read()
     entries = raw_data.strip().strip('\n').split('\n\n')
     parsed_data = list()
+    tool_name_count = {}
 
     for ent in entries:
         lines = ent.split('\n')
@@ -30,7 +32,13 @@ def parse_log_data(data_path: str) -> list[dict[str, list[list[float]], str]]:
                 points.append(vals)
         #{toolhead: [[toolbase, tooltip, holebase holeend],timestamp]}
         parsed_data.append({name: [points, timestamp]})
-    return parsed_data
+
+        if name in tool_name_count:
+            tool_name_count[name] += 1
+        else:
+            tool_name_count[name] = 1
+
+    return parsed_data, tool_name_count
 
 
 def export_to_csv(data: list, out_path: str) -> None:
