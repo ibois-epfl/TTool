@@ -184,10 +184,11 @@ def draw_progression_graph(csv_path: str, out_path: str) -> plt.figure:
     colors = plt.cm.tab20(np.linspace(0, 1, df['Name'].nunique()))
 
     columns = df.columns.drop('Name')
+
     for column in columns:
         data = df.groupby('Name')[column].apply(list).reset_index()
         max_length = max(data[column].apply(len))
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots(figsize=(10, 4))
 
         for index, row in data.iterrows():
             tool_name = row['Name']
@@ -196,6 +197,11 @@ def draw_progression_graph(csv_path: str, out_path: str) -> plt.figure:
             categories = np.arange(1, len(values)+1)
             ax.plot(categories, values, color=tool_color, linewidth=2, label=tool_name)
             ax.scatter(categories, values, color=tool_color, s=1)
+
+        ax.hist(df[column], bins=85, color=CYBERGREEN, alpha=0.2,  orientation='horizontal', zorder=2)
+        ax2 = ax.twinx()
+        ax2.set_ylim(ax.get_ylim())
+        ax2.tick_params(axis='y', which='both', left=False, right=False, labelleft=False, labelright=False)
 
         if column.split('_')[0] == 'Rotation':
             y_label = 'Angular Error [deg]'
