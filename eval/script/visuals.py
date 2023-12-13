@@ -198,7 +198,7 @@ def draw_progression_graph(csv_path: str, out_path: str) -> plt.figure:
             ax.plot(categories, values, color=tool_color, linewidth=2, label=tool_name)
             ax.scatter(categories, values, color=tool_color, s=1)
 
-        ax.hist(df[column], bins=85, color=CYBERGREEN, alpha=0.2,  orientation='horizontal', zorder=2)
+        ax.hist(df[column], bins=85, color=CYBERGREEN, alpha=0.165,  orientation='horizontal', zorder=2)
         ax2 = ax.twinx()
         ax2.set_ylim(ax.get_ylim())
         ax2.tick_params(axis='y', which='both', left=False, right=False, labelleft=False, labelright=False)
