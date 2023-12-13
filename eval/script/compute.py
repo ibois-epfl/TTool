@@ -19,6 +19,8 @@ def main(data_path: str, out_path: str, dir_name: str) -> None:
     visuals.export_box_plot(csv_path=dirs['csv'], out_path=dirs['boxplot'])
     print(f"\033[92m[INFO]: Latex table will be exported to {dirs['latex']}\033[0m")
     visuals.export_latex_table(csv_path=dirs['csv'], out_path=dirs['latex'], num_of_operations=n_operations)
+    print(f"\033[92m[INFO]: Progression graph will be exported to {dirs['progression']}\033[0m")
+    visuals.draw_progression_graph(csv_path=dirs['csv'], out_path=dirs['progression'])
     print("\033[1m\033[44m[INFO]: __Pose Estimation Accuracy Error Computation Completed__\033[0m")
 
 

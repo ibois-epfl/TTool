@@ -14,6 +14,7 @@ def export_box_plot(csv_path: str, out_path: str) -> None:
 
         Args:
             csv_path (str): The path to the csv files
+            out_path (str): The path to the output directory
         Returns:
             None
     """
@@ -22,6 +23,7 @@ def export_box_plot(csv_path: str, out_path: str) -> None:
         save_plot = os.path.join(out_path, "boxplot_{}_graph.png".format(csv_file.split('/')[-1].split('.')[0]))
         box_plot = draw_boxplot_from_csv(csv_file=csv_file, _name="{}".format(csv_file.split('/')[-1].split('.')[0]))
         box_plot.savefig(save_plot)
+        box_plot.close()
         print(f"\033[90m[INFO]: Boxplot is exported to {save_plot}\033[0m")
 
 
@@ -98,7 +100,7 @@ def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt.figure:
         Draws the boxplot of the statistics (mean, median, std, min, max, q1, q3)
 
         Args:
-            csv_path (str): The path to the csv files
+            csv_file (str): The csv file with the statistics
             _name (str): The name of the plot
         Returns:
             plt.figure: The boxplot
@@ -164,3 +166,52 @@ def draw_boxplot_from_csv(csv_file: str, _name: str) -> plt.figure:
 
     plt.tight_layout()
     return plt
+
+
+def draw_progression_graph(csv_path: str, out_path: str) -> plt.figure:
+    """
+        Draws the progression graph of the results with respect to the number of operations
+
+        Args:
+            csv_path (str): The path to the csv files
+            out_path (str): The path to the output directory
+        Returns:
+            plt.figure: The progression graph
+    """
+    csv_file = os.path.join(csv_path, 'results.csv')
+    df = pd.read_csv(csv_file)
+
+    colors = plt.cm.tab20(np.linspace(0, 1, df['Name'].nunique()))
+
+    columns = df.columns.drop('Name')
+    for column in columns:
+        data = df.groupby('Name')[column].apply(list).reset_index()
+        max_length = max(data[column].apply(len))
+        fig, ax = plt.subplots(figsize=(8, 4))
+
+        for index, row in data.iterrows():
+            tool_name = row['Name']
+            values = row[column]
+            tool_color = colors[index % len(colors)]
+            categories = np.arange(1, len(values)+1)
+            ax.plot(categories, values, color=tool_color, linewidth=2, label=tool_name)
+            ax.scatter(categories, values, color=tool_color, s=1)
+
+        if column.split('_')[0] == 'Rotation':
+            y_label = 'Angular Error [deg]'
+        else:
+            y_label = 'Distance Error [mm]'
+        ax.set_ylabel(y_label)
+        ax.set_xlabel('Number of operations')
+        ax.set_xticks(np.arange(1, max_length + 1))
+
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+
+        ax.yaxis.grid(False)
+
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        plt.tight_layout()
+        plt.savefig(os.path.join(out_path, f'progression_{column.lower()}_graph.png'))
+        plt.close(fig)
