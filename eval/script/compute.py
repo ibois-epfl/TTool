@@ -2,6 +2,7 @@ import util
 import visuals
 import io_stream
 import compute_error
+import compute_ux
 
 
 def main(data_path: str, out_path: str, dir_name: str) -> None:
@@ -21,6 +22,8 @@ def main(data_path: str, out_path: str, dir_name: str) -> None:
     visuals.export_latex_table(csv_path=dirs['csv'], out_path=dirs['latex'], num_of_operations=n_operations)
     print(f"\033[92m[INFO]: Progression graph will be exported to {dirs['progression']}\033[0m")
     visuals.draw_progression_graph(csv_path=dirs['csv'], out_path=dirs['progression'])
+    print(f"\033[92m[INFO]: UX evaluation graphs will be exported to {dirs['ux']}\033[0m")
+    compute_ux.export_ux_graph(out_path=dirs['ux'])
     print("\033[1m\033[44m[INFO]: __Pose Estimation Accuracy Error Computation Completed__\033[0m")
 
 
