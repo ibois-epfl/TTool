@@ -1,4 +1,4 @@
-**Section 1: Tool Selection**
+Section 1: Tool Selection
 Q1: How effectively did the design of the ML (Machine Learning) in UI (User Interface) minimize unnecessary steps or interactions during tool selection?
 1 (Very Ineffective) / 2 / 3 / 4 / 5 (Very Effective)
 Rate: 5
@@ -24,7 +24,7 @@ Q6: How often would you choose to use the non-ML version of the UI for tool sele
 Rate: 2
 
 
-**Section 2: Input Pose**
+Section 2: Input Pose
 Q1: How easy was it for you to achieve the desired level of precision in aligning the AR objects with the real physical objects?
 1 (Very Difficult) / 2 / 3 / 4 / 5 (Very Easy)
 Rate: 4
@@ -50,21 +50,21 @@ Q6: How easy was it for you to maintain focus on the display and ensure the alig
 Rate: 5
 
 
-**Section 3: Final Pose**
+Section 3: Final Pose
 Q1: How effective do you believe the refinement tool was in achieving the desired final pose of the AR objects?
 1 (Very Ineffective) / 2 / 3 / 4 / 5 (Very Effective)
 Rate: 5
 
 Q2: How often did you encounter challenges or uncertainty when deciding to start the refinement process for alignment enhancement?
-1 (Very Rarely) / 2 / 3 / 4 / 5 (Very Often)
-Rate: 2
+1 (Very Often) / 2 / 3 / 4 / 5 (Very Rarely)
+Rate: 4
 
 Q3: How confident were you in determining when to stop using the refinement tool after achieving the desired alignment enhancement?
 1 (Not Confident at All) / 2 / 3 / 4 / 5 (Very Confident)
 Rate: 4
 
 
-**Section 4: Tool Based Questions**
+Section 4: Tool Based Questions
 Q1: Overall, how would you rate your experience with an Auger Drill Bit (d:20mm, L:235mm) using the TTool?
 1 (Very Negative) / 2 / 3 / 4 / 5 (Very Positive)
 Rate: 3
