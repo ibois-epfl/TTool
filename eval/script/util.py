@@ -11,7 +11,7 @@ def create_out_dir(out_path: str, dir_name: str) -> dict[str, str, str]:
         Returns:
             dict[str, str, str]: The paths of the output directories
     """
-    subdirs = ['csv', 'latex', 'boxplot', 'progression']
+    subdirs = ['csv', 'latex', 'boxplot', 'progression', 'ux']
     paths = {}
     out_path = os.path.join(out_path, 'output', dir_name)
     for subdir in subdirs:
