@@ -32,4 +32,16 @@ It does not contain the log files of **self_feeding_bit_40_90**.
 It does not contain the screen recordings of **self_feeding_bit_40_90**.
 4. **screenshots**: Contains all screenshots from AC taken during the evaluation.
 
+- ```output``` 
+This folder contains all the results of the evaluation. 
+The folder is organized into the several subfolders: **all_sessions**, **session1**, **session2**, **session3**, **session4**.
+- **all_sessions**: Contains the results of the evaluation of all sessions.
+- **session1** - **session4**: Contains the results of the evaluation of each session.
+
+Each of these folders contains the following subfolders: **boxplot**, **csv**, **latex**, **progression**, **ux**.
+- **boxplot**: Contains the boxplot graphs of the evaluation results.
+- **csv**: Contains the CSV files of the evaluation results.
+- **latex**: Contains the LaTeX tables of the evaluation results.
+- **progression**: Contains the progression graphs of the evaluation results.
+- **ux**: Contains the UX graphs of the evaluation results.
 
