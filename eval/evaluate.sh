@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 BOLD='\033[1m'
 RESET='\033[0m'
 BG_BLUE='\033[44m'
@@ -20,13 +19,15 @@ function print_prompt() {
 
 function run_bg() {
   echo -en "\033[0;90m"
-  $@
+  "$@" &
   echo -e "\033[0m"
+  wait $!
 }
 
 # Parse the arguments
 DATA_PATH=""
 OUT_PATH=""
+DIR_NAME=""
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -38,6 +39,10 @@ while [ "$#" -gt 0 ]; do
       OUT_PATH="$2"
       shift 2
       ;;
+    --dir_name)
+      DIR_NAME="$2"
+      shift 2
+      ;;
     *)
       print_error "Unknown argument: $1"
       exit 1
@@ -46,8 +51,8 @@ while [ "$#" -gt 0 ]; do
 done
 
 # Check if the variables are set
-if [ -z "$DATA_PATH" ] || [ -z "$OUT_PATH" ]; then
-    print_error "Missing arguments. Usage: $0 --data_path DATA_PATH --out_path OUT_PATH"
+if [ -z "$DATA_PATH" ] || [ -z "$OUT_PATH" ] || [ -z "$DIR_NAME" ]; then
+    print_error "Missing arguments. Usage: $0 --data_path DATA_PATH --out_path OUT_PATH --dir_name DIR_NAME"
     exit 1
 fi
 
@@ -97,5 +102,5 @@ echo -e "${BOLD}${BG_BLUE}[INFO] Activated the Conda environment '$ENV_NAME'.${R
 
 # Run the evaluation script
 print_info "Running the evaluation script."
-python script/compute.py --data_path "$DATA_PATH" --out_path "$OUT_PATH"
+python script/compute.py --data_path "$DATA_PATH" --out_path "$OUT_PATH" --dir_name "$DIR_NAME"
 
