@@ -1,12 +1,15 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
-from tabulate import tabulate
 import glob
 import numpy as np
 from matplotlib.lines import Line2D
+from matplotlib.ticker import FixedLocator
 
 CYBERGREEN = '#2DDE98'
+CYBERBLUE = '#007BFF'
+DARKGREY = '#808080'
+
 
 def export_box_plot(csv_path: str, out_path: str) -> None:
     """
@@ -221,3 +224,36 @@ def draw_progression_graph(csv_path: str, out_path: str) -> plt.figure:
         plt.tight_layout()
         plt.savefig(os.path.join(out_path, f'progression_{column.lower()}_graph.png'))
         plt.close(fig)
+
+
+def draw_spider_graph(categories: list, values: list, title: str) -> plt.figure:
+    """
+        Draws the spider graph of the UX evaluation
+
+        Args:
+            categories (list): The categories of the UX evaluation
+            values (list): The values of the UX evaluation
+            title (str): The title of the graph
+        Returns:
+            plt.figure: The spider graph
+    """
+    N = len(categories)
+    angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
+    values += values[:1]
+    angles += angles[:1]
+
+    fig = plt.figure(figsize=(5, 4))
+    ax = fig.add_subplot(111, polar=True)
+    ax.set_theta_offset(np.pi / 2)
+    ax.set_theta_direction(-1)
+
+    ax.tick_params(axis='x', pad=20, rotation=0)
+    ax.xaxis.set_major_locator(FixedLocator(angles[:-1]))
+    ax.set_xticklabels(categories, color=DARKGREY, size=8, ha='center', va='center')
+
+    plt.xticks(angles[:-1], categories, color=DARKGREY, size=8)
+    ax.plot(angles, values)
+    ax.fill(angles, values, 'b', alpha=0.1)
+    ax.set_title(title, size=11, color=CYBERBLUE, y=1.2)
+    plt.tight_layout()
+    return plt
