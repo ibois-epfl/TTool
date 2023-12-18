@@ -56,9 +56,6 @@ If not, it will be created using the `environment.yml` file.
 Then it will run the evaluation and export the results to the **/output** directory within the specified path under the given directory name.
 
 ## Manual Setup
-
-### 1. Setting up the Anaconda Environment
-
 For a manual setup, first create the Anaconda environment using the `environment.yml` file:
 ```bash
 conda env create -f environment.yml
@@ -67,8 +64,8 @@ If the environment already exists, update it with:
 ```bash
 conda env update --name myenv --file environment.yml --prune
 ```
-### 2. Running the Evaluation
 
+## Running the Evaluation
 After setting up the environment, run the evaluation with:
 
 ```bash
