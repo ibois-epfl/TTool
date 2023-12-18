@@ -30,7 +30,6 @@ def parse_log_data(data_path: str) -> tuple[list[dict[Any, Any]], dict[str, int]
             if len(coords) > 2:
                 vals = float(coords[3]), float(coords[4]), float(coords[5])
                 points.append(vals)
-        #{toolhead: [[toolbase, tooltip, holebase holeend],timestamp]}
         parsed_data.append({name: [points, timestamp]})
 
         if name in tool_name_count:
