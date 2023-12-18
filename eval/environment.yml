@@ -1,0 +1,16 @@
+# to create from scratch: conda env create -f environment.yml
+# to update the environment: conda env update --name myenv --file environment.yml --prune
+# or update with environment activated: conda env update --file environment.yml --prune
+
+name: ttooleval2
+channels:
+    - conda-forge
+dependencies:
+   - python==3.9
+   - pip
+   - pip:
+     - numpy==1.20.3
+     - matplotlib==3.4.3
+     - pandas==2.0.2
+     - Jinja2==3.1.2
+   - git
