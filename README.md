@@ -22,7 +22,7 @@
 
 🚀 For a quick hands-on start or more details, check out our [Wiki](https://github.com/ibois-epfl/TSlam/wiki).
 
-<!-- ![Alt](https://repobeats.axiom.co/api/embed/1d0a652170a09d7569e8675428a319c6feb06866.svg "Repobeats analytics image") -->
+![Alt](https://repobeats.axiom.co/api/embed/1a5487df11b22b8d23cc28d05201ddbc60a61310.svg "Repobeats analytics image")
 
 # How it works
 
