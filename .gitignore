@@ -67,6 +67,10 @@ include/divisible/*
 # Local 
 [Bb][Uu][Ii][Ll][Dd]/**/*
 
+#pose evaluation logging
+trackingPose.log
+trackingPose.txt
+
 
 ## >>>>>>>>> vscode >>>>>>>>>
 # gen

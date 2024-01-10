@@ -1,0 +1,16 @@
+cff-version: 2.1.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Settimi"
+  given-names: "Andrea"
+  orcid: "https://orcid.org/0000-0001-5020-7331"
+- family-names: "Naravich"
+  given-names: "Chutisilp"
+  orcid: "https://orcid.org/0009-0005-8782-732X"
+- family-names: "Nazgul"
+  given-names: "Zholmagambetova"
+title: "Software of TTool: a supervised AI-assisted Visual Pose Detector for AR Wood-working"
+version: 2.1.0
+doi: 10.5281/zenodo.10093230  # to replace
+date-released: 2024-01-10
+url: "https://github.com/ibois-epfl/TTool"
