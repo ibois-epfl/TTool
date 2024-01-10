@@ -40,8 +40,7 @@ On the left, the user can select the tool type and input an initial pose. On the
 
 # Caveats
 TTool was tailored to our specific use case. If you want to adapt it to your use case, you will need to change the following files:
-- `CMakeLists.txt`: comment the following line, it won't use zenodo for the models, but you will have to provide the models yourself, se the wiki on how to do it.
-  https://github.com/ibois-epfl/TTool/blob/b357383e85708844efd9854291f0f85e521d227b/CMakeLists.txt#L12C1-L12C29
+- `CMakeLists.txt`: comment the line `include(cmake/dataset.cmake)`, it won't use zenodo for the models, but you will have to provide the models yourself, se the wiki on how to do it.
 - `assets/config.yaml`: list the models you want to use, and their path by replacing these lines:
   https://github.com/ibois-epfl/TTool/blob/b357383e85708844efd9854291f0f85e521d227b/assets/config.yml#L57-L66
   Be sure to erase these lines specific to our use case:
