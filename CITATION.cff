@@ -11,6 +11,6 @@ authors:
   given-names: "Zholmagambetova"
 title: "Software of TTool: a supervised AI-assisted Visual Pose Detector for AR Wood-working"
 version: 2.1.0
-doi: 10.5281/zenodo.10093230  # to replace
+doi: 10.5281/zenodo.10480155
 date-released: 2024-01-10
 url: "https://github.com/ibois-epfl/TTool"
