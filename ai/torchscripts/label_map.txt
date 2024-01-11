@@ -1,0 +1,11 @@
+auger_drill_bit_34_235: 0
+chain_swordsaw_blade_200: 1
+spade_drill_bit_25_150: 2
+brad_point_drill_bit_20_150: 3
+chain_saw_blade_f_250: 4
+self_feeding_bit_40_90: 5
+circular_saw_blade_makita_190: 6
+self_feeding_bit_50_90: 7
+twist_drill_bit_32_165: 8
+saber_saw_blade_makita_t_300: 9
+auger_drill_bit_20_235: 10
