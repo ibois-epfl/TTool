@@ -6,16 +6,20 @@ histOffset: 100
 histRad: 40
 searchRad: 25
 classifierModelPath: "ai/torchscripts/efficientnet.pt"
+
+# The order of classifierLabels is determined by the classifier during training
 classifierLabels:
-   - "auger_drill_bit_20_235"
+   - "auger_drill_bit_34_235"
+   - "chain_swordsaw_blade_200"
+   - "spade_drill_bit_25_150"
    - "brad_point_drill_bit_20_150"
    - "chain_saw_blade_f_250"
-   - "circular_saw_blade_makita_190"
-   - "saber_saw_blade_makita_t_300"
    - "self_feeding_bit_40_90"
+   - "circular_saw_blade_makita_190"
    - "self_feeding_bit_50_90"
-   - "spade_drill_bit_25_150"
    - "twist_drill_bit_32_165"
+   - "saber_saw_blade_makita_t_300"
+   - "auger_drill_bit_20_235"
 classifierImageSize: 384
 classifierImageChannels: 3
 classifierMean:
