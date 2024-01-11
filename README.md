@@ -21,7 +21,7 @@
 
 ↳ `TTool` can be imported as a C++ API in a third project or used as an executable. It is tailored to our specific use case in timber carpentry but see the [Caveats](#caveats) section below to adapt it to your use case.
 
-🚀 For a quick hands-on start or more details, check out our [Wiki](https://github.com/ibois-epfl/TSlam/wiki).
+🚀 For a quick hands-on start or more details, check out our [Wiki](https://github.com/ibois-epfl/TTool/wiki).
 
 ![Alt](https://repobeats.axiom.co/api/embed/1a5487df11b22b8d23cc28d05201ddbc60a61310.svg "Repobeats analytics image")
 
