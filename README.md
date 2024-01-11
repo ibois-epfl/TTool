@@ -25,7 +25,7 @@
 
 ![Alt](https://repobeats.axiom.co/api/embed/1a5487df11b22b8d23cc28d05201ddbc60a61310.svg "Repobeats analytics image")
 
-# How it works
+## How it works
 
 ![Alt](./img/XX_fig_cutseuqence.png "Cut sequence for TTool")
 
@@ -39,7 +39,7 @@
 
 On the left, the user can select the tool type and input an initial pose. On the right, the pose is refined and projected onto the camera feed. *The digital twin between the aligned model and the chainsaw plate (or any other tool) is preserved even when occuluded and inside the wood*.
 
-# Caveats
+## Caveats
 TTool was tailored to our specific use case. If you want to adapt it to your use case, you will need to change the following files:
 - `CMakeLists.txt`: comment the line `include(cmake/dataset.cmake)`, it won't use zenodo for the models, but you will have to provide the models yourself, se the wiki on how to do it.
 - `assets/config.yaml`: list the models you want to use, and their path by replacing these lines:
@@ -48,6 +48,6 @@ TTool was tailored to our specific use case. If you want to adapt it to your use
   https://github.com/ibois-epfl/TTool/blob/b357383e85708844efd9854291f0f85e521d227b/assets/config.yml#L67-L76
 - `ML classifier`: to adapt the ML classifier to your use case, you will need to train your own model. We have a template [in this repo](https://github.com/ibois-epfl/TTool-ai).
 
-# Acknowledgement
+## Acknowledgement
 This project was possible thanks to technical support and conslling of thanks to the technical support and consulting of the [EPFL Center for Imaging](https://imaging.epfl.ch/) in the person of [Florian Aymanns](https://github.com/faymanns).
 Check out their [GitHub Organization](https://github.com/EPFL-Center-for-Imaging) to discover other nice projects they are helping building!
