@@ -9,6 +9,8 @@ authors:
   orcid: "https://orcid.org/0009-0005-8782-732X"
 - family-names: "Nazgul"
   given-names: "Zholmagambetova"
+- family-names: "Florian"
+  given-names: "Aymanns"
 title: "Software of TTool: a supervised AI-assisted Visual Pose Detector for AR Wood-working"
 version: 2.1.0
 doi: 10.5281/zenodo.10480155
