@@ -8,6 +8,8 @@ searchRad: 25
 classifierModelPath: "ai/torchscripts/efficientnet.pt"
 
 # The order of classifierLabels is determined by the classifier during training
+# the classifier once trained output a .pt (weights) and a .txt file for the order
+# see the .txt file in ai/torchscripts to see the order to recreate here below
 classifierLabels:
    - "auger_drill_bit_34_235"
    - "chain_swordsaw_blade_200"
