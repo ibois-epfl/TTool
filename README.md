@@ -12,7 +12,7 @@
     <img src="vid/mosaic.gif">
 </p>
 
-🌲 `TTool` is developed at the [**Laboratory for Timber Construction**](https://www.epfl.ch/labs/ibois/) (director: Prof.Yves Weinand), at [**EPFL**](https://www.epfl.ch/en/), Lausanne, Switzerland. The project is part of the [**Augmented Carpentry Research**](https://www.epfl.ch/labs/ibois/augmented-carpentry/).
+🌲 `TTool` is developed at the [**Laboratory for Timber Construction**](https://www.epfl.ch/labs/ibois/) (director: Prof.Yves Weinand) with the support of the [EPFL Center for Imaging](https://imaging.epfl.ch/), at [**EPFL**](https://www.epfl.ch/en/), Lausanne, Switzerland. The project is part of the [**Augmented Carpentry Research**](https://www.epfl.ch/labs/ibois/augmented-carpentry/).
 
 🪚 `TTool` is an open-source **AI-powered and supervised 6DoF detector** for monocular camera. It is developed in C++ and for UNIX systems to allow **accurate end-effectors detection** during **wood-working operations** such as cutting, drilling, sawing and screwing with multiple tools. This is a fundamental component of any subtractive AR fabrication system since you can for instance, calculate and give users feedback on the correct orientation and depth to start and finish a hole or a cut.
 
@@ -48,3 +48,6 @@ TTool was tailored to our specific use case. If you want to adapt it to your use
   https://github.com/ibois-epfl/TTool/blob/b357383e85708844efd9854291f0f85e521d227b/assets/config.yml#L67-L76
 - `ML classifier`: to adapt the ML classifier to your use case, you will need to train your own model. We have a template [in this repo](https://github.com/ibois-epfl/TTool-ai).
 
+# Acknowledgement
+This project was possible thanks to technical support and conslling of thanks to the technical support and consulting of the [EPFL Center for Imaging](https://imaging.epfl.ch/) in the person of [Florian Aymanns](https://github.com/faymanns).
+Check out their [GitHub Organization](https://github.com/EPFL-Center-for-Imaging) to discover other nice projects they are helping building!
