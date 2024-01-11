@@ -26,7 +26,8 @@ ttool::ML::Classifier::Classifier(std::string modelPath,
                                   std::vector<float> std)
 : IMAGE_SIZE(imageSize), IMAGE_CHANNEL(imageChannel), m_Pred2Label(pred2Label), m_Mean(mean), m_Std(std)
 {
-    m_Module = torch::jit::load(modelPath);
+    torch::Device device(torch::kCPU);
+    m_Module = torch::jit::load(modelPath, device);
 
     // // Dry run to initialize the model
     // cv::Mat image = cv::Mat::zeros(IMAGE_SIZE, IMAGE_SIZE, CV_8UC3);
