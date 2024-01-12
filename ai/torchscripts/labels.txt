@@ -1,4 +1,4 @@
-auger_drill_bit_34_235
+auger_drill_bit_35_235
 chain_swordsaw_blade_200
 spade_drill_bit_25_150
 brad_point_drill_bit_20_150
