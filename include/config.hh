@@ -30,6 +30,8 @@
 #include <variant>
 #include <functional>
 #include <unordered_map>
+#include <filesystem>
+#include <algorithm>
 
 namespace ttool
 {
@@ -341,20 +343,41 @@ namespace ttool
              */
             ConfigData GetConfigData()
             {
+                std::vector<std::string> fileNames;
                 // Create a copy of the ConfigData object
                 ConfigData configData = this->m_ConfigData;
                 // Prefix the model files with the m_TToolRootPath
                 for (auto& modelFile : configData.ModelFiles)
                 {
                     modelFile = std::string(m_TToolRootPath) + "/" + modelFile;
+                    fileNames.push_back(modelFile);
                 }
                 // Prefix the acit files with the m_TToolRootPath
                 for (auto& acitFile : configData.AcitFiles)
                 {
                     acitFile = std::string(m_TToolRootPath) + "/" + acitFile;
+                    fileNames.push_back(acitFile);
                 }
                 // Prefix the classifier model path with the m_TToolRootPath
                 configData.ClassifierModelPath = std::string(m_TToolRootPath) + "/" + configData.ClassifierModelPath;
+
+                for (const auto& label : configData.ClassifierLabels)
+                {
+                    bool labelMatches = false;
+                    for (const auto& filePath : fileNames)
+                    {
+                        if (filePath.find(label) != std::string::npos)
+                        {
+                            labelMatches = true;
+                            break;
+                        }
+                    }
+
+                    if (!labelMatches)
+                    {
+                        std::cout << "Label \"" << label << "\" does not match any file paths" << std::endl;
+                    }
+                }
                 return configData;
             }
 
