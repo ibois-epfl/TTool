@@ -60,6 +60,8 @@ def main(source_path: str, config_path: str) -> None:
         with open(config_path, "w") as f:
             f.writelines(config_lines)
 
+        _log_success("The labels were successfully loaded into the assets/config.yml file.")
+
     except FileNotFoundError as e:(
         _log_error(f"Error: File not found - {e}"))
     except ValueError as e:(
