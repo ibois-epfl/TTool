@@ -32,6 +32,7 @@
 #include <unordered_map>
 #include <filesystem>
 #include <algorithm>
+#include <unordered_set>
 
 namespace ttool
 {
@@ -206,6 +207,36 @@ namespace ttool
             }
 
             /**
+             * @brief Check if the labels in the config file match the file paths of model files and acit files
+             *
+             */
+
+            void CheckClassifierLabelsConfig()
+            {
+                std::filesystem::path rootPath(m_TToolRootPath);
+                std::unordered_set<std::string> filePaths;
+
+                for (const auto& modelFile : m_ConfigData.ModelFiles) {
+                    filePaths.insert((rootPath / modelFile).string());
+                }
+                for (const auto& acitFile : m_ConfigData.AcitFiles) {
+                    filePaths.insert((rootPath / acitFile).string());
+                }
+
+                for (const auto& label : m_ConfigData.ClassifierLabels) {
+                    bool labelMatches = std::any_of(filePaths.begin(), filePaths.end(),
+                                                    [&label](const std::string& filePath) {
+                                                        return filePath.find(label) != std::string::npos;
+                                                    });
+
+                    if (!labelMatches) {
+                        throw std::runtime_error("Label mismatch error: Label \"" + label + "\" does not match any file paths");
+                    }
+                }
+
+            }
+
+            /**
              * @brief Read the config file and set the values to the ConfigData object
              * 
              */
@@ -247,6 +278,8 @@ namespace ttool
                 m_ConfigData.setValue("classifierMean",classifierMean);
                 m_ConfigData.setValue("classifierStd", classifierStd);
 
+                // check the classifier labels match
+                CheckClassifierLabelsConfig();
                 return fs.release();
             }
 
@@ -360,24 +393,6 @@ namespace ttool
                 }
                 // Prefix the classifier model path with the m_TToolRootPath
                 configData.ClassifierModelPath = std::string(m_TToolRootPath) + "/" + configData.ClassifierModelPath;
-
-                for (const auto& label : configData.ClassifierLabels)
-                {
-                    bool labelMatches = false;
-                    for (const auto& filePath : fileNames)
-                    {
-                        if (filePath.find(label) != std::string::npos)
-                        {
-                            labelMatches = true;
-                            break;
-                        }
-                    }
-
-                    if (!labelMatches)
-                    {
-                        std::cout << "Label \"" << label << "\" does not match any file paths" << std::endl;
-                    }
-                }
                 return configData;
             }
 
