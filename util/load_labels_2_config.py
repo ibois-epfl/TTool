@@ -50,7 +50,7 @@ def main(source_path: str, config_path: str) -> None:
                 break
 
         new_labels_section = [f'{classifier_labels}\n'] + \
-                             [f"  - \"{label}\"\n" for label in labels]
+                             [f"   - \"{label}\"\n" for label in labels]
 
         if start_idx != -1:
             config_lines = config_lines[:start_idx] + new_labels_section + config_lines[end_idx:]
