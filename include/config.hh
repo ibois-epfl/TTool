@@ -207,10 +207,40 @@ namespace ttool
             }
 
             /**
+             * @brief Check if the ACIT files are valid
+             *
+             */
+            void CheckAcitFiles()
+            {
+                for (const auto& acitFile : m_ConfigData.AcitFiles) {
+                    try {
+                        cv::FileStorage fs(acitFile, cv::FileStorage::READ);
+                        if (!fs.isOpened()) {
+                            std::cerr << "Could not open file: " << acitFile << std::endl;
+                            continue;
+                        }
+
+                        std::string acitFileName;
+                        fs["name"] >> acitFileName;
+                        fs.release();
+
+                        std::filesystem::path path(acitFile);
+                        std::string folderName = path.parent_path().filename().string();
+
+                        if (folderName != acitFileName) {
+                            std::cerr << "Mismatch in " << acitFile << ": Folder name (" << folderName
+                                      << ") does not match ACIT file name (" << acitFileName << ")" << std::endl;
+                        }
+                    } catch (const std::exception& e) {
+                        std::cerr << "Error processing file " << acitFile << ": " << e.what() << std::endl;
+                    }
+                }
+            }
+
+            /**
              * @brief Check if the labels in the config file match the file paths of model files and acit files
              *
              */
-
             void CheckClassifierLabelsConfig()
             {
                 std::filesystem::path rootPath(m_TToolRootPath);
@@ -279,6 +309,7 @@ namespace ttool
                 m_ConfigData.setValue("classifierStd", classifierStd);
 
                 // check the classifier labels match
+                CheckAcitFiles();
                 CheckClassifierLabelsConfig();
                 return fs.release();
             }
