@@ -33,6 +33,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <unordered_set>
+#include <fstream>
 
 namespace ttool
 {
@@ -207,32 +208,44 @@ namespace ttool
             }
 
             /**
-             * @brief Check if the ACIT files are valid
+             * @brief Check if the acit names match the folder names
              *
              */
-            void CheckAcitFiles()
+            void CheckAcitFiles(const std::string& TToolRootPath)
             {
+
+                std::filesystem::path rootPath = std::filesystem::current_path() / TToolRootPath;
+
+                std::string line;
+                std::string toolheadNameTagStart = "<toolhead name=\"";
+                std::string toolheadNameTagEnd = "\"";
+
                 for (const auto& acitFile : m_ConfigData.AcitFiles) {
-                    try {
-                        cv::FileStorage fs(acitFile, cv::FileStorage::READ);
-                        if (!fs.isOpened()) {
-                            std::cerr << "Could not open file: " << acitFile << std::endl;
-                            continue;
+                    std::string acitFileR = acitFile.substr(1);
+                    std::filesystem::path acitFilePath = rootPath / acitFileR;
+                    std::string toolheadName = "";
+
+                    std::ifstream fs(acitFilePath);
+                    if (!fs.is_open()) {
+                        throw std::runtime_error("Could not open file: " + acitFilePath.string());
+                    }
+
+                    while (std::getline(fs, line)) {
+                        size_t start = line.find(toolheadNameTagStart);
+                        if (start != std::string::npos) {
+                            start += toolheadNameTagStart.length();
+                            size_t end = line.find(toolheadNameTagEnd, start);
+                            if (end != std::string::npos) {
+                                toolheadName = line.substr(start, end - start);
+                                break;
+                            }
                         }
+                    }
+                    fs.close();
 
-                        std::string acitFileName;
-                        fs["name"] >> acitFileName;
-                        fs.release();
-
-                        std::filesystem::path path(acitFile);
-                        std::string folderName = path.parent_path().filename().string();
-
-                        if (folderName != acitFileName) {
-                            std::cerr << "Mismatch in " << acitFile << ": Folder name (" << folderName
-                                      << ") does not match ACIT file name (" << acitFileName << ")" << std::endl;
-                        }
-                    } catch (const std::exception& e) {
-                        std::cerr << "Error processing file " << acitFile << ": " << e.what() << std::endl;
+                    if (acitFile.find(toolheadName) == std::string::npos) {
+                        throw std::runtime_error("Toolhead name mismatch error: Toolhead name \"" + toolheadName +
+                                                 "\" does not match the folder name \"" + acitFile + "\"");
                     }
                 }
             }
@@ -243,14 +256,13 @@ namespace ttool
              */
             void CheckClassifierLabelsConfig()
             {
-                std::filesystem::path rootPath(m_TToolRootPath);
                 std::unordered_set<std::string> filePaths;
 
                 for (const auto& modelFile : m_ConfigData.ModelFiles) {
-                    filePaths.insert((rootPath / modelFile).string());
+                    filePaths.insert( modelFile);
                 }
                 for (const auto& acitFile : m_ConfigData.AcitFiles) {
-                    filePaths.insert((rootPath / acitFile).string());
+                    filePaths.insert(acitFile);
                 }
 
                 for (const auto& label : m_ConfigData.ClassifierLabels) {
@@ -309,12 +321,11 @@ namespace ttool
                 m_ConfigData.setValue("classifierStd", classifierStd);
 
                 // check the classifier labels match
-                CheckAcitFiles();
                 CheckClassifierLabelsConfig();
                 return fs.release();
             }
 
-            /**
+        /**
              * @brief Print the config file to the console
              * 
              */
