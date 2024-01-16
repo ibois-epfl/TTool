@@ -50,6 +50,7 @@ namespace ttool
         TTool(std::string ttoolRootPath, std::string configFile, std::string cameraCalibFile)
         {
             InitializeConfig(ttoolRootPath, configFile);
+            m_ConfigPtr->CheckAcitFiles(ttoolRootPath);
 
             m_CameraCalibFile = cameraCalibFile;
 
