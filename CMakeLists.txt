@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.21)
 project(TTool VERSION "0.1.0" LANGUAGES CXX)
 
 # zenodo direct doi link (to change if dataset us updated)
-set(TTOOL_DSET_DOI "https://zenodo.org/record/10014284" CACHE INTERNAL "")
+set(TTOOL_DSET_DOI "https://zenodo.org/doi/10.5281/zenodo.7956930" CACHE INTERNAL "")
 
 # Not sur it is a good idea, it will fail on installed version (NR)
 set(__TTOOL_CONFIG_PATH__ "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.yml")
