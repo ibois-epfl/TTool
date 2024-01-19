@@ -43,10 +43,6 @@ class ResNetBlock(nn.Module):
 
 class ResNet(nn.Module):
     def __init__(
-        """
-        Implementaiton of the ResNet model.
-        The parameters can be used to change the architecture.
-        """
         self,
         num_classes=14,
         num_blocks=[3, 3, 3],
@@ -54,6 +50,10 @@ class ResNet(nn.Module):
         act_fn=nn.ReLU,
         **kwargs,
     ):
+        """
+        Implementaiton of the ResNet model.
+        The parameters can be used to change the architecture.
+        """
         super().__init__()
         self.input_net = nn.Sequential(
             nn.Conv2d(3, c_hidden[0], kernel_size=3, padding=1, bias=False),
