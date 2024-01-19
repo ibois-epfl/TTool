@@ -174,9 +174,9 @@ ax = plt.gca()
 ax.tick_params(axis="both", which="major", labelsize=6)
 ax.tick_params(axis="both", which="minor", labelsize=6)
 plt.xticks(rotation=90)
-plt.tight_layout()
 # plt.title(f"{model_type} acc={acc:.2f}")
 plt.title(f"acc={acc:.2f}")
+plt.tight_layout()
 plt.savefig(
     f"confusion_matrix_{model_type}_trained_on_test_train_dataset_validated_on_test_dataset.pdf"
 )
