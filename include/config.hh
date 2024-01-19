@@ -320,8 +320,6 @@ namespace ttool
                 m_ConfigData.setValue("classifierMean",classifierMean);
                 m_ConfigData.setValue("classifierStd", classifierStd);
 
-                // check the classifier labels match
-                CheckClassifierLabelsConfig();
                 return fs.release();
             }
 
