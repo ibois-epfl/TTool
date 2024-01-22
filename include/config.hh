@@ -30,6 +30,10 @@
 #include <variant>
 #include <functional>
 #include <unordered_map>
+#include <filesystem>
+#include <algorithm>
+#include <unordered_set>
+#include <fstream>
 
 namespace ttool
 {
@@ -204,6 +208,77 @@ namespace ttool
             }
 
             /**
+             * @brief Check if the acit names match the folder names
+             *
+             */
+            void CheckAcitFiles(const std::string& TToolRootPath)
+            {
+
+                std::filesystem::path rootPath = std::filesystem::current_path() / TToolRootPath;
+
+                std::string line;
+                std::string toolheadNameTagStart = "<toolhead name=\"";
+                std::string toolheadNameTagEnd = "\"";
+
+                for (const auto& acitFile : m_ConfigData.AcitFiles) {
+                    std::string acitFileR = acitFile.substr(1);
+                    std::filesystem::path acitFilePath = rootPath / acitFileR;
+                    std::string toolheadName = "";
+
+                    std::ifstream fs(acitFilePath);
+                    if (!fs.is_open()) {
+                        throw std::runtime_error("Could not open file: " + acitFilePath.string());
+                    }
+
+                    while (std::getline(fs, line)) {
+                        size_t start = line.find(toolheadNameTagStart);
+                        if (start != std::string::npos) {
+                            start += toolheadNameTagStart.length();
+                            size_t end = line.find(toolheadNameTagEnd, start);
+                            if (end != std::string::npos) {
+                                toolheadName = line.substr(start, end - start);
+                                break;
+                            }
+                        }
+                    }
+                    fs.close();
+
+                    if (acitFile.find(toolheadName) == std::string::npos) {
+                        throw std::runtime_error("Toolhead name mismatch error: Toolhead name \"" + toolheadName +
+                                                 "\" does not match the folder name \"" + acitFile + "\"");
+                    }
+                }
+            }
+
+            /**
+             * @brief Check if the labels in the config file match the file paths of model files and acit files
+             *
+             */
+            void CheckClassifierLabelsConfig()
+            {
+                std::unordered_set<std::string> filePaths;
+
+                for (const auto& modelFile : m_ConfigData.ModelFiles) {
+                    filePaths.insert( modelFile);
+                }
+                for (const auto& acitFile : m_ConfigData.AcitFiles) {
+                    filePaths.insert(acitFile);
+                }
+
+                for (const auto& label : m_ConfigData.ClassifierLabels) {
+                    bool labelMatches = std::any_of(filePaths.begin(), filePaths.end(),
+                                                    [&label](const std::string& filePath) {
+                                                        return filePath.find(label) != std::string::npos;
+                                                    });
+
+                    if (!labelMatches) {
+                        throw std::runtime_error("Label mismatch error: Label \"" + label + "\" does not match any file paths");
+                    }
+                }
+
+            }
+
+            /**
              * @brief Read the config file and set the values to the ConfigData object
              * 
              */
@@ -248,7 +323,7 @@ namespace ttool
                 return fs.release();
             }
 
-            /**
+        /**
              * @brief Print the config file to the console
              * 
              */
@@ -341,17 +416,20 @@ namespace ttool
              */
             ConfigData GetConfigData()
             {
+                std::vector<std::string> fileNames;
                 // Create a copy of the ConfigData object
                 ConfigData configData = this->m_ConfigData;
                 // Prefix the model files with the m_TToolRootPath
                 for (auto& modelFile : configData.ModelFiles)
                 {
                     modelFile = std::string(m_TToolRootPath) + "/" + modelFile;
+                    fileNames.push_back(modelFile);
                 }
                 // Prefix the acit files with the m_TToolRootPath
                 for (auto& acitFile : configData.AcitFiles)
                 {
                     acitFile = std::string(m_TToolRootPath) + "/" + acitFile;
+                    fileNames.push_back(acitFile);
                 }
                 // Prefix the classifier model path with the m_TToolRootPath
                 configData.ClassifierModelPath = std::string(m_TToolRootPath) + "/" + configData.ClassifierModelPath;
