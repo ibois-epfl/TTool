@@ -49,5 +49,5 @@ TTool was tailored to our specific use case. If you want to adapt it to your use
 - `ML classifier`: to adapt the ML classifier to your use case, you will need to train your own model. We have a template [in this repo](https://github.com/ibois-epfl/TTool-ai).
 
 ## Acknowledgement
-This project was possible thanks to technical support and conslling of thanks to the technical support and consulting of the [EPFL Center for Imaging](https://imaging.epfl.ch/) in the person of [Florian Aymanns](https://github.com/faymanns). We also would like to acknowledge the help of [Nicolas Richart](https://people.epfl.ch/nicolas.richart?lang=en) in the CMake project and CI development of TTool
+This project was possible thanks to technical support and counseling of the [EPFL Center for Imaging](https://imaging.epfl.ch/) in the person of [Florian Aymanns](https://github.com/faymanns). We also would like to acknowledge the help of [Nicolas Richart](https://people.epfl.ch/nicolas.richart?lang=en) in the CMake project and CI development of TTool
 Check out their [GitHub Organization](https://github.com/EPFL-Center-for-Imaging) to discover other nice projects they are helping building!
