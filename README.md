@@ -12,18 +12,38 @@
     <img src="vid/mosaic.gif">
 </p>
 
+
 🌲 `TTool` is developed at the [**Laboratory for Timber Construction**](https://www.epfl.ch/labs/ibois/) (director: Prof.Yves Weinand) with the support of the [**EPFL Center for Imaging**](https://imaging.epfl.ch/) and the [**SCITAS**](https://scitas-doc.epfl.ch/), at [**EPFL**](https://www.epfl.ch/en/), Lausanne, Switzerland. The project is part of the [**Augmented Carpentry Research**](https://www.epfl.ch/labs/ibois/augmented-carpentry/).
 
 🪚 `TTool` is an open-source **AI-powered and supervised 6DoF detector** for monocular camera. It is developed in C++ and for UNIX systems to allow **accurate end-effectors detection** during **wood-working operations** such as cutting, drilling, sawing and screwing with multiple tools. This is a fundamental component of any subtractive AR fabrication system since you can for instance, calculate and give users feedback on the correct orientation and depth to start and finish a hole or a cut.
 
 🖧 `TTool` is a AI-6DoF pose detector that recognizes automatically tools and allows the user to input an initial pose via an AR manipulator. The pose is then refined by a modified version of [SLET](://github.com/huanghone/SLET) (checkout our [changelog](docs/CHANGELOG.md)) and visualized as a projection onto the camera feed.
 
-
 ↳ `TTool` can be imported as a C++ API in a third project or used as an executable. It is tailored to our specific use case in timber carpentry but see the [Caveats](#caveats) section below to adapt it to your use case.
 
 🚀 For a quick hands-on start or more details, check out our [Wiki](https://github.com/ibois-epfl/TTool/wiki).
 
 ![Alt](https://repobeats.axiom.co/api/embed/1a5487df11b22b8d23cc28d05201ddbc60a61310.svg "Repobeats analytics image")
+
+## Publication
+
+`TTool` is published in a MDPI Journal Paper of Applied Sciences that you can find [here](https://www.mdpi.com/2076-3417/14/7/3011).
+```bibitex
+@article{Settimi2024,
+  title = {TTool: A Supervised Artificial Intelligence-Assisted Visual Pose Detector for Tool Heads in Augmented Reality Woodworking},
+  volume = {14},
+  ISSN = {2076-3417},
+  url = {http://dx.doi.org/10.3390/app14073011},
+  DOI = {10.3390/app14073011},
+  number = {7},
+  journal = {Applied Sciences},
+  publisher = {MDPI AG},
+  author = {Settimi,  Andrea and Chutisilp,  Naravich and Aymanns,  Florian and Gamerro,  Julien and Weinand,  Yves},
+  year = {2024},
+  month = apr,
+  pages = {3011}
+}
+```
 
 ## How it works
 
