@@ -47,7 +47,7 @@ namespace ttool
          * @param configFile 
          * @param cameraCalibFile 
          */
-        TTool(std::string ttoolRootPath, std::string configFile, std::string cameraCalibFile)
+        TTool(std::string ttoolRootPath, std::string configFile, std::string cameraCalibFile, bool initDraw=true)
         {
             InitializeConfig(ttoolRootPath, configFile);
 
@@ -70,9 +70,11 @@ namespace ttool
             m_Input = ttool::InputModelManager(m_ModelManagerPtr);
             InitializeObjectTracker();
 
-            // dry run to initialize silouhette drawing
-            cv::Mat emptyMat = cv::Mat::zeros(480, 640, CV_8UC3);
-            RunOnAFrame(emptyMat);
+            // dry run to initialize silhouette drawing
+            if (initDraw) {
+                cv::Mat emptyMat = cv::Mat::zeros(480, 640, CV_8UC3);
+                RunOnAFrame(emptyMat);
+            }
         }
 
         /**
