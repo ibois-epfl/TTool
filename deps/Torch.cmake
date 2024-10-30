@@ -12,7 +12,7 @@
 
 # using local file
 download_external_project(libtorch
-    URL "file://${PROJECT_SOURCE_DIR}/assets/libtorch-cxx11-abi-shared-with-deps-2.5.0%2Bcpu.zip"
+    URL "file://${PROJECT_SOURCE_DIR}/assets/libtorch-cxx11-abi-shared-with-deps-2.5.0+cpu.zip"
 )
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/libtorch")
